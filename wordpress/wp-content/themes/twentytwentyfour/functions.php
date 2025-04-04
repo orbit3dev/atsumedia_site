@@ -311,3 +311,232 @@ function hide_dashboard_move_buttons()
     </style>";
 }
 add_action('admin_head', 'hide_dashboard_move_buttons');
+
+function allow_iframes_in_admin()
+{
+	echo '<style> iframe { display: block; width: 100%; height: 90vh; border: none; } </style>';
+}
+add_action('admin_head', 'allow_iframes_in_admin');
+
+function custom_phpmyadmin_page_content()
+{
+	$phpmyadmin_url = 'http://127.0.0.1/phpmyadmin/index.php?route=/sql&pos=0&db=atsumedia&table=article_data';
+	// $phpmyadmin_url = 'www.google.com';
+
+	// $phpmyadmin_url = 'http://localhost/phpmyadmin/index.php?route=/sql&pos=0&db=atsumedia&table=article_data';
+	echo '<div style="height: 90vh; overflow: hidden;">';
+	echo '<iframe src="' . esc_url($phpmyadmin_url) . '" width="100%" height="100%" style="border: none;"></iframe>';
+	echo '</div>';
+}
+
+function display_custom_table()
+{
+	global $wpdb;
+
+	// Replace 'your_table_name' with your actual MySQL table name
+	$table_name = $wpdb->prefix . 'article_data';
+	$results = $wpdb->get_results("SELECT * FROM $table_name");
+
+	if (empty($results)) {
+		return "<p>No data found.</p>";
+	}
+
+	// Generate HTML table
+	$output = '<table border="1" cellpadding="5" cellspacing="0">';
+	$output .= '<tr><th>ID</th><th>Name</th><th>Email</th></tr>';
+
+	foreach ($results as $row) {
+		$output .= "<tr><td>{$row->id}</td><td>{$row->name}</td><td>{$row->email}</td></tr>";
+	}
+
+	$output .= '</table>';
+	return $output;
+}
+
+// Register as a shortcode
+add_shortcode('custom_table_v1', 'display_custom_table');
+
+function custom_csv_menu()
+{
+	add_menu_page(
+		'Upload CSV', // Page title
+		'CSV のアップロード', // Menu title
+		'manage_options', // Capability
+		'custom-csv-uploader', // Menu slug
+		'custom_csv_upload_page', // Callback function
+		'dashicons-upload', // Icon
+		20 // Position
+	);
+}
+add_action('admin_menu', 'custom_csv_menu');
+function enqueue_datatables_scripts()
+{
+	wp_enqueue_script('jquery');
+	wp_enqueue_script('datatables-js', 'https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js', ['jquery'], null, true);
+	wp_enqueue_style('datatables-css', 'https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css');
+	wp_enqueue_script('custom-datatable-handler', get_template_directory_uri() . '/custom_function/js/datatable-handler.js', ['jquery', 'datatable-js'], null, true);
+}
+add_action('wp_enqueue_scripts', 'enqueue_datatables_scripts');
+
+function enqueue_datatables_assets()
+{
+	// DataTables CSS
+	wp_enqueue_style('datatables-css', 'https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css');
+
+	// jQuery (WordPress already includes it, but we ensure it's available)
+	wp_enqueue_script('jquery');
+
+	// DataTables JS
+	wp_enqueue_script('datatables-js', 'https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js', array('jquery'), null, true);
+}
+add_action('admin_enqueue_scripts', 'enqueue_datatables_assets'); // Load only in admin pages
+
+
+if (is_admin()) { // Only loads in the admin panel
+	require_once get_template_directory() . '/custom_function/csv_upload.php';
+}
+
+// Enqueue CSS for styling
+function custom_csv_enqueue_styles()
+{
+	wp_enqueue_style('custom-csv-style', get_template_directory_uri() . '/css/style_csv.css');
+}
+add_action('admin_enqueue_scripts', 'custom_csv_enqueue_styles');
+
+// Include the CSV processing function
+require_once get_template_directory() . '/custom_function/csv_upload.php';
+
+// Handle file upload and immediate processing
+if (isset($_POST['upload_csv']) && check_admin_referer('custom_csv_upload', 'custom_csv_nonce')) {
+	if (!empty($_FILES['csv_file']['tmp_name']) && !empty($_POST['file_type'])) {
+		$upload_dir = wp_upload_dir();
+		$target_file = $upload_dir['path'] . '/' . basename($_FILES['csv_file']['name']);
+		$file_type = sanitize_text_field($_POST['file_type']); // Sanitize input
+
+		if (move_uploaded_file($_FILES['csv_file']['tmp_name'], $target_file)) {
+			update_option('uploaded_csv_path', $target_file);
+			// echo '<div class="updated"><p>CSV uploaded successfully and is now being processed...</p></div>';
+			error_log(444);
+			// Call processing function
+			custom_process_csv_function($target_file, $file_type);
+		} else {
+			echo '<div class="error"><p>Failed to upload CSV.</p></div>';
+		}
+	} else {
+		echo '<div class="error"><p>Invalid file or missing file type.</p></div>';
+	}
+}
+
+add_action('wp_ajax_fetch_csv_data', function () {
+	$file_path = get_option('uploaded_csv_path');
+	$file_type = isset($_POST['file_type']) ? sanitize_text_field($_POST['file_type']) : '';
+
+	if ($file_path) {
+		// $result = custom_process_csv_function($file_path, $file_type);
+		// wp_send_json($result);
+	} else {
+		wp_send_json(['error' => 'No CSV uploaded yet.']);
+	}
+});
+
+function redirect_to_login_if_not_admin()
+{
+	if (!is_admin() && !is_user_logged_in()) {
+		wp_redirect(wp_login_url());
+		exit;
+	} elseif (!is_admin() && current_user_can('administrator')) {
+		wp_redirect(admin_url());
+		exit;
+	}
+}
+add_action('template_redirect', 'redirect_to_login_if_not_admin');
+
+require_once get_template_directory() . '/custom_function/news/content_news.php';
+
+if (!defined('ABSPATH')) {
+	exit;
+}
+
+// Add menu item in admin panel
+function custom_content_menu()
+{
+	add_menu_page(
+		'新しいニュース',
+		'新しいニュース',
+		'edit_posts',
+		'custom-content-form',
+		'custom_content_page',
+		'dashicons-welcome-write-blog',
+		20
+	);
+}
+add_action('admin_menu', 'custom_content_menu');
+add_action('wp_ajax_insert_at_news', 'insert_at_news');
+
+// Enqueue necessary scripts for media uploader
+function custom_content_admin_scripts($hook)
+{
+	if ($hook !== 'toplevel_page_custom-content-form') {
+		return;
+	}
+	wp_enqueue_media(); // WordPress built-in media uploader
+	wp_enqueue_script('custom-content-script', plugin_dir_url(__FILE__) . 'script.js', ['jquery'], null, true);
+}
+add_action('admin_enqueue_scripts', 'custom_content_admin_scripts');
+
+// Admin page content
+add_action('admin_footer', 'custom_content_scripts');
+
+function add_custom_favicon()
+{
+	echo '<link rel="icon" href="' . get_stylesheet_directory_uri() . '/images/favicon.ico" type="image/png">';
+}
+add_action('wp_head', 'add_custom_favicon');
+function enqueue_editorjs_assets()
+{
+	wp_enqueue_script('editorjs', 'https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest', array(), null, true);
+	wp_enqueue_script('editorjs-header', 'https://cdn.jsdelivr.net/npm/@editorjs/header@latest', array(), null, true);
+	wp_enqueue_script('editorjs-list', 'https://cdn.jsdelivr.net/npm/@editorjs/list@latest', array(), null, true);
+	wp_enqueue_script('editorjs-embed', 'https://cdn.jsdelivr.net/npm/@editorjs/embed', array(), null, true);
+}
+add_action('admin_enqueue_scripts', 'enqueue_editorjs_assets');
+
+function fetch_url_metadata()
+{
+	if (!isset($_POST['url'])) {
+		wp_send_json_error(['message' => 'URL is required']);
+	}
+
+	$url = esc_url_raw($_POST['url']);
+
+	// Use an external API to get metadata (e.g., jsonlink.io)
+	$response = wp_remote_get("https://jsonlink.io/api/extract?url=" . urlencode($url));
+
+	if (is_wp_error($response)) {
+		wp_send_json_error(['message' => 'Failed to fetch data']);
+	}
+
+	$body = wp_remote_retrieve_body($response);
+	$data = json_decode($body, true);
+
+	if (!$data) {
+		wp_send_json_error(['message' => 'Invalid response']);
+	}
+
+	// Format the response for Editor.js
+	$result = [
+		'success' => 1,
+		'meta' => [
+			'title' => $data['title'] ?? '',
+			'description' => $data['description'] ?? '',
+			'image' => ['url' => $data['images'][0] ?? ''],
+		]
+	];
+
+	wp_send_json($result);
+}
+
+// Register WordPress API Endpoint
+add_action('wp_ajax_fetch_url_metadata', 'fetch_url_metadata');
+add_action('wp_ajax_nopriv_fetch_url_metadata', 'fetch_url_metadata');
+

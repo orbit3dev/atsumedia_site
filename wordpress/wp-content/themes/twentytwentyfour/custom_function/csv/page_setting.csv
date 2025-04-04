@@ -1,0 +1,16 @@
+※入力規則,アニメ項目マスタC列のID,anime/movie/drama/variety,CAROUSEL/SPOTLIGHT,表示順位を半角数字で記入,
+,ID,ジャンル,タイプ,順番,
+,ID,genre,type,sort,
+,31102,anime,CAROUSEL,1,薬屋のひとりごと
+,31287,anime,SPOTLIGHT,1,Sランクモンスターの《ベヒーモス》だけど、猫と間違われてエルフ娘の騎士（ペット）として暮らしてます
+,31185,anime,CAROUSEL,2,Dr.STONE SCIENCE FUTURE
+,30131,anime,SPOTLIGHT,2,わたしの幸せな結婚 2期
+,30104,anime,CAROUSEL,3,地縛少年花子くん２
+,30172,anime,SPOTLIGHT,3,天久鷹央の推理カルテ
+,30213,anime,SPOTLIGHT,4,ババンババンバンバンパイア
+,30239,anime,SPOTLIGHT,5,魔法使いの約束
+,30369,anime,SPOTLIGHT,6,異修羅 第2期
+,30424,anime,SPOTLIGHT,7,Aランクパーティを離脱した俺は、元教え子たちと迷宮深部を目指す。
+,31142,anime,SPOTLIGHT,8,マジック・メイカー ～異世界魔法の作り方～
+,31876,anime,SPOTLIGHT,9,戦隊レッド 異世界で冒険者になる
+,30340,anime,SPOTLIGHT,10,沖縄で好きになった子が方言すぎてツラすぎる
