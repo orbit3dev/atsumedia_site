@@ -1,0 +1,32 @@
+# Ignore everything in wordpress directory...
+/wordpress/*
+
+# ...but not the themes folder
+!/wordpress/wp-content/
+/wordpress/wp-content/*
+!/wordpress/wp-content/themes/
+/wordpress/wp-content/themes/*
+!/wordpress/wp-content/themes/twentytwentyfour/
+
+# Optional: if you're customizing plugins, adjust accordingly
+/wordpress/wp-content/plugins/*
+!/wordpress/wp-content/plugins/your-custom-plugin/
+
+# Ignore WordPress core
+/wordpress/wp-admin/
+/wordpress/wp-includes/
+
+# Ignore config and sensitive files
+/wordpress/wp-config.php
+/wordpress/.htaccess
+
+# Ignore uploads (media files)
+wordpress/wp-content/uploads/
+
+# IDE and OS junk
+*.log
+*.tmp
+.DS_Store
+.vscode/
+.idea/
+node_modules/
