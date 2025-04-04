@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $id = $data['id'] ?? "";
                 $season = $data['season'] ?? "";
 
-                // insertSeason($id, $season);
+                insertSeason($id, $season);
 
                 $processed_data[] = ["id" => $id, "season" => $season];
             }
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($file_type === 'broadcast_master') {
                 $id = $data['id'] ?? "";
                 $name = $data['name'] ?? "";
-                // insertNetwork($id, $name);
+                insertNetwork($id, $name);
                 $processed_data[] = ["id" => $id, "name" => $name];
             }
 
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $genre = $data['genre'] ?? "";
                 $role = $data['role'] ?? "";
                 $type = $data['type'] ?? "";
-                // insertPerson($id, $name, $image, $type, $role, $group, $genre);
+                insertPerson($id, $name, $image, $type, $role, $group, $genre);
 
                 $processed_data[] = [
                     "id" => $id,
