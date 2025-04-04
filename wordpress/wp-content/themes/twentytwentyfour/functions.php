@@ -204,3 +204,110 @@ if ( ! function_exists( 'twentytwentyfour_pattern_categories' ) ) :
 endif;
 
 add_action( 'init', 'twentytwentyfour_pattern_categories' );
+
+// Starts Here
+
+function remove_admin_menus()
+{
+	remove_menu_page('edit.php'); // Posts
+	remove_menu_page('dashboard.php'); // Posts
+	remove_menu_page('upload.php'); // Media
+	remove_menu_page('edit.php?post_type=page'); // Pages
+	remove_menu_page('themes.php'); // Appearance
+	remove_menu_page('plugins.php'); // Plugins
+	remove_menu_page('edit-comments.php'); // Comments
+}
+add_action('admin_menu', 'remove_admin_menus');
+
+function customize_admin_bar()
+{
+	global $wp_admin_bar;
+
+	// Remove WordPress logo menu
+	$wp_admin_bar->remove_node('wp-logo');
+
+	// Remove Updates menu
+	$wp_admin_bar->remove_node('updates');
+
+	// Remove + New menu
+	$wp_admin_bar->remove_node('new-content');
+
+	// Remove Comments menu
+	$wp_admin_bar->remove_node('comments');
+}
+add_action('wp_before_admin_bar_render', 'customize_admin_bar');
+
+function remove_wp_admin_bar_items()
+{
+	global $wp_admin_bar;
+	$wp_admin_bar->remove_node('wp-logo'); // Removes WordPress logo & menu
+}
+add_action('wp_before_admin_bar_render', 'remove_wp_admin_bar_items');
+
+function custom_dashboard_widget()
+{
+	$current_user = wp_get_current_user();
+	echo "<h2>管理パネルへようこそ！</h2>";
+}
+function add_custom_dashboard_widget()
+{
+	wp_add_dashboard_widget('custom_dashboard_widget', '管理者メッセージ ', 'custom_dashboard_widget');
+}
+
+function change_dashboard_heading($translated_text, $text, $domain)
+{
+	if ($text === 'Dashboard' && $domain === 'default') {
+		return 'ダッシュボード';
+	}
+	return $translated_text;
+}
+add_filter('gettext', 'change_dashboard_heading', 10, 3);
+add_action('wp_dashboard_setup', 'add_custom_dashboard_widget');
+
+function change_dashboard_menu_label()
+{
+	global $menu;
+
+	foreach ($menu as $key => $value) {
+		if ($value[2] === 'index.php') {
+			$menu[$key][0] = 'ダッシュボード'; // Change label here
+			break;
+		}
+	}
+}
+add_action('admin_menu', 'change_dashboard_menu_label');
+
+function remove_dashboard_widgets()
+{
+	remove_meta_box('dashboard_quick_press', 'dashboard', 'side'); // Quick Draft
+	remove_meta_box('dashboard_primary', 'dashboard', 'side'); // WordPress News
+	remove_meta_box('dashboard_activity', 'dashboard', 'normal'); // Activity
+	remove_meta_box('dashboard_right_now', 'dashboard', 'normal'); // At a Glance
+	remove_meta_box('dashboard_site_health', 'dashboard', 'normal'); // Remove Site Health Status
+}
+add_action('wp_dashboard_setup', 'remove_dashboard_widgets');
+
+function remove_site_health_widget()
+{
+	remove_meta_box('dashboard_site_health', 'dashboard', 'normal'); // Remove Site Health Status
+}
+add_action('wp_dashboard_setup', 'remove_site_health_widget');
+
+function remove_dashboard_menus()
+{
+	remove_submenu_page('index.php', 'update-core.php'); // Remove "Updates"
+	remove_submenu_page('index.php', 'index.php'); // Remove "Home"
+}
+add_action('admin_menu', 'remove_dashboard_menus');
+
+function hide_dashboard_move_buttons()
+{
+	echo "
+    <style>
+        .handle-order-higher,
+        .handle-order-lower {
+            display: none !important; /* Hide Move Up and Move Down buttons */
+        }
+    </style>";
+}
+add_action('admin_head', 'hide_dashboard_move_buttons');
