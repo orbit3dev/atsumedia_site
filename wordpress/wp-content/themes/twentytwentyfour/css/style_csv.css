@@ -1,0 +1,30 @@
+/* Center the upload form */
+.custom-csv-wrapper {
+    max-width: 100%;
+    margin: 30px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background: #f9f9f9;
+    text-align: center;
+}
+
+.csv_button{
+    max-width: 60%;
+}
+
+/* Styling for the dropdown */
+.custom-csv-wrapper select,
+.custom-csv-wrapper input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+/* Buttons */
+.custom-csv-wrapper .button {
+    width: 100%;
+    margin-top: 10px;
+}
