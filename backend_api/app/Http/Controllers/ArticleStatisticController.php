@@ -1,0 +1,173 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\AtArticleStatistic;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
+
+class ArticleStatisticController extends Controller
+{
+    // List all statistics (optional pagination)
+    public function index(Request $request)
+    {
+        $statistics = AtArticleStatistic::query()->paginate(20);
+        return response()->json($statistics);
+    }
+
+    // Query by parent_article_id_year_week and order by click_count
+    public function listByParentArticleIdAndYearWeekAndClickCount(Request $request)
+    {
+        $parentKey = $request->input('parent_article_id_year_week');
+        $statistics = AtArticleStatistic::where('parent_article_id_year_week', $parentKey)
+            ->orderByDesc('click_count')
+            ->get();
+
+        return response()->json($statistics);
+    }
+
+    // Query by genre_type_year_week_tag_type and order by click_count
+    public function listByGenreTypeAndYearWeekAndTagTypeAndClickCount(Request $request)
+    {
+        $key = $request->input('genre_type_year_week_tag_type');
+        $statistics = AtArticleStatistic::where('genre_type_year_week_tag_type', $key)
+            ->orderByDesc('click_count')
+            ->get();
+
+        return response()->json($statistics);
+    }
+
+    // Query by year_week_tag_type and order by click_count
+    public function listByYearWeekAndTagTypeAndClickCount(Request $request)
+    {
+        $key = $request->input('year_week_tag_type');
+        $statistics = AtArticleStatistic::where('year_week_tag_type', $key)
+            ->orderByDesc('click_count')
+            ->get();
+
+        return response()->json($statistics);
+    }
+
+    public function getArticleStatisticByCountClick(Request $request)
+    {
+        // Get input data
+        $parentArticleIdYearWeek = $request->input('parentArticleIdYearWeek');
+        $YearWeek = $request->input('YearWeek');
+        $parentIds = $request->input('parent_id');
+        $limit = $request->input('limit', 10); // Default limit to 10 if not provided
+
+        // Validate input
+        if (!$parentArticleIdYearWeek) {
+            return response()->json(['error' => 'Missing parentArticleIdYearWeek'], 400);
+        }
+
+        // Query article statistics
+        $query = AtArticleStatistic::select([
+            'at_article_statistic.article_id AS id',
+            'at_article.path_name AS pathName',
+            'at_article_genre_type.name AS genreType',
+            'at_article_tag_type.name AS tagType',
+            'at_article.title',
+            'at_article.thumbnail',
+            'at_article.title_meta AS titleMeta',
+            'at_article.description_meta AS descriptionMeta',
+            'at_article.network_id',
+            'at_article_statistic.year_week AS yearWeek',
+            'at_article_statistic.click_count AS clickCount',
+            'at_network.name AS networkName',
+        ])
+            ->leftJoin('at_article', 'at_article.id', '=', 'at_article_statistic.article_id')
+            ->leftJoin('at_article_genre_type', 'at_article.genre_type_id', '=', 'at_article_genre_type.id')
+            ->leftJoin('at_article_tag_type', 'at_article.tag_type_id', '=', 'at_article_tag_type.id')
+            ->leftJoin('at_network', 'at_article.network_id', '=', 'at_network.id')
+            ->where('at_article_statistic.article_id', '=', $parentIds)
+            ->where('at_article_statistic.year_week', '=', $YearWeek)
+            ->orderBy('at_article_statistic.click_count', 'DESC')
+            ->limit($limit)->get();
+        $response = $query->map(function ($item) {
+            $thumbnail = json_decode($item->thumbnail, true);
+            return [
+                'yearWeek' => $item->yearWeek,
+                'clickCount' => $item->clickCount,
+                'article' => [
+                    'id' => (string)$item->id,
+                    'pathName' => $item->pathName,
+                    'genreType' => $item->genreType,
+                    'tagType' => $item->tagType,
+                    'title' => $item->title,
+                    'thumbnail' => [
+                        'link' => $thumbnail['link'],  // Get the 'link' from the decoded JSON
+                        'url' => $thumbnail['url'],    // Optionally, you can also return the 'url' if needed
+                        'text' => $thumbnail['text']   // Return the 'text' if needed
+                    ], // Assuming thumbnail is stored as JSON string
+                    'titleMeta' => $item->titleMeta,
+                    'descriptionMeta' => $item->descriptionMeta,
+                    'network' => [
+                        'id' => (int)$item->network_id, // Assuming network_id is an integer
+                        'name' => $item->networkName, // Replace with actual network name or logic
+                    ]
+                ]
+            ];
+        });
+        return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        // Validate the incoming data
+        $validated = $request->validate([
+            'articleId' => 'required|integer',
+            'parentArticleId' => 'required|string',
+            'genreType' => 'required|string',
+            'tagType' => 'required|string',
+        ]);
+
+        // Get the current year and week
+        $now = now();
+        $year = $now->year;
+        $week = $now->weekOfYear;
+        $yearWeek = (int)($year . $week);
+
+        // Create a unique ID
+        $customId = "{$validated['articleId']}-{$yearWeek}";
+
+        // Check if the article statistic already exists
+        $articleStatistic = AtArticleStatistic::find($customId);
+
+        if ($articleStatistic) {
+            // Update the existing article statistic
+            $articleStatistic->update([
+                'click_count' => $articleStatistic->click_count + 1,
+                'updated_at' => now(),
+            ]);
+        } else {
+            // Create a new article statistic with a custom ID
+            $articleStatistic = AtArticleStatistic::create([
+                'id' => $customId, // Custom ID
+                'article_id' => $validated['articleId'],
+                'year_week' => $yearWeek,
+                'click_count' => 1,
+                'parent_article_id_year_week' => $validated['parentArticleId'] . '-' . $yearWeek,
+                'genre_type_year_week_tag_type' => $validated['genreType'] . '-' . $yearWeek . '-' . $validated['tagType'],
+                'year_week_tag_type' => $yearWeek . '-' . $validated['tagType'],
+            ]);
+        }
+
+        // Return response
+        return response()->json([
+            'data' => [
+                'id' => $customId,
+                'articleId' => (string) $articleStatistic->article_id,
+                'yearWeek' => (int) $articleStatistic->year_week,
+                'clickCount' => (int) $articleStatistic->click_count,
+                'parentArticleIdYearWeek' => (string) $articleStatistic->parent_article_id_year_week,
+                'genreTypeYearWeekTagType' => (string) $articleStatistic->genre_type_year_week_tag_type,
+                'yearWeekTagType' => (string) $articleStatistic->year_week_tag_type,
+                'createdAt' => $articleStatistic->created_at->toIso8601String(),
+                'updatedAt' => $articleStatistic->updated_at->toIso8601String(),
+            ]
+        ], 200);
+    }
+}
