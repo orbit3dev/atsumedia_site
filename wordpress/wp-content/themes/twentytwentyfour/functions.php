@@ -540,3 +540,18 @@ function fetch_url_metadata()
 add_action('wp_ajax_fetch_url_metadata', 'fetch_url_metadata');
 add_action('wp_ajax_nopriv_fetch_url_metadata', 'fetch_url_metadata');
 
+add_filter('admin_bar_menu', 'custom_replace_howdy', 25);
+
+function custom_replace_howdy($wp_admin_bar) {
+    $my_account = $wp_admin_bar->get_node('my-account');
+    
+    // Replace "Howdy" with your Kanji greeting
+    $new_title = str_replace('Howdy,', 'ようこそ,', $my_account->title);
+    
+    // Update the node with the new title
+    $wp_admin_bar->add_node([
+        'id' => 'my-account',
+        'title' => $new_title,
+    ]);
+}
+
