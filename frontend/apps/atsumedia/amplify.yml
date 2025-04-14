@@ -1,0 +1,32 @@
+version: 1
+applications:
+  - backend:
+      phases:
+        build:
+          commands:
+            - nvm use 18
+            - cd libs/amplify-backend
+            - npm install --force --no-frozen-lockfile
+            - npx ampx generate outputs --branch $AWS_BRANCH --app-id $BACKEND_APP_ID
+            - cd ../../
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm install
+#            - npm run reset
+            - env | grep -e DOMAIN >> apps/atsumedia/.env.production
+            - env | grep -e AWS_BRANCH >> apps/atsumedia/.env.production
+        build:
+          commands:
+            - npx nx build atsumedia
+      artifacts:
+        baseDirectory: dist/apps/atsumedia/.next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - dist/**/*
+          - node_modules/**/*
+      buildPath: /
+    appRoot: apps/atsumedia

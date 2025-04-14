@@ -117,7 +117,7 @@ class ArticleController extends Controller
         //     'genre_type_year_week_tag_type' => 'required|string',
         // ]);
         $genreTypeYearWeek = $request->genre_type_year_week;
-        $genreTypeYearWeek = '202512';
+        $genreTypeYearWeek = '202449';
         $combinations = [
             'anime-' . $genreTypeYearWeek . '-series',
             'anime-' . $genreTypeYearWeek . '-episode',
@@ -133,6 +133,7 @@ class ArticleController extends Controller
                 'at_article_statistic.*',
                 'at_network.name AS network_name',
                 'at_article_genre_type.name AS genre_name',
+                'at_article.id AS article_id_data',
             )
             ->orderBy('click_count', 'desc')
             ->get();
@@ -143,7 +144,7 @@ class ArticleController extends Controller
 
             // fallback to generate URL if not present
             if (!$thumbnailUrl && $article->path_name && $article->id) {
-                $thumbnailUrl = 'public/anime/' . $article->path_name . '/program_thumbnail_' . $article->id . '.png';
+                $thumbnailUrl = 'public/anime/' . $article->path_name . '/program_thumbnail_' . $article->article_id_data . '.png';
             }
 
             // You can also fetch network name if you want, or leave blank
@@ -170,6 +171,8 @@ class ArticleController extends Controller
                 ],
             ];
         });
+        Log::info('shaped data');
+        Log::info($shapedData);
 
         return response()->json($shapedData);
     }
@@ -237,6 +240,7 @@ class ArticleController extends Controller
                 'at_article.thumbnail_link',
             )
             ->get();
+        Log::info($articleChilds);
 
         $articleChilds2 = Network::where('id', $articles[0]['network_id'])
             ->select('id','name')
@@ -291,11 +295,11 @@ class ArticleController extends Controller
             )
             ->get();
         $articleChilds8 = AtArticleCast::where('article_id', $articles[0]['id'])
-            ->select('at_article_cast.role_name', 'at_article_cast.id')
+            ->select('at_article_cast.role_name', 'at_article_cast.person_id')
             ->get()
             ->map(function ($cast) {
                 $person = Person::select('id', 'name', 'image', 'sort')
-                    ->where('id', $cast->id)
+                    ->where('id', $cast->person_id)
                     ->first();
 
                 return [
@@ -446,9 +450,25 @@ class ArticleController extends Controller
                 'text' => $article->video_text,
                 'url' => $article->video_url,
             ];
+
+            $summaryData = (json_decode($article->summary,true));
+            $summaryArr = (json_decode($summaryData,true));
+            $article->summary = [
+                'link' => $summaryArr['link'][0],
+                'reference' => $summaryArr['reference'],
+                'text' => $summaryArr['text'],
+                'title' => $summaryArr['title'],
+            ];
+// [2025-04-11 07:45:36] local.INFO: {"link":[""],"text":"（C）龍幸伸／集英社・ダンダダン製作委員会","url":"public\/anime\/dandadan\/program_thumbnail_29120.png"}  
+
+            $thumbnailData = (json_decode($article->thumbnail,true));
+            $thumbnailArr = (json_decode($thumbnailData,true));
+            $article->thumbnail = [
+                'link' => $thumbnailArr['link'][0],
+                'text' => $thumbnailArr['text'],
+                'url' => $thumbnailArr['url'],
+            ];
             $article->music = []; // #temporary
-            $article->summary = json_decode($article->summary, true);
-            $article->thumbnail = json_decode($article->thumbnail, true);
             unset($article->categoryId);
             unset($article->category_name);
             $article->casts = $articleChilds8;

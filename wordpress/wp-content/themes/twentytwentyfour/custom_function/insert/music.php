@@ -1,24 +1,36 @@
 <?php
 
-require_once "db/db.php";
-require_once "constants/constants.php";
+if (!defined('ABSPATH')) {
+    require_once('../../../../../wp-load.php'); // Adjust path as needed
+}
 
-function insertMusic( $articleId, $course, $edArtist, $opArtist, $opSong, $otherArtist, $otherSong, $type, $updatedAt, $createdAt)
+function insertMusic($wpdb, $articleId, $course, $edArtist, $opArtist, $opSong, $otherArtist, $otherSong, $type)
 {
-    global $conn;
+    $table = $wpdb->prefix . 'article_music';
 
-    $stmt = $conn->prepare("
-        INSERT INTO " .TABLE_MUSIC . " (article_id, course, ed_artist, op_artist, op_song 
-        ,other_artist, other_song, sort, type, updated_at, created_at)
-        VALUES (?, ?, ?, ?, ?, ? , ? ,? ,?, ? ,?)
-        ON DUPLICATE KEY UPDATE
-            article_id = VALUES(article_id),
-            type = VALUES(type),
-            sort = VALUES(sort),
-            created_at = VALUES(created_at),
-            updated_at = VALUES(updated_at)
-    ");
+    $result = $wpdb->insert(
+        $table,
+        [
+            'article_id'     => $articleId,
+            'course'         => $course,
+            'ed_artist'      => $edArtist,
+            'op_artist'      => $opArtist,
+            'op_song'        => $opSong,
+            'other_artist'   => $otherArtist,
+            'other_song'     => $otherSong,
+            'sort'           => $articleId, // Assuming sort = article_id
+            'type'           => $type,
+            'updated_at'     => current_time('mysql'),
+            'created_at'     => current_time('mysql')
+        ],
+        [
+            '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s'
+        ]
+    );
 
-    $stmt->bind_param("sisssssisss", $articleId, $course, $edArtist, $opArtist, $opSong, $otherArtist, $otherSong,$articleId, $type, $updatedAt, $createdAt);
-    $stmt->execute();
+    if ($result === false) {
+        error_log("Error inserting music: " . $wpdb->last_error);
+    }
+
+    return $result;
 }

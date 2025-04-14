@@ -1,0 +1,20 @@
+@import '../../../libs/shared/util/src/styles/global.css';
+
+.truncate-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  max-height: 7.5em; /* 3行行高的大约高度 */
+  line-height: 1.5em; /* 设置行高 */
+}
+
+.editor .codex-editor {
+  padding-left: 0 !important;
+}
+
+.editor .codex-editor__redactor {
+  padding: 0 !important;
+}
