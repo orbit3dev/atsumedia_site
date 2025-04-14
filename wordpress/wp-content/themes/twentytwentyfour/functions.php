@@ -536,6 +536,19 @@ function fetch_url_metadata()
 	wp_send_json($result);
 }
 
+function custom_page_setting_menu()
+{
+	add_menu_page(
+		'Page Settings', // Page title
+		'ページ設定', // Menu title
+		'manage_options', // Capability
+		'page-settings-config', // Menu slug
+		'page_settings_config', // Callback function
+		'dashicons-admin-generic', // Icon
+		25 // Position
+	);
+}
+
 // Register WordPress API Endpoint
 add_action('wp_ajax_fetch_url_metadata', 'fetch_url_metadata');
 add_action('wp_ajax_nopriv_fetch_url_metadata', 'fetch_url_metadata');
