@@ -6,6 +6,7 @@ require_once __DIR__ . "/../insert/vod.php";
 require_once __DIR__ . "/../insert/page_setting.php";
 require_once __DIR__ . "/../insert/production.php";
 require_once __DIR__ . "/../insert/category.php";
+require_once __DIR__ . "/../insert/music.php";
 require_once __DIR__ . "/../process_csv/main_csv.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -13,7 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $tableData = json_decode($_POST['tableData'], true);
     $type = ($_POST['file_type']) ? ($_POST['file_type']) : null;
-    $filePath = $_POST['file_path'] ?  $_POST['file_path'] : null;
+    $filePath = !empty($_POST['file_path']) ?  $_POST['file_path'] : null;
+    $type_upload = !empty($_POST['type_upload']) ?  $_POST['type_upload'] : null;
     $processed_data = [];
     $rowCount = 0;
     if ($type != 'article') {
@@ -39,6 +41,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 insertSeason($id, $season);
 
                 $processed_data[] = ["id" => $id, "season" => $season];
+            }
+            if ($file_type === 'song') {
+                $id = $data['id'] ?? "";
+                $course = $data['course'] ?? "";
+                $op_artist = $data['season'] ?? "";
+                $op_song = $data['season'] ?? "";
+                $ed_artist = $data['season'] ?? "";
+                $ed_song = $data['season'] ?? "";
+                $other_artist = $data['season'] ?? "";
+                $other_song = $data['season'] ?? "";
+                $type = "ArticleMusic";
+
+                insertMusic($wpdb, $id, $course, $op_artist,  $op_song, $ed_artist, $ed_song, $other_artist, $other_song, $type);
+
+
+                $processed_data[] = ["id" => $id, "course" => $course];
             }
 
             if ($file_type === 'broadcast_master') {
@@ -140,11 +158,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $rowCount++;
         }
+        $matchFile = isset($result['match_file']) ? $result['match_file'] : true;
     } else {
-        if(!empty($filePath)){
-            $result = process_article_csv($filePath);
+        if (!empty($filePath)) {
+            $start = microtime(true);
+            $result = process_article_csv($filePath , $type_upload);
+            $end = microtime(true);
+            $duration = $end - $start;
+            error_log('Execution time :' . round($duration, 4) . "seconds");
             $processed_data = [];
             $rowCount = $result['num_row_processed'];
+            $matchFile = isset($result['match_file']) ? $result['match_file'] : true;
         } else {
             echo json_encode(["error" => "File Path Not Found"]);
             exit;
@@ -153,6 +177,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-    echo json_encode(["message" => "Processed $rowCount rows.", "data" => $processed_data]);
+    echo json_encode(["message" => "Processed $rowCount rows.", "data" => $processed_data , "match_file" => $matchFile]);
     exit;
 }

@@ -1,0 +1,25 @@
+@import '../../../libs/shared/util/src/styles/global.css';
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    display: flex;
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  .scroll-area > div {
+    height: 100%;
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .table-cell > div {
+    cursor: pointer;
+    justify-content: center;
+    background-color: transparent;
+  }
+}

@@ -1,12 +1,11 @@
 <?php
 require_once "constants/constants.php";
 
-
 function custom_csv_upload_page()
 {
 ?>
     <div class="wrap">
-        <h1 style="text-align: center;">Upload CSV File</h1>
+        <h1 style="text-align: center;">CSVファイルをアップロードしてください</h1>
         <div class="custom-csv-wrapper">
             <form id="csvUploadForm" method="post" enctype="multipart/form-data">
                 <label for="file_type"><strong>ファイルの種類を選択:</strong></label>
@@ -29,9 +28,31 @@ function custom_csv_upload_page()
                 <!-- New "Add New Row" button -->
                 <button type="button" id="addNewRowButton" style="display: none;">Add New Row</button>
             </form>
+            <div class="csv-upload-options" style="margin-bottom: 20px; display: none;">
+                <label for="csvUploadMode" style="font-weight: bold; display: block; margin-bottom: 5px;">
+                    アップロードCSV記事の方法:
+                </label>
+                <select id="csvUploadMode" style="padding: 5px; width: 100%; max-width: 300px;">
+                    <option value="1">新しい行のみ追加</option>
+                    <option value="2">すべての行を更新</option>
+                    <option value="3">既存の行のみ更新</option>
+                </select>
+            </div>
+
 
             <!-- DataTable will be inserted here -->
             <div id="csvDataTableWrapper" class="custom-csv-wrapper" style="display: none;"></div>
+            <!-- Loading Bar -->
+            <div id="loadingWrapper" style="display: none; margin-top: 20px;">
+                <label><strong>アップロード進行状況:</strong></label>
+                <div style="position: relative; width: 100%; height: 25px; background-color: #e0e0e0; border-radius: 4px;">
+                    <div id="loadingBar" style="height: 100%; width: 0%; background-color: #4CAF50; border-radius: 4px; text-align: center; color: white; line-height: 25px;">
+                        0%
+                    </div>
+                </div>
+                <p id="rowProcessedText" style="margin-top: 10px;">処理済みの行数: 0</p>
+            </div>
+
         </div>
     </div>
 
@@ -40,12 +61,67 @@ function custom_csv_upload_page()
         jQuery(document).ready(function($) {
             var table;
 
+            function isValidJSON(data) {
+                try {
+                    JSON.parse(data);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+            try_attempt = 0;
+
+            function pollProgress() {
+                $.ajax({
+                    url: "<?php echo get_template_directory_uri(); ?>/custom_function/process_csv/csv_progress_tracker.php",
+                    method: 'POST',
+                    success: function(data) {
+                        try {
+                            if (typeof data !== 'undefined') {
+                                if (typeof data === 'string' && isValidJSON(data)) {
+                                    res = JSON.parse(data);
+                                } else {
+                                    res = data
+                                }
+                                percent = 0
+                                if (typeof res.processed !== 'undefined' && typeof res.total != 'undefined') {
+                                    if (res.total != 0) {
+                                        percent = Math.round((res.processed / res.total) * 100);
+                                    } else {
+                                        percent = 0
+                                    }
+                                    $('#loadingBar').css('width', percent + '%').text(percent + '%');
+                                    $('#rowProcessedText').text('処理済みの行数: ' + res.processed + ' / ' + res.total);
+
+                                    if (res.status !== 'done') {
+                                        setTimeout(pollProgress, 3000);
+                                    } else {
+                                        $('#rowProcessedText').append(' ✔ 完了しました');
+                                    }
+                                }
+                            } else {
+                                setTimeout(pollProgress, 5000);
+                                try_attempt++;
+                                if (try_attempt > 10) {
+                                    $('#rowProcessedText').append('処理はまだ進行中です');
+                                }
+                            }
+                        } catch (err) {
+                            console.error('JSON parse error:', err);
+                        }
+                    },
+                    error: function(err) {
+                        console.error('AJAX error:', err);
+                    }
+                });
+            }
             $('#csv_file').change(function() {
                 if (!$('#file_type').val()) {
                     alert('ファイルタイプを選択してください。');
                     $('#csv_file').val('');
                     return;
                 }
+
                 processCSV(false);
             });
 
@@ -97,7 +173,15 @@ function custom_csv_upload_page()
                             var html = '<button id="uploadCSV">CSVをアップロード</button><br><br>';
                             $('#csvDataTableWrapper').html(html).fadeIn(500);
                             $('#addNewRowButton').hide();
+                            $('.csv-upload-options').show();
+
                             $('#uploadCSV').click(function() {
+                                $('#csvDataTableWrapper').hide(); // clear Loading
+                                $('#loadingWrapper').show();
+                                $('#loadingBar').css('width', '0%').text('0%');
+                                $('#rowProcessedText').text('処理済みの行数: 0');
+                                pollProgress()
+
                                 $.ajax({
                                     url: "<?php echo get_template_directory_uri(); ?>/custom_function/process_csv/csv_insert_data.php",
                                     type: "POST",
@@ -105,18 +189,36 @@ function custom_csv_upload_page()
                                         file_path: response.file_path,
                                         file_type: 'article',
                                         tableData: null,
+                                        type_upload: $('#csvUploadMode').val()
                                     },
-                                    success: function() {
-                                        alert('記事データのアップロードが完了しました');
-                                        $('#csvDataTableWrapper').fadeOut(500, function() {
-                                            $('#csvDataTableWrapper').empty();
-                                            $('#csv_file').val('');
-                                            $('#file_type').val('');
-                                        });
+                                    success: function(response) {
+                                        if (response.match_file == false) {
+                                            alert('「間違ったファイルをアップロードしています。もう一度ファイルを確認してください。」');
+                                            setTimeout(function() {
+                                                // window.location.reload();
+                                            }, 6000);
+                                        } else {
+                                            alert('記事データのアップロードが完了しました');
+                                            $('#csvDataTableWrapper').fadeOut(500, function() {
+                                                $('#csvDataTableWrapper').empty();
+                                                $('#csv_file').val('');
+                                                $('#file_type').val('');
+                                            });
+                                            setTimeout(function() {
+                                                // window.location.reload();
+                                            }, 3000);
+                                        }
                                     }
                                 });
                             });
                         } else {
+                            match_file = (typeof response.match_file != 'undefined') ? response.match_file : true;
+                            if (!match_file) {
+                                alert('「間違ったファイルをアップロードしています。もう一度ファイルを確認してください。」');
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 6000);
+                            }
                             // Existing logic for other file types (editable table + add new row)
                             var tableHtml = '<button id="uploadCSV">CSVをアップロード</button><br><br>';
                             tableHtml += '<table id="csvDataTable" class="display" width="100%"><thead><tr>';
@@ -202,6 +304,9 @@ function custom_csv_upload_page()
                                             $('#csv_file').val('');
                                             $('#file_type').val('');
                                         });
+                                        setTimeout(function() {
+                                            // window.location.reload();
+                                        }, 3000);
                                     }
                                 });
                             });
@@ -225,6 +330,7 @@ function custom_process_csv_function($file_path, $file_type)
     }
 
     $data = [];
+    $match_file = true;
     $columns = $columns_jp = [];
     if (!empty($file_type)) {
         if ($file_type === "season_master") {
@@ -256,10 +362,11 @@ function custom_process_csv_function($file_path, $file_type)
             $columns_jp = Constants::VOD_COLUMNS_JP; // Ensure proper column mapping
         }
         if ($file_type === "song") {
-            require_once get_template_directory() . "/custom_function/process_csv/vod_csv.php";
-            $result = process_vod_csv($file_path);
-            $columns = Constants::VOD_COLUMNS; // Ensure proper column mapping
-            $columns_jp = Constants::VOD_COLUMNS_JP; // Ensure proper column mapping
+            require_once get_template_directory() . "/custom_function/process_csv/music_csv.php";
+            $result = process_music_csv($file_path);
+            $columns = Constants::MUSIC_COLUMNS; // Ensure proper column mapping
+            $columns_jp = Constants::MUSIC_COLUMNS_JP; // Ensure proper column mapping
+            error_log(json_encode($result));
         }
         if ($file_type === "page_settings") {
             require_once get_template_directory() . "/custom_function/process_csv/page_setting_csv.php";
@@ -279,23 +386,32 @@ function custom_process_csv_function($file_path, $file_type)
             $columns = Constants::CATEGORY_COLUMNS; // Ensure proper column mapping
             $columns_jp = Constants::CATEGORY_COLUMNS_JP; // Ensure proper column mapping
         }
-        if ($file_type === "article") {
-            // require_once get_template_directory() . "/custom_function/process_csv/main_csv.php";
-            // $result = process_article_csv($file_path);
-            // $columns = Constants::ARTICLE_COLUMNS; // Ensure proper column mapping
-            // $columns_jp = Constants::ARTICLE_COLUMNS_JP; // Ensure proper column mapping
-        }
-        if ($result && isset($result["data"])) {
+        if (!empty($result) && isset($result["data"])) {
             $data = $result["data"];
         }
-        $type = ($file_type =='article') ? 'article' : '';
+        if (!empty($result) && isset($result["match_file"])) {
+            $match_file = $result["match_file"];
+        }
+        if ($file_type == 'article') {
+            $type = 'article';
+            $dir = __DIR__ . '/process_csv/tmp';
+            $filePath = $dir . '/csv_progress.json';
+            file_put_contents($filePath, json_encode([
+                "status" => "progress",
+                "processed" => 0,
+                "total" => 0,
+            ]));
+        } else {
+            $type = '';
+        }
         return [
             'data' => $data,
             'columns' => $columns,
             'columns_jp' => $columns_jp,
             'message' => '<div class="updated"><p>Processed ' . count($data) . ' rows.</p></div>',
             'type' => $type,
-            'file_path' => $file_path
+            'file_path' => $file_path,
+            'match_file' => $match_file,
         ];
     } else {
         if (($handle = fopen($file_path, "r")) !== FALSE) {

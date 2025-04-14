@@ -1,0 +1,56 @@
+[data-amplify-authenticator] {
+  .amplify-button:not(.amplify-button--link) {
+    border-width: 1px !important;
+    border-style: none;
+    background-color: var(--amplify-colors-overlay-80);
+    color: var(--amplify-colors-background-secondary);
+
+    &:active, &:hover {
+      background-color: var(--amplify-colors-overlay-90);
+      border-color: var(--amplify-colors-overlay-70);
+    }
+
+    &:focus {
+      color: var(--amplify-colors-white);
+      background-color: var(--amplify-colors-overlay-40);
+    }
+
+    &.amplify-field__show-password {
+      color: var(--amplify-colors-overlay-80);
+      background-color: transparent;
+      border: 1px solid var(--amplify-colors-overlay-60);
+      border-left: none;
+
+      &:focus {
+        box-shadow: 0 0 0 0.5px var(--amplify-colors-overlay-90);
+        border-left: 1px solid var(--amplify-colors-overlay-60);
+      }
+    }
+  }
+}
+
+[data-amplify-authenticator] [data-amplify-router] {
+  border-width: 0;
+}
+
+.amplify-input {
+  &:focus {
+    box-shadow: 0 0 0 0.5px var(--amplify-colors-overlay-90);
+    border-color: var(--amplify-colors-overlay-50);
+  }
+}
+
+[data-amplify-footer], [data-amplify-authenticator-forgotpassword] {
+  .amplify-button--link {
+    color: var(--amplify-colors-overlay-70);
+
+    &:active, &:hover {
+      background-color: var(--amplify-colors-overlay-10);
+    }
+
+    &:focus {
+      border-color: var(--amplify-colors-overlay-60);
+      box-shadow: 0 0 0 0.5px var(--amplify-colors-overlay-60);
+    }
+  }
+}
