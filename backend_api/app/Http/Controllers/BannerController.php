@@ -14,16 +14,7 @@ class BannerController extends Controller
         $type = $request->input('type', 'anime-CAROUSEL'); // Default to 'anime-CAROUSEL'
         $limit = $request->input('limit', 5);
 
-        // Fetch banners from the PageSetting table
-        // $banners = DB::table('at_page_setting')
-        //     ->whereNotNull('article_id')
-        //     ->where('type', 'CAROUSEL')
-        //     ->orderBy('sort')
-        //     ->limit($limit)
-        //     ->get();
         $typePage = ($type == 'banner') ? 'CAROUSEL' : ($type == 'topic' ? 'SPOTLIGHT' : '');
-        // Log::info('$request');
-        // Log::info($request->all());
         $banners = DB::table('at_page_setting')
             ->leftJoin('at_article', 'at_article.id', '=', 'at_page_setting.article_id')
             ->leftjoin('at_network', 'at_article.network_id', '=', 'at_network.id')
@@ -53,10 +44,11 @@ class BannerController extends Controller
             }
             $list = array_slice($list, 0, 4); // Keep exactly 4 items
         }
+
         if ($typePage == 'CAROUSEL') {
             $formattedData = $banners->map(function ($banner) {
                 $banner->thumbnail = json_decode($banner->thumbnail, true);
-                $thumbnail_url = !empty($banner->thumbnail['url']) ? $banner->thumbnail['url'] : '';
+                $thumbnail = !empty($banner->thumbnail) && is_string($banner->thumbnail) ? json_decode($banner->thumbnail, true) : '';
                 return [
                     'article' => [
                         'id' => (string) $banner->article_id,
@@ -64,7 +56,7 @@ class BannerController extends Controller
                         'title' => $banner->title ?? 'Unknown Title',
                         'titleMeta' => $banner->title_meta ?? 'No Meta Title',
                         'thumbnail' => [
-                            'url' => !empty($banner->thumbnail_url) ? $banner->thumbnail_url : $thumbnail_url, // Include thumbnail URL
+                            'url' => !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : '', // Include thumbnail URL
                         ],
                         'pathName' => $banner->path_name ?? 'unknown-path',
                     ],
@@ -74,7 +66,8 @@ class BannerController extends Controller
         } else {
             $formattedData = $banners->map(function ($item) {
                 $item->thumbnail = json_decode($item->thumbnail, true);
-                $thumbnail_url = !empty($item->thumbnail['url']) ? $item->thumbnail['url'] : '';
+                $thumbnail = !empty($item->thumbnail) && is_string($item->thumbnail) ? json_decode($item->thumbnail, true) : '';
+
                 return [
                     'id' => $item->article_id,
                     'pathName' => $item->path_name ?? '', // fallback if null
@@ -82,7 +75,7 @@ class BannerController extends Controller
                     'title' => $item->title ?? '',
                     'titleMeta' => $item->title_meta ?? '',
                     'thumbnail' => [
-                        'url' => !empty($item->thumbnail_url) ? $item->thumbnail_url : $thumbnail_url,
+                        'url' => !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : '', // Include thumbnail URL
                     ],
                     'network' => [
                         'id' => $item->network_id ?? '',

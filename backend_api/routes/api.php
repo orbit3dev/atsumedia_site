@@ -8,6 +8,10 @@ use App\Http\Controllers\NewsController; // ✅ Explicitly import the controller
 use App\Http\Controllers\PageSettingController;
 use App\Http\Controllers\ArticleStatisticController;
 
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok']);
+});
+
 
 Route::get('/articles', [ArticleController::class, 'index']);
 Route::get('/get-person', [PersonController::class, 'getPerson']);

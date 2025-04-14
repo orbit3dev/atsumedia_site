@@ -1,0 +1,30 @@
+{
+	"compileOnSave": false,
+	"compilerOptions": {
+		"rootDir": ".",
+		"sourceMap": true,
+		"declaration": false,
+		"moduleResolution": "node",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"importHelpers": true,
+		"target": "es2015",
+		"module": "esnext",
+		"lib": ["es2020", "dom"],
+		"skipLibCheck": true,
+		"skipDefaultLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"@admin/*": ["apps/admin/app/*"],
+			"@atsumedia/amplify-backend": ["libs/amplify-backend/src/index.ts"],
+			"@atsumedia/amplify-client": ["libs/amplify-client/src/index.ts"],
+			"@atsumedia/data": ["libs/shared/data/src/index.ts"],
+			"@atsumedia/shared-editor": ["libs/shared/editor/src/index.ts"],
+			"@atsumedia/shared-ui": ["libs/shared/ui/src/index.ts"],
+			"@atsumedia/shared-ui/ui/*": ["libs/shared/ui/src/*"],
+			"@atsumedia/shared-util": ["libs/shared/util/src/index.ts"],
+			"@atsumedia/shared-util/util/*": ["libs/shared/util/src/*"]
+		}
+	},
+	"exclude": ["node_modules", "tmp"]
+}

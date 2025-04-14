@@ -213,11 +213,11 @@ function remove_admin_menus()
 	remove_menu_page('dashboard.php'); // Posts
 	remove_menu_page('upload.php'); // Media
 	remove_menu_page('edit.php?post_type=page'); // Pages
-	remove_menu_page('themes.php'); // Appearance
+	// remove_menu_page('themes.php'); // Appearance
 	remove_menu_page('plugins.php'); // Plugins
 	remove_menu_page('edit-comments.php'); // Comments
 }
-add_action('admin_menu', 'remove_admin_menus');
+// add_action('admin_menu', 'remove_admin_menus');
 
 function customize_admin_bar()
 {
@@ -539,4 +539,3 @@ function fetch_url_metadata()
 // Register WordPress API Endpoint
 add_action('wp_ajax_fetch_url_metadata', 'fetch_url_metadata');
 add_action('wp_ajax_nopriv_fetch_url_metadata', 'fetch_url_metadata');
-

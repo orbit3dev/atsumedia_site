@@ -1,0 +1,9 @@
+{
+	"name": "shared-editor",
+	"$schema": "../../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "libs/shared/editor/src",
+	"projectType": "library",
+	"tags": [],
+	"// targets": "to see all targets run: nx show project shared-editor --web",
+	"targets": {}
+}

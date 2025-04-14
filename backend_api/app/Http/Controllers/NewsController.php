@@ -44,6 +44,7 @@ class NewsController extends Controller
 
         $hasNextPage = ($offset + $limit) < $totalRecords;
         $nextPage    = $hasNextPage ? $page + 1 : null;
+        Log::info($newsList);
 
         return response()->json([
             'newsList' => $newsList,
