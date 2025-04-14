@@ -12,6 +12,13 @@
 /wordpress/wp-content/plugins/*
 !/wordpress/wp-content/plugins/your-custom-plugin/
 
+# Ignore everything by default
+/*
+
+# Allow the wordpress and backend_api directories
+!/wordpress/
+!/backend_api/
+
 # Ignore WordPress core
 /wordpress/wp-admin/
 /wordpress/wp-includes/
@@ -30,3 +37,6 @@ wordpress/wp-content/uploads/
 .vscode/
 .idea/
 node_modules/
+
+# Ignore specific theme assets
+/wordpress/wp-content/themes/twentytwentyfour/assets/assets/
