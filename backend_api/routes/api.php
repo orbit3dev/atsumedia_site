@@ -12,7 +12,9 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
 });
 
-
+Route::get('/get-personsss', function () { 
+    return ['status' => 'ok'];
+});
 Route::get('/articles', [ArticleController::class, 'index']);
 Route::get('/get-person', [PersonController::class, 'getPerson']);
 Route::get('/get-person-ten', [PersonController::class, 'getPerson']);
