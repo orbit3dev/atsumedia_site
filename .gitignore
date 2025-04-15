@@ -1,13 +1,3 @@
-# Ignore everything in wordpress directory...
-/wordpress/*
-
-# ...but not the themes folder
-!/wordpress/wp-content/
-/wordpress/wp-content/*
-!/wordpress/wp-content/themes/
-/wordpress/wp-content/themes/*
-!/wordpress/wp-content/themes/twentytwentyfour/
-
 # Optional: if you're customizing plugins, adjust accordingly
 /wordpress/wp-content/plugins/*
 !/wordpress/wp-content/plugins/your-custom-plugin/
@@ -41,3 +31,8 @@ node_modules/
 # Ignore specific theme assets
 /wordpress/wp-content/themes/twentytwentyfour/assets/assets/
 wordpress/wp-content/themes/twentytwentyfour/assets/assets
+
+# Ignore specific files even if the folders are included
+/wordpress/wp-content/themes/twentytwentyfour/custom_function/db/db.php
+/wordpress/wp-content/themes/twentytwentyfour/custom_function/process_csv/tmp/c>
+
