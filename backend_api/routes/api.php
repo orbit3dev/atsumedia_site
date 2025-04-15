@@ -15,6 +15,9 @@ Route::get('/health', function () {
 Route::get('/get-personsss', function () { 
     return ['status' => 'ok'];
 });
+Route::get('/api/get-personsss', function () { 
+    return ['status' => 'ok1'];
+});
 Route::get('/articles', [ArticleController::class, 'index']);
 Route::get('/get-person', [PersonController::class, 'getPerson']);
 Route::get('/get-person-ten', [PersonController::class, 'getPerson']);
