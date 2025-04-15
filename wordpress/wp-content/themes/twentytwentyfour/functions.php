@@ -548,6 +548,8 @@ function custom_page_setting_menu()
 		25 // Position
 	);
 }
+add_action('admin_menu', 'custom_page_setting_menu');
+require_once get_template_directory() . '/custom_function/custom_page_setting.php';
 
 // Register WordPress API Endpoint
 add_action('wp_ajax_fetch_url_metadata', 'fetch_url_metadata');
