@@ -9,6 +9,12 @@ use App\Http\Controllers\PageSettingController;
 use App\Http\Controllers\ArticleStatisticController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Middleware\Log404Request;
+
+// Register middleware for all API routes
+Route::middleware([Log404Request::class])->group(function () {
+    // Add your routes here
+});
 
 
 Route::any('/{any}', function (Request $request, $any) {
