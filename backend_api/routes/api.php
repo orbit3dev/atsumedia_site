@@ -7,15 +7,37 @@ use App\Http\Controllers\BannerController; // ✅ Explicitly import the controll
 use App\Http\Controllers\NewsController; // ✅ Explicitly import the controller
 use App\Http\Controllers\PageSettingController;
 use App\Http\Controllers\ArticleStatisticController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+
+Route::any('/{any}', function (Request $request, $any) {
+    $debugInfo = [
+        'method'       => $request->method(),
+        'full_url'     => $request->fullUrl(),
+        'uri'          => $request->path(),
+        'params'       => $request->all(),
+        'headers'      => $request->headers->all(),
+        'route_param'  => $any,
+        'user_agent'   => $request->userAgent(),
+        'ip'           => $request->ip(),
+    ];
+
+    Log::info('API Catch-All Debug', $debugInfo);
+
+    return response()->json([
+        'debug' => $debugInfo,
+    ]);
+})->where('any', '.*');
 
 Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
 });
 
-Route::get('/get-personsss', function () { 
+Route::get('/get-personsss', function () {
     return ['status' => 'ok'];
 });
-Route::get('/api/get-personsss', function () { 
+Route::get('/api/get-personsss', function () {
     return ['status' => 'ok1'];
 });
 Route::get('/articles', [ArticleController::class, 'index']);
