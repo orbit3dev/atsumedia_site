@@ -40,3 +40,4 @@ node_modules/
 
 # Ignore specific theme assets
 /wordpress/wp-content/themes/twentytwentyfour/assets/assets/
+wordpress/wp-content/themes/twentytwentyfour/assets/assets
