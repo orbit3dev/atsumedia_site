@@ -40,3 +40,8 @@ node_modules/
 
 # Ignore specific theme assets
 /wordpress/wp-content/themes/twentytwentyfour/assets/assets/
+
+# Ignore specific files even if the folders are included
+/wordpress/wp-content/themes/twentytwentyfour/custom_function/db/db.php
+/wordpress/wp-content/themes/twentytwentyfour/custom_function/process_csv/tmp/csv_progress.json
+
