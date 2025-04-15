@@ -31,9 +31,9 @@ Route::any('/{any}', function (Request $request, $any) {
 
     Log::info('API Catch-All Debug', $debugInfo);
 
-    return response()->json([
-        'debug' => $debugInfo,
-    ]);
+    // return response()->json([
+    //     'debug' => $debugInfo,
+    // ]);
 })->where('any', '.*');
 
 Route::get('/health', function () {
