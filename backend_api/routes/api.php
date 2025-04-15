@@ -42,6 +42,18 @@ Route::prefix('article-statistics')->group(function () {
     Route::get('/by-yearweek', [ArticleStatisticController::class, 'listByYearWeekAndTagTypeAndClickCount']);
 });
 
+Route::get('/', function () {
+    $routes = collect(Route::getRoutes())->map(function ($route) {
+        return [
+            'method' => implode('|', $route->methods()),
+            'uri' => $route->uri(),
+            'name' => $route->getName(),
+            'action' => $route->getActionName(),
+        ];
+    });
+
+    return response()->json($routes);
+});
 // Route::get('/page-settings/{type}', [PageSettingController::class, 'getSettingsByType']);
 
 // Route::get('/person', [PersonController::class, 'index']);
