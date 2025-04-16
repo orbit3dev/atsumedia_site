@@ -203,26 +203,26 @@ export const getBannerList = async () => {
 	return dataResult;
 };
 
-export const getTopList = unstable_cache(
-	async (limit: number) => {
-		return runWithAmplifyServerContext({
-			nextServerContext: null,
-			operation: async (contextSpec) => {
-				const params = {
-					selectionSet: TopicArticleSelectionSet,
-					parentId: 'root',
-					limit,
-				};
-				// @ts-ignore
-				const dbResult10 = await reqResBasedClient.models.Article.listByParentIdAndSort(contextSpec, params);
-				// @ts-ignore
-				return (dbResult10.data ?? []) as Article[];
-			},
-		});
-	},
-	['getTopList'],
-	{ revalidate: 300 }
-);
+// export const getTopList = unstable_cache(
+// 	async (limit: number) => {
+// 		return runWithAmplifyServerContext({
+// 			nextServerContext: null,
+// 			operation: async (contextSpec) => {
+// 				const params = {
+// 					selectionSet: TopicArticleSelectionSet,
+// 					parentId: 'root',
+// 					limit,
+// 				};
+// 				// @ts-ignore
+// 				const dbResult10 = await reqResBasedClient.models.Article.listByParentIdAndSort(contextSpec, params);
+// 				// @ts-ignore
+// 				return (dbResult10.data ?? []) as Article[];
+// 			},
+// 		});
+// 	},
+// 	['getTopList'],
+// 	{ revalidate: 300 }
+// );
 
 
 export const getNewList = async (

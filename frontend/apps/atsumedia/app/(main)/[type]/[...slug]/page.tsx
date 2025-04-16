@@ -38,7 +38,7 @@ const Page = async ({ params }: PageProps) => {
 	if (!check) {
 		return notFound();
 	}
-	const { paths, targetCategory, data, parentData } = await getResultData(params);
+	const { paths, targetCategory, data } = await getResultData(params);
 	if (!data) {
 		return notFound();
 	}
@@ -65,7 +65,7 @@ const Page = async ({ params }: PageProps) => {
 				<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 			</section>
 			<MainPath paths={paths} />
-			<DetailContent category={targetCategory} tagType={data.tagType} data={data} parentData={parentData} />
+			<DetailContent category={targetCategory} tagType={data.tagType} data={data} parentData={data} />
 			<StatisticClickCount data={data} />
 		</>
 	);

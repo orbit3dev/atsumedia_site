@@ -20,7 +20,7 @@ export function generateMetadata(): Metadata {
 			description:
 				'『あつめでぃあ』は動画配信情報や放送日、キャスト/声優/原作者/制作会社などの番組情報を掲載している@S[アットエス]が運営する総合メディア情報サイトです。',
 			locale: 'ja_JP',
-			images:  '/public/anime/dummy_thumbnail.png',
+			images: '/public/anime/dummy_thumbnail.png',
 		},
 	};
 }
@@ -34,20 +34,60 @@ export default async function Index() {
 		getIsTopNewsList(10),
 	]);
 
-	const fanGroupList = fanGroupListDbResult.map((item) => {
-		return {
-			...item.article,
-			yearWeek: item.yearWeek,
-			clickCount: item.clickCount,
+	type FanGroupArticle = {
+		id: string;
+		pathName: string;
+		genreType: string;
+		tagType: string;
+		title: string;
+		thumbnail: {
+			url: string;
 		};
-	});
+		titleMeta: string;
+		descriptionMeta: string;
+		network: {
+			id: string;
+			name: string;
+		};
+	};
 
-	let todayTopicList: Article[] = [];
-	if (fanGroupList && fanGroupList.length > 0) {
+	type FanGroupItem = {
+		yearWeek: number;
+		clickCount: number;
+		article: FanGroupArticle;
+	};
+
+	type ArticleWithMeta = Article & {
+		yearWeek: number;
+		clickCount: number;
+	  };
+
+	  type NewsItem = {
+		id: number;
+		title: string;
+		type: string;
+		genreType: string;
+		titleMeta: string;
+		description_meta: string;
+		image: string;
+		pathName: string;
+		author: string;
+	  };
+	  
+	const fanGroupList = (fanGroupListDbResult as FanGroupItem[]).map((item) => {
+		return {
+		  ...item.article,
+		  yearWeek: item.yearWeek,
+		  clickCount: item.clickCount,
+		};
+	  }) as ArticleWithMeta[];
+
+	  let todayTopicList: ArticleWithMeta[] = [];
+	  if (fanGroupList && fanGroupList.length > 0) {
 		todayTopicList = fanGroupList.slice(0, 4);
-	}
+	  }
 
-	return (
+	  return (
 		<>
 			{bannerList.length > 0 && <HomeBanner data={bannerList} />}
 			{fanGroupList.length > 0 && (
@@ -79,7 +119,7 @@ export default async function Index() {
 			/>
 			{newsList.length > 0 && (
 				<HomeList
-					data={newsList.map((item) => {
+					data={newsList.map((item: NewsItem) => {
 						return {
 							titleMeta: item.title,
 							genreType: item.genreType,

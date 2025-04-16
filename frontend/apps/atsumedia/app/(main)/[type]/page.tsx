@@ -17,6 +17,72 @@ type PageProps = {
 	params: { type: CategoryType };
 };
 
+type Network = {
+	id: string;
+	name: string;
+  };
+
+  type Thumbnail = {
+	url: string;
+  };
+
+  type Article = {
+	id: string;
+	pathName: string;
+	genreType: string;
+	tagType: string;
+	title: string;
+	thumbnail: Thumbnail;
+	titleMeta: string;
+	descriptionMeta: string;
+	network: Network;
+  };
+
+  type List10DbResultItem = {
+	yearWeek: number;
+	clickCount: number;
+	article: Article;
+  };
+  
+  type ArticleWithStats = Article & {
+	yearWeek: number;
+	clickCount: number;
+  };
+
+  type HomeListItemType = {
+	id: string;
+	pathName: string;
+	title: string;
+	titleMeta: string;
+	descriptionMeta: string;
+	thumbnail: {
+	  url: string;
+	};
+	network: {
+	  id: string;
+	  name: string;
+	};
+	tagType: string;
+	genreType: string; // ← this is the fix (was: CategoryType | undefined)
+	yearWeek: number;
+	clickCount: number;
+  };
+
+  type NewsItem = {
+	id: number;
+	title: string;
+	type: string;
+	genreType: string;
+	titleMeta: string;
+	description_meta: string;
+	image: string;
+	pathName: string;
+	author: string;
+  };
+  
+  
+
+
 export const revalidate = 300;
 
 export function generateMetadata({ params }: PageProps): Metadata {
@@ -44,20 +110,18 @@ const Page = async ({ params }: PageProps) => {
 
 	const [personList, bannerList, list10DbResult, topicData, newList, { newsList }] = await Promise.all([
 		getPersonList(),
-		getBannerList(params.type),
+		getBannerList(),
 		getRootArticleListByGenreTypeOrderByClickCount(params.type, 10, TagType.series),
-		getTopicData(params.type),
+		getTopicData(),
 		getNewList(params.type),
 		getNewsListByGenreType(params.type, 10),
 	]);
-
-	const list10 = list10DbResult.map((item) => {
-		return {
-			...item.article,
-			yearWeek: item.yearWeek,
-			clickCount: item.clickCount,
-		};
-	});
+	const list10 = (list10DbResult as List10DbResultItem[]).map((item) => ({
+		...item.article,
+		yearWeek: item.yearWeek,
+		clickCount: item.clickCount,
+		genreType: item.article.genreType as CategoryType,
+	  }));
 
 	return (
 		<>
@@ -108,7 +172,7 @@ const Page = async ({ params }: PageProps) => {
 			{/*<HomeActor title={'注目の声優'} imageUrl={'/image/home/vector-icon.svg'} data={personList} />*/}
 			{newsList.length > 0 && (
 				<HomeList
-					data={newsList.map((item) => {
+					data={newsList.map((item: NewsItem) => {
 						return {
 							titleMeta: item.title,
 							genreType: item.genreType,
