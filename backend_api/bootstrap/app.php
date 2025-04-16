@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->append(StripEnvPrefix::class);
+        $middleware->append(\App\Http\Middleware\StripEnvPrefix::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
