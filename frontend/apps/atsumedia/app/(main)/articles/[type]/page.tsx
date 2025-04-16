@@ -7,7 +7,7 @@ import LayoutWithRight from '../../_components/LayoutWithRight';
 import ArticlesMain from '../_components/ArticlesMain';
 import CategoryRight from '../../_components/CategoryRight';
 import AdTop from '../../_components/AdTop';
-import { S3Domain } from '@atsumedia/amplify-client';
+// import { S3Domain } from '@atsumedia/amplify-client';
 
 type PageProps = {
 	params: { type: CategoryType };
@@ -24,7 +24,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
 			title: value?.title,
 			type: 'website',
 			description: value?.description,
-			images: S3Domain + '/public/anime/dummy_thumbnail.png',
+			images: '/public/anime/dummy_thumbnail.png',
 			locale: 'ja_JP',
 		},
 	};

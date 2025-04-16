@@ -179,7 +179,7 @@ export const getNewsListByGenreType = async (
 
 
 
-export const getIsTopNewsList = async () => {
+export const getIsTopNewsList = async (data:number) => {
 	const response = await fetch(
 		process.env.NEXT_PUBLIC_API_URL + "/news-list-by-genre",
 		{

@@ -11,6 +11,51 @@ type MoviePopularProps = {
 	data?: Article[];
 	category: KeyValue;
 };
+
+type ArticlesData = {
+	id: string;
+	pathName: string;
+	genreType: string;
+	tagType: string;
+	title: string;
+	thumbnail: { url: string }; // You can expand this based on the real structure
+	titleMeta: string;
+	descriptionMeta: string;
+	network: { id: string; name: string }; // Adjust according to actual structure
+};
+
+type TopListItem = {
+	yearWeek: number;
+	clickCount: number;
+	article: ArticlesData;
+};
+
+type Thumbnail = {
+	url: string;
+};
+
+// Define the structure of the `network` object
+type Network = {
+	id: string;
+	name: string;
+};
+
+// Define the structure of the `dataMainTitle` object
+type DataMainTitle = {
+	id: string;
+	pathName: string;
+	genreType: string;
+	tagType: string;
+	title: string;
+	thumbnail: Thumbnail;
+	titleMeta: string;
+	descriptionMeta: string;
+	network: Network;
+	yearWeek: number;
+	clickCount: number;
+};
+
+type TopListDbResult = TopListItem[];
 const getTopList = unstable_cache(
 	async (categoryType: CategoryType) => {
 		const topListDbResult = await getRootArticleListByGenreTypeOrderByClickCount(
@@ -18,7 +63,7 @@ const getTopList = unstable_cache(
 			6,
 			TagType.series
 		);
-		return topListDbResult.map((item) => {
+		return topListDbResult.map((item: TopListItem) => {
 			return {
 				...item.article,
 				yearWeek: item.yearWeek,
@@ -31,10 +76,10 @@ const getTopList = unstable_cache(
 );
 
 const DetailPopular: React.FC<MoviePopularProps> = async ({ category }) => {
-    const categoryType = category.key as CategoryType;
+	const categoryType = category.key as CategoryType;
 	const data = await getTopList(categoryType);
-	const getPath = (data: Article) => {
-		return `/${data.genreType}/` + data.pathName;
+	const getPath = ({ genreType, pathName }: { genreType: string; pathName: string }) => {
+		return `/${genreType}/` + pathName;
 	};
 	if (data.length == 0) {
 		return <></>;
@@ -44,8 +89,8 @@ const DetailPopular: React.FC<MoviePopularProps> = async ({ category }) => {
 			<MainTitle title={`現在人気の${category.value}`} imageUrl={'/image/home/move-icon.svg'} />
 			<div className="overflow-hidden md:!overflow-visible">
 				<div className="ml-[10px] flex flex-nowrap overflow-hidden overflow-x-scroll pr-2 text-xs md:ml-0 md:grid md:grid-cols-3 md:gap-2 md:!overflow-visible">
-					{data!.map((item) => (
-						<Link key={item.id} href={getPath(item)}>
+					{data!.map((item: DataMainTitle) => (
+						<Link key={item.id} href={getPath({ genreType: item.genreType, pathName: item.pathName })}>
 							<div key={item.id} className="mr-2 md:mr-0">
 								<div className="relative min-w-[166px] overflow-hidden rounded-md transition-all duration-300 md:hover:z-10 md:hover:!scale-110 md:hover:brightness-50">
 									<MyImage

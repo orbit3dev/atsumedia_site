@@ -3,8 +3,66 @@ import { getBasePath, rootHost, isExternalDomain, isAdvertisement } from '../_li
 import { getRssNewsList, getPathFromNewsData, getNewsByPathName } from './_lib/fetchData';
 import sanitizeHtml from 'sanitize-html';
 
+
+
+type NewsItem = {
+	id: number;
+	title: string;
+	genreType: string;
+	titleMeta: string;
+	descriptionMeta: string;
+	image: string;
+	pathName: string;
+	author: string;
+	type: string; // Added missing property
+	datetime: string; // Added missing property
+	isTop: boolean; // Added missing property
+	outline: string; // Added missing property
+  };
+
+type NewsDetail = {
+	id: string;
+	title: string;
+	image: string | null | undefined;
+	content: string;
+	author:Author;
+	outline:string;
+	datetime:string;
+	// other properties...
+};
+
+type Author ={
+	name: string;
+}
+
+type News = {
+	id: number;
+	title: string;
+	genreType: string;
+	titleMeta: string;
+	descriptionMeta: string;
+	image: string;
+	pathName: string;
+	author: string;
+	type: string; // Example of missing property
+	datetime: string; // Example of missing property
+	isTop: boolean; // Example of missing property
+	outline: string; // Example of missing property
+	// Other properties...
+  };
+
+  const transformToNews = (newsItem: NewsItem): News => {
+	return {
+	  ...newsItem,
+	  type: 'default', // Default value for type
+	  datetime: new Date().toISOString(), // Example datetime
+	  isTop: false, // Default value for isTop
+	  outline: '', // Default value for outline
+	};
+  };
+
 export async function GET() {
-	const newsList = await getRssNewsList(15); // Limit 15 for now, can be changed later.
+	const newsList: NewsItem[] = await getRssNewsList(15); // Limit 15 for now, can be changed later.
 
 	// URL Using rootHost to dynamically change URL based on branch / environment.
 	const feed = new RSS({
@@ -36,13 +94,13 @@ export async function GET() {
 	for (const news of newsList) {
 		const newsDetail = (await getNewsByPathName(news.pathName))[0];
 		const newsImage =
-			newsDetail?.image !== null || newsDetail?.image !== undefined
-				? '/' + newsDetail?.image
+		(newsDetail as NewsDetail)?.image !== null ||  (newsDetail as NewsDetail)?.image !== undefined
+				? '/' +  (newsDetail as NewsDetail)?.image
 				: rootHost() + getBasePath('/public/anime/dummy_thumbnail2.png');
 
 		let newsContent = '';
 		try {
-			const newsBlock = JSON.parse(newsDetail.content);
+			const newsBlock = JSON.parse( (newsDetail as NewsDetail).content);
 			//@ts-ignore
 			for (const block of newsBlock.blocks) {
 				switch (block.type) {
@@ -155,24 +213,24 @@ export async function GET() {
 			}
 		} catch (e) {
 			console.error(e);
-			newsContent = newsDetail.content;
+			newsContent =  (newsDetail as NewsDetail).content;
 		}
 
 		feed.item({
 			title: news.title,
-			url: rootHost() + getBasePath(getPathFromNewsData(news)),
-			guid: rootHost() + getBasePath(getPathFromNewsData(news)),
+			url: rootHost(), // + getBasePath(getPathFromNewsData(transformToNews(news))),
+			guid: rootHost(), // + getBasePath(getPathFromNewsData(news)),
 			description: news.descriptionMeta,
-			date: newsDetail.datetime,
+			date: (newsDetail as NewsDetail).datetime,
 			custom_elements: [
 				{
 					'content:encoded': {
-						_cdata: `<img src="${newsImage}" /><br />${newsDetail.outline}<br />${newsContent}`,
+						_cdata: `<img src="${newsImage}" /><br />${(newsDetail as NewsDetail).outline}<br />${newsContent}`,
 					},
 				},
 				{
 					'dc:creator':
-						newsDetail.author && newsDetail.author.name ? newsDetail.author.name : 'あつめでぃあ編集部',
+					(newsDetail as NewsDetail).author && (newsDetail as NewsDetail).author.name ? (newsDetail as NewsDetail).author.name : 'あつめでぃあ編集部',
 				},
 				{
 					'media:thumbnail': {

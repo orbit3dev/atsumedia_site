@@ -163,7 +163,7 @@ export const SharedEditor: FC<SharedEditorProps> = memo(({ defaultValue, value, 
 										return {
 											success: 1,
 											file: {
-												url: S3Domain + '/' + res.path,
+												url: '/' + res.path,
 												// any other image data you want to store, such as width, height, color, extension, etc
 											},
 										};
