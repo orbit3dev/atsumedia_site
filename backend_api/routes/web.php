@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\PersonController; // ✅ Explicitly import the controller
 
-Route::get('/x', function (Request $request, $any) { // it should be /{any}
+Route::get('/{any}', function (Request $request, $any) { // it should be /{any}
     $debugInfo = [
 	'x' => 123,
         'method'       => $request->method(),
@@ -13,7 +13,7 @@ Route::get('/x', function (Request $request, $any) { // it should be /{any}
         'uri'          => $request->path(),
         'params'       => $request->all(),
         //'headers'      => $request->headers->all(),
-        'route_param'  => 555,
+        'route_param'  => $any,
         'user_agent'   => $request->userAgent(),
         'ip'           => $request->ip(),
     ];
