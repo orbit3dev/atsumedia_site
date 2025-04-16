@@ -6,6 +6,7 @@ const { composePlugins, withNx } = require('@nx/next');
 const nextConfig = {
 	reactStrictMode: false,
 	basePath: '/test/frontend',
+	trailingSlash: true,
 	// basePath: '/media',
 	experimental: {
 		optimizePackageImports: [
