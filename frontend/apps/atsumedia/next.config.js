@@ -5,7 +5,8 @@ const { composePlugins, withNx } = require('@nx/next');
  **/
 const nextConfig = {
 	reactStrictMode: false,
-	basePath: '/media',
+	basePath: '/test/frontend',
+	// basePath: '/media',
 	experimental: {
 		optimizePackageImports: [
 			'@atsumedia/amplify-backend',
