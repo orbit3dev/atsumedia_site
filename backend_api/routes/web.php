@@ -3,10 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Http\Middleware\Log404Request;
 use App\Http\Controllers\PersonController; // ✅ Explicitly import the controller
 
-Route::get('/x', function (Request $request, $any) {
+Route::get('/x', function (Request $request, $any) { // it should be /{any}
     $debugInfo = [
 	'x' => 123,
         'method'       => $request->method(),
@@ -20,13 +19,13 @@ Route::get('/x', function (Request $request, $any) {
     ];
 
     Log::info('API Catch-All Debug', $debugInfo);
-
-    // return response()->json([
-    //     'debug' => $debugInfo,
-    // ]);
 })->where('any', '.*');
 
-	Route::get('/test/api/get-person', [PersonController::class, 'getPerson']);
+Route::prefix('test/api')->middleware('api')->group(function () {
+    require base_path('routes/api_routes.php');
+});
+
+	// Route::get('/test/api/get-person', [PersonController::class, 'getPerson']);
 Route::get('/', function () {
     return view('welcome');
 });
