@@ -137,6 +137,20 @@ class ArticleController extends Controller
             )
             ->orderBy('click_count', 'desc')
             ->get();
+        $sql = AtArticleStatistic::whereIn('genre_type_year_week_tag_type', $combinations)
+            ->leftJoin('at_article', 'at_article.id', '=', 'at_article_statistic.article_id')
+            ->leftJoin('at_network', 'at_article.network_id', '=', 'at_network.id')
+            ->leftJoin('at_article_genre_type', 'at_article_genre_type.id', '=', 'at_article.genre_type_id')
+            ->select(
+                'at_article.*',
+                'at_article_statistic.*',
+                'at_network.name AS network_name',
+                'at_article_genre_type.name AS genre_name',
+                'at_article.id AS article_id_data',
+            )
+            ->orderBy('click_count', 'desc')
+            ->toSql();
+        Log::info($sql);
         $shapedData = $stats->map(function ($article) {
             // Decode thumbnail JSON if exists
             $thumbnail = json_decode($article->thumbnail, true);
@@ -243,7 +257,7 @@ class ArticleController extends Controller
         Log::info($articleChilds);
 
         $articleChilds2 = Network::where('id', $articles[0]['network_id'])
-            ->select('id','name')
+            ->select('id', 'name')
             ->first();
         $str = $articles[0]['vod'];
         $intArray = array_map('intval', explode(',', $str));
@@ -451,18 +465,18 @@ class ArticleController extends Controller
                 'url' => $article->video_url,
             ];
 
-            $summaryData = (json_decode($article->summary,true));
-            $summaryArr = (json_decode($summaryData,true));
+            $summaryData = (json_decode($article->summary, true));
+            $summaryArr = (json_decode($summaryData, true));
             $article->summary = [
                 'link' => $summaryArr['link'][0],
                 'reference' => $summaryArr['reference'],
                 'text' => $summaryArr['text'],
                 'title' => $summaryArr['title'],
             ];
-// [2025-04-11 07:45:36] local.INFO: {"link":[""],"text":"（C）龍幸伸／集英社・ダンダダン製作委員会","url":"public\/anime\/dandadan\/program_thumbnail_29120.png"}  
+            // [2025-04-11 07:45:36] local.INFO: {"link":[""],"text":"（C）龍幸伸／集英社・ダンダダン製作委員会","url":"public\/anime\/dandadan\/program_thumbnail_29120.png"}  
 
-            $thumbnailData = (json_decode($article->thumbnail,true));
-            $thumbnailArr = (json_decode($thumbnailData,true));
+            $thumbnailData = (json_decode($article->thumbnail, true));
+            $thumbnailArr = (json_decode($thumbnailData, true));
             $article->thumbnail = [
                 'link' => $thumbnailArr['link'][0],
                 'text' => $thumbnailArr['text'],
