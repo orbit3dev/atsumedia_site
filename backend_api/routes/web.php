@@ -21,9 +21,9 @@ Route::get('/x', function (Request $request, $any) { // it should be /{any}
     Log::info('API Catch-All Debug', $debugInfo);
 })->where('any', '.*');
 
-Route::prefix('test/api')->middleware('api')->group(function () {
-    require base_path('routes/api_routes.php');
-});
+// Route::prefix('test/api')->middleware('api')->group(function () {
+//     require base_path('routes/api_routes.php');
+// });
 
 	// Route::get('/test/api/get-person', [PersonController::class, 'getPerson']);
 Route::get('/', function () {
