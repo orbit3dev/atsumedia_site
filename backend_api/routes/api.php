@@ -10,10 +10,21 @@ use App\Http\Controllers\ArticleStatisticController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Middleware\Log404Request;
+use App\Http\Middleware\StripEnvPrefix;
 
 // Register middleware for all API routes
 Route::middleware([Log404Request::class])->group(function () {
     // Add your routes here
+});
+
+Route::middleware('strip-env')->group(function () {
+    // your routes here
+    Route::get('/get-person', [PersonController::class, 'getPerson']);
+});
+
+Route::prefix('test/api')->group(function () {
+    Route::get('/get-person', [PersonController::class, 'getPerson']);
+    // other routes...
 });
 
 
@@ -22,11 +33,11 @@ Route::any('/{any}', function (Request $request, $any) {
         'method'       => $request->method(),
         'full_url'     => $request->fullUrl(),
         'uri'          => $request->path(),
-        'params'       => $request->all(),
-        'headers'      => $request->headers->all(),
+        //'params'       => $request->all(),
+        //'headers'      => $request->headers->all(),
         'route_param'  => $any,
         'user_agent'   => $request->userAgent(),
-        'ip'           => $request->ip(),
+        //'ip'           => $request->ip(),
     ];
 
     Log::info('API Catch-All Debug', $debugInfo);
@@ -79,7 +90,7 @@ Route::get('/', function () {
             'method' => implode('|', $route->methods()),
             'uri' => $route->uri(),
             'name' => $route->getName(),
-            'action' => $route->getActionName(),
+            //'action' => $route->getActionName(),
         ];
     });
 
