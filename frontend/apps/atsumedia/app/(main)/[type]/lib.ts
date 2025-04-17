@@ -235,7 +235,7 @@ export const getNewList = async (
 		{
 			method: "POST",
 			body: JSON.stringify({
-				season_id: '21',
+				season_id: '22',
 				genre_type_id: 1,
 				tag_type_id: 2,
 			}),
