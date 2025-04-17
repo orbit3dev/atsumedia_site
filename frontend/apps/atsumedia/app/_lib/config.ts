@@ -18,7 +18,9 @@ export const rootHost = () => {
 
 export const getBasePath = (url: string) => {
 	if (basePath.length) {
-		return `/${basePath}${url}`;
+		const cleanBase = basePath.replace(/\/$/, '');
+		const cleanUrl = url.replace(/^\//, '');
+		return basePath.length ? `/${cleanBase}/${cleanUrl}` : url;
 	}
 	return url;
 };
