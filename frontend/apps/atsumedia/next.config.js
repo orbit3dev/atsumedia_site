@@ -28,6 +28,14 @@ const nextConfig = {
 		// See: https://github.com/gregberge/svgr
 		svgr: false,
 	},
+	webpack: (config, { isServer }) => {
+		// 🔥 Disable cache to prevent corrupted .next/cache issues
+		config.cache = false;
+
+		// You can add more Webpack customizations here if needed
+
+		return config;
+	}
 };
 
 const plugins = [
