@@ -137,20 +137,6 @@ class ArticleController extends Controller
             )
             ->orderBy('click_count', 'desc')
             ->get();
-        $sql = AtArticleStatistic::whereIn('genre_type_year_week_tag_type', $combinations)
-            ->leftJoin('at_article', 'at_article.id', '=', 'at_article_statistic.article_id')
-            ->leftJoin('at_network', 'at_article.network_id', '=', 'at_network.id')
-            ->leftJoin('at_article_genre_type', 'at_article_genre_type.id', '=', 'at_article.genre_type_id')
-            ->select(
-                'at_article.*',
-                'at_article_statistic.*',
-                'at_network.name AS network_name',
-                'at_article_genre_type.name AS genre_name',
-                'at_article.id AS article_id_data',
-            )
-            ->orderBy('click_count', 'desc')
-            ->toSql();
-        Log::info($sql);
         $shapedData = $stats->map(function ($article) {
             // Decode thumbnail JSON if exists
             $thumbnail = json_decode($article->thumbnail, true);
@@ -185,8 +171,6 @@ class ArticleController extends Controller
                 ],
             ];
         });
-        Log::info('shaped data');
-        Log::info($shapedData);
 
         return response()->json($shapedData);
     }
@@ -215,7 +199,10 @@ class ArticleController extends Controller
                 DB::raw('CAST(at_article.category_id AS CHAR) AS categoryId'),
                 'at_article.network_id',
                 'at_article.season_id AS season',
-                'at_article.vod AS vod',
+                (DB::raw("CASE 
+                WHEN custom_vod IS NOT NULL AND custom_vod != '' THEN custom_vod 
+                ELSE vod 
+            END AS vod")),
                 'at_category.name AS category_name',
                 'at_article.summary',
                 'at_article.author_organization AS authorOrganiation',
@@ -254,7 +241,6 @@ class ArticleController extends Controller
                 'at_article.thumbnail_link',
             )
             ->get();
-        Log::info($articleChilds);
 
         $articleChilds2 = Network::where('id', $articles[0]['network_id'])
             ->select('id', 'name')
@@ -262,7 +248,9 @@ class ArticleController extends Controller
         $str = $articles[0]['vod'];
         $intArray = array_map('intval', explode(',', $str));
         $articleChilds3 = Vod::whereIn('id', $intArray)
+            ->orderByRaw('FIELD(id, ' . implode(',', $intArray) . ')')
             ->get();
+
         $articleChilds4 = AtArticleAuthor::where('article_id', $articles[0]['id'])
             ->leftJoin('at_person', 'at_article_author.person_id', '=', 'at_person.id')
             ->select(
@@ -310,6 +298,8 @@ class ArticleController extends Controller
             ->get();
         $articleChilds8 = AtArticleCast::where('article_id', $articles[0]['id'])
             ->select('at_article_cast.role_name', 'at_article_cast.person_id')
+            ->orderBy('at_article_cast.sort', 'asc')
+            ->orderBy('at_article_cast.id', 'asc')
             ->get()
             ->map(function ($cast) {
                 $person = Person::select('id', 'name', 'image', 'sort')
@@ -326,9 +316,6 @@ class ArticleController extends Controller
                     ]
                 ];
             });
-
-
-
         // 3. For each child, get productions and group
         $articleChilds = $articleChilds->map(function ($child) {
             // Get productions for each child

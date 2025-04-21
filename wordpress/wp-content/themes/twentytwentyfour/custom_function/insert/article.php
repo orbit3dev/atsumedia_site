@@ -9,10 +9,10 @@ function insertOrUpdateArticle($wpdb, $data) {
 
     $table_name = $wpdb->prefix . 'article';
     // Ensure JSON encoding of relevant fields
-    $data['content'] = json_encode($data['content']);
-    $data['summary'] = json_encode($data['summary']);
-    $data['thumbnail'] = json_encode($data['thumbnail']);
-    $data['video_url'] = json_encode($data['video_url']);
+    $data['content'] = json_encode($data['content'],JSON_UNESCAPED_UNICODE);
+    $data['summary'] = json_encode($data['summary'],JSON_UNESCAPED_UNICODE);
+    $data['thumbnail'] = json_encode($data['thumbnail'],JSON_UNESCAPED_UNICODE);
+    $data['video_url'] = json_encode($data['video_url'],JSON_UNESCAPED_UNICODE);
 
     $insert_data = [
         'id' => $data['id'],
@@ -37,6 +37,7 @@ function insertOrUpdateArticle($wpdb, $data) {
         'volume' => $data['volume'],
         'website' => $data['website'],
         'path' => $data['path'],
+        'path_name' => $data['path_name'],
         'genre_type_id' => $data['genre_type_id'],
         'tag_type_id' => $data['tag_type_id'],
         'vod' => $data['vod'],
