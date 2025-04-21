@@ -213,11 +213,11 @@ function remove_admin_menus()
 	remove_menu_page('dashboard.php'); // Posts
 	remove_menu_page('upload.php'); // Media
 	remove_menu_page('edit.php?post_type=page'); // Pages
-	// remove_menu_page('themes.php'); // Appearance
+	remove_menu_page('themes.php'); // Appearance
 	remove_menu_page('plugins.php'); // Plugins
 	remove_menu_page('edit-comments.php'); // Comments
 }
-// add_action('admin_menu', 'remove_admin_menus');
+add_action('admin_menu', 'remove_admin_menus');
 
 function customize_admin_bar()
 {
@@ -551,17 +551,52 @@ function custom_page_setting_menu()
 add_action('admin_menu', 'custom_page_setting_menu');
 require_once get_template_directory() . '/custom_function/custom_page_setting.php';
 
-function hide_admin_menus() {
-    if (!current_user_can('administrator')) {
-        remove_menu_page('edit.php');                   // Posts
-        remove_menu_page('upload.php');                 // Media
-        remove_menu_page('edit.php?post_type=page');    // Pages
-        remove_menu_page('edit-comments.php');          // Comments
-        remove_menu_page('plugins.php');                // Plugins
-        remove_menu_page('tools.php');                  // Tools
-    }
+function custom_vod_menu()
+{
+	add_menu_page(
+		'Vod Menu', // Page title
+		'Vod Menu', // Menu title
+		'manage_options', // Capability
+		'call-vod-order', // Menu slug
+		'call_vod_order', // Callback function
+		'dashicons-admin-generic', // Icon
+		26 // Position
+	);
 }
-add_action('admin_menu', 'hide_admin_menus', 999);
+add_action('admin_menu', 'custom_vod_menu');
+require_once get_template_directory() . '/custom_function/custom_vod.php';
+
+function custom_cast_menu()
+{
+	add_menu_page(
+		'Cast Menu', // Page title
+		'Cast Menu', // Menu title
+		'manage_options', // Capability
+		'call-cast-order', // Menu slug
+		'call_cast_order', // Callback function
+		'dashicons-admin-generic', // Icon
+		27 // Position
+	);
+}
+add_action('admin_menu', 'custom_cast_menu');
+require_once get_template_directory() . '/custom_function/custom_cast.php';
+
+function hide_admin_menus_for_all_users() {
+    remove_menu_page('edit.php');                     // Posts
+    remove_menu_page('upload.php');                   // Media
+    remove_menu_page('edit.php?post_type=page');      // Pages
+    remove_menu_page('edit-comments.php');            // Comments
+    remove_menu_page('plugins.php');                  // Plugins
+    remove_menu_page('tools.php');                    // Tools
+}
+add_action('admin_menu', 'hide_admin_menus_for_all_users', 999);
+
+function remove_admin_toolbar_items_for_all_users($wp_admin_bar) {
+    $wp_admin_bar->remove_node('new-post');
+    $wp_admin_bar->remove_node('comments');
+    $wp_admin_bar->remove_node('updates');
+}
+add_action('admin_bar_menu', 'remove_admin_toolbar_items_for_all_users', 999);
 
 // Register WordPress API Endpoint
 add_action('wp_ajax_fetch_url_metadata', 'fetch_url_metadata');

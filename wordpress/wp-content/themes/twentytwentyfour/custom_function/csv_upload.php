@@ -69,49 +69,60 @@ function custom_csv_upload_page()
                     return false;
                 }
             }
-            try_attempt = 0;
+            let try_attempt = 0;
 
             function pollProgress() {
                 $.ajax({
                     url: "<?php echo get_template_directory_uri(); ?>/custom_function/process_csv/csv_progress_tracker.php",
                     method: 'POST',
                     success: function(data) {
-                        try {
-                            if (typeof data !== 'undefined') {
-                                if (typeof data === 'string' && isValidJSON(data)) {
-                                    res = JSON.parse(data);
-                                } else {
-                                    res = data
-                                }
-                                percent = 0
-                                if (typeof res.processed !== 'undefined' && typeof res.total != 'undefined') {
-                                    if (res.total != 0) {
-                                        percent = Math.round((res.processed / res.total) * 100);
-                                    } else {
-                                        percent = 0
-                                    }
-                                    $('#loadingBar').css('width', percent + '%').text(percent + '%');
-                                    $('#rowProcessedText').text('処理済みの行数: ' + res.processed + ' / ' + res.total);
+                        let res;
+                        let percent = 0;
 
-                                    if (res.status !== 'done') {
-                                        setTimeout(pollProgress, 3000);
-                                    } else {
-                                        $('#rowProcessedText').append(' ✔ 完了しました');
-                                    }
+                        try {
+                            if (!data) {
+                                throw new Error('Empty response');
+                            }
+
+                            if (typeof data === 'string' && isValidJSON(data)) {
+                                res = JSON.parse(data);
+                            } else if (typeof data === 'object') {
+                                res = data;
+                            } else {
+                                throw new Error('Invalid data format');
+                            }
+
+                            if (typeof res.processed !== 'undefined' && typeof res.total !== 'undefined') {
+                                percent = res.total !== 0 ? Math.round((res.processed / res.total) * 100) : 0;
+
+                                $('#loadingBar').css('width', percent + '%').text(percent + '%');
+                                $('#rowProcessedText').text('処理済みの行数: ' + res.processed + ' / ' + res.total);
+
+                                if (res.status !== 'done') {
+                                    setTimeout(pollProgress, 3000);
+                                } else {
+                                    $('#rowProcessedText').append(' ✔ 完了しました');
                                 }
                             } else {
-                                setTimeout(pollProgress, 5000);
-                                try_attempt++;
-                                if (try_attempt > 10) {
-                                    $('#rowProcessedText').append('処理はまだ進行中です');
-                                }
+                                throw new Error('Missing expected properties in response');
                             }
+
                         } catch (err) {
-                            console.error('JSON parse error:', err);
+                            console.warn('Polling fallback:', err.message);
+                            try_attempt++;
+                            if (try_attempt > 10) {
+                                $('#rowProcessedText').append('<br>処理はまだ進行中です…');
+                            }
+                            setTimeout(pollProgress, 5000); // Retry after 5 seconds on failure
                         }
                     },
                     error: function(err) {
                         console.error('AJAX error:', err);
+                        try_attempt++;
+                        if (try_attempt > 10) {
+                            $('#rowProcessedText').append('<br>サーバーエラーが発生しました。再試行中...');
+                        }
+                        setTimeout(pollProgress, 5000); // Retry after 5 seconds on error
                     }
                 });
             }

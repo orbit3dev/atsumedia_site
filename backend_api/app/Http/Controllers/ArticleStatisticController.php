@@ -111,7 +111,6 @@ class ArticleStatisticController extends Controller
                 ]
             ];
         });
-        Log::info($response);
         return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
     }
 

@@ -178,6 +178,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 'tag' => $tagType,
                 'tag_type_id' => $tag_type_id,
                 'path' => $titlePath,
+                'path_name' => $titlePath,
                 'volume' => $data['volume'] ?? "",
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
@@ -222,7 +223,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $castRole = trim($data[$roleKey] ?? "");
 
                 if ($castName === "") break;
-                insertCast($wpdb, $id, $castName, $castRole);
+                // insertCast($wpdb, $id, $castName, $castRole);
             }
 
             // === Insert Authors (author_1 to author_3)

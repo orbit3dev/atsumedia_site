@@ -93,7 +93,7 @@ const dataSort = (article: Article): Article => {
 	return {
 		...article,
 		childs: article.childs && article.childs.length > 0 ? article.childs.sort((o1, o2) => o1.sort - o2.sort) : [],
-		vods: article.vods.filter((item) => !!item.vod).sort((o1, o2) => o1.vod!.sort - o2.vod!.sort),
+		// vods: article.vods.filter((item) => !!item.vod).sort((o1, o2) => o1.vod!.sort - o2.vod!.sort),
 		authors: article.authors.filter((item) => !!item.person).sort((o1, o2) => o1.person!.sort - o2.person!.sort),
 		directors: article.directors
 			.filter((item) => !!item.person)
@@ -104,7 +104,7 @@ const dataSort = (article: Article): Article => {
 		screenwriters: article.screenwriters
 			.filter((item) => !!item.person)
 			.sort((o1, o2) => o1.person!.sort - o2.person!.sort),
-		casts: article.casts.filter((item) => !!item.person).sort((o1, o2) => o1.person!.sort - o2.person!.sort),
+		// casts: article.casts.filter((item) => !!item.person).sort((o1, o2) => o1.person!.sort - o2.person!.sort),
 		articleOriginalWorks: article.articleOriginalWorks
 			.filter((item) => !!item.person)
 			.sort((o1, o2) => o1.person!.sort - o2.person!.sort),
