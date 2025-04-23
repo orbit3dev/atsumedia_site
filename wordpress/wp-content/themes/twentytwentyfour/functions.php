@@ -561,11 +561,11 @@ function custom_vod_menu()
 {
 	add_menu_page(
 		'Vod Menu', // Page title
-		'Vod Menu', // Menu title
+		'VODの注文を変更する', // Menu title
 		'manage_options', // Capability
 		'call-vod-order', // Menu slug
 		'call_vod_order', // Callback function
-		'dashicons-admin-generic', // Icon
+		'dashicons-format-video', // Icon
 		26 // Position
 	);
 }
@@ -576,11 +576,11 @@ function custom_cast_menu()
 {
 	add_menu_page(
 		'Cast Menu', // Page title
-		'Cast Menu', // Menu title
+		'キャスト順の変更', // Menu title
 		'manage_options', // Capability
 		'call-cast-order', // Menu slug
 		'call_cast_order', // Callback function
-		'dashicons-admin-generic', // Icon
+		'dashicons-groups', // Icon
 		27 // Position
 	);
 }
@@ -591,11 +591,11 @@ function custom_switch_images_menu()
 {
 	add_menu_page(
 		'Switch Images Menu', // Page title
-		'Switch Images Menu', // Menu title
+		'画像を切り替える', // Menu title
 		'manage_options', // Capability
 		'switch-image', // Menu slug
 		'switch_image', // Callback function
-		'dashicons-admin-generic', // Icon
+		'dashicons-format-image', // Icon
 		27 // Position
 	);
 }
@@ -606,11 +606,11 @@ function custom_free_text_menu()
 {
 	add_menu_page(
 		'Free Texts Menu', // Page title
-		'Free Texts Menu', // Menu title
+		'フリーテキスト設定', // Menu title
 		'manage_options', // Capability
 		'free-text-menu', // Menu slug
 		'free_text_menu', // Callback function
-		'dashicons-admin-generic', // Icon
+		'dashicons-welcome-write-blog', // Icon
 		28 // Position
 	);
 }

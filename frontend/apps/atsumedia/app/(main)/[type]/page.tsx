@@ -107,10 +107,9 @@ const Page = async ({ params }: PageProps) => {
 		return notFound();
 	}
 	const { name: categoryName, color } = value;
-
 	const [personList, bannerList, list10DbResult, topicData, newList, { newsList }] = await Promise.all([
 		getPersonList(),
-		getBannerList(),
+		getBannerList(categoryName),
 		getRootArticleListByGenreTypeOrderByClickCount(params.type, 10, TagType.series),
 		getTopicData(),
 		getNewList(params.type),

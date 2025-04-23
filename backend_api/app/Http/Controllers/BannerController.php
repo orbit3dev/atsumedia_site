@@ -13,6 +13,14 @@ class BannerController extends Controller
 
         $type = $request->input('type', 'anime-CAROUSEL'); // Default to 'anime-CAROUSEL'
         $limit = $request->input('limit', 5);
+        $category = $request->input('category', 'anime');
+
+        if($category == 'アニメ'){
+            $cat = 'anime';
+        } else if($category == '映画'){
+            $cat = 'movie';
+        }
+        
 
         $typePage = ($type == 'banner') ? 'CAROUSEL' : ($type == 'topic' ? 'SPOTLIGHT' : '');
         $banners = DB::table('at_page_setting')
@@ -31,7 +39,7 @@ class BannerController extends Controller
                 'at_article_genre_type.name'
             )
             ->where('at_page_setting.type', $typePage)
-            ->where('at_page_setting.genre', 'anime')
+            ->where('at_page_setting.genre', $cat)
             ->whereNotNull('at_page_setting.article_id')
             ->orderBy('at_page_setting.article_id', 'ASC')
             ->get();
