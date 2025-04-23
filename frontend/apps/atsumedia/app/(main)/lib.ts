@@ -21,7 +21,7 @@ export const getBannerList = async () => {
 				"Accept": "application/json",
 			},
 		});
-
+console.log(123)
 	const dataResult = await response.json()
 	return dataResult;
 };

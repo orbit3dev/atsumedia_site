@@ -51,6 +51,12 @@ class Constants
         'season_id'
     ];
     public const ARTICLE_COLUMNS_JP = [];
+    public const CATEGORY = [
+        'anime' => 1,
+        'movie' => 2,
+        'drama_japan' => 3,
+        'drama_global' => 4,
+    ];
 }
 
 const TABLE_NETWORK = "at_network";

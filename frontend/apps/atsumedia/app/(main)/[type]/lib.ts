@@ -187,12 +187,12 @@ export const getTopicData = async () => {
 
 
 
-export const getBannerList = async () => {
+export const getBannerList = async (categoryName: string) => {
 	//v1
 	const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/get-banner",
 		{
 			method: "POST",
-			body: JSON.stringify({ type: 'banner' }),
+			body: JSON.stringify({ type: 'banner' , category:categoryName }),
 			headers: {
 				"Content-Type": "application/json", // Ensure JSON is sent
 				"Accept": "application/json",

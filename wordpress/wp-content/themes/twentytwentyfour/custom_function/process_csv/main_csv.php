@@ -62,12 +62,18 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
 
         while (($row = fgetcsv($handle)) !== false && $rowCount < $limitRows) {
             $data = array_combine($headers, $row);
-            if (!$data || $row[0] == '入力不可' || $row[0] == '' || $row[0] == null || $row[0] == '使用不可') {
+            // if (!$data || $row[0] == '入力不可' || $row[0] == '' || $row[0] == null || $row[0] == '使用不可') {
+            if (!$data || $row[0] == '入力不可' || $row[0] == '使用不可' ) {
                 $rowCount++;
                 continue;
             }
 
-            $id = isset($data['id']) ? (string)intval($data['id']) : uniqid();
+            if($data['program_title'] == '' || empty($data['program_title'])){
+                $rowCount++;
+                continue;
+            }
+
+            $id = isset($data['id']) ? (string)($data['id']) : uniqid();
             if ($type_upload == 1) {
                 if (($key = array_search($id, $idArticle)) !== false) {
                     unset($idArticleArr[$key]);
@@ -116,6 +122,15 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $parentId = null;
             }
 
+            if($data['genre'] == 'アニメ'){
+                $genre_type_id = Constants::CATEGORY['anime'];
+            } elseif($data['genre'] == '映画'){
+                $genre_type_id = Constants::CATEGORY['movie'];
+            } elseif($data['genre'] == '国内ドラマ'){
+                $genre_type_id = Constants::CATEGORY['drama_japan'];
+
+            };
+
             // Thumbnail
             $thumbnailUrl = !empty($data['thumbnail']) && !empty($titlePath) ? $data['thumbnail'] : ('public/anime/' . $titlePath);
             $thumbnailUrl = ('public/anime/' . $titlePath);
@@ -132,7 +147,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 'sort' => (int)$id,
                 'author_organization' => $data['author_organiation'] ?? "",
                 'program_title' => $data['program_title'] ?? "",
-                'title' => $data['program_title'] ?? "",
+                'title' => $data['title_path'] ?? "",
                 'title_meta' => $data['title_meta'] ?? "",
                 'description_meta' => $data['description_meta'] ?? "",
                 'network_id' => $data['network_1'] ?? "",
@@ -154,7 +169,9 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                     $data['producer_6'] ?? "",
                     $data['producer_7'] ?? "",
                     $data['producer_8'] ?? "",
-                    $data['producer_9'] ?? ""
+                    $data['producer_9'] ?? "",
+                    $data['producer_10'] ?? "",
+                    $data['producer_11'] ?? "",
                 ])),
                 'screenwriters' => array_filter([trim($data['screenwriter_1'] ?? ""), trim($data['screenwriter_2'] ?? "")]),
                 'production_companies' => array_map('trim', explode(",", $data['production_1'] ?? "")),
@@ -183,7 +200,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 'updated_at' => date("Y-m-d H:i:s"),
                 'staff' => $data['staff'] ?? "",
                 'vod' => $data['vod'] ?? "",
-                'genre_type_id' => Constants::ANIME_GENRE,
+                'genre_type_id' => $genre_type_id,
                 'summary' => json_encode([
                     "link" => ['0' => $data['website'] ?? ""],
                     "reference" => $data['summary_reference'] ?? "",
@@ -204,8 +221,55 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                     "text" => $data['thumbnail_text'] ?? '',
                     "url" => $thumbnailUrl
                 ], JSON_UNESCAPED_UNICODE),
-                'thumbnail_text' =>  $data['thumbnail_text'] ?? '',
-                'thumbnail_link' =>  $data['thumbnail_link'] ?? '',
+                'flag_series' =>  $data['flag_series'] ?? '',
+                'canonical' =>  $data['canonical'] ?? '',
+                'broadcast_day' =>  $data['broadcast_day'] ?? '',
+                'weekday' =>  $data['weekday'] ?? '',
+                'stream_day' =>  $data['stream_day'] ?? '',
+                'kana' =>  $data['kana'] ?? '',
+                'original_title' =>  $data['original_title'] ?? '',
+                'primary_program' =>  $data['primary_program'] ?? '',
+                'distribution' =>  $data['distribution'] ?? '',
+                'production_country' =>  $data['production_country'] ?? '',
+                'dubcast' => json_encode([
+                    "dubcast_1" => $data['dubcast_1'] ?? '',
+                    "dubcast_2" => $data['dubcast_2'] ?? '',
+                    "dubcast_3" => $data['dubcast_3'] ?? '',
+                    "dubcast_4" => $data['dubcast_4'] ?? '',
+                    "dubcast_5" => $data['dubcast_5'] ?? '',
+                    "dubcast_6" => $data['dubcast_6'] ?? '',
+                    "dubcast_7" => $data['dubcast_7'] ?? '',
+                    "dubcast_8" => $data['dubcast_8'] ?? '',
+                    "dubcast_9" => $data['dubcast_9'] ?? '',
+                    "dubcast_10" => $data['dubcast_10'] ?? '',
+                    "dubcast_11" => $data['dubcast_11'] ?? '',
+                    "dubcast_12" => $data['dubcast_12'] ?? '',
+                    "dubcast_13" => $data['dubcast_13'] ?? '',
+                    "dubcast_14" => $data['dubcast_14'] ?? '',
+                    "dubcast_15" => $data['dubcast_15'] ?? '',
+                ], JSON_UNESCAPED_UNICODE),
+                'dubcast_role' => json_encode([
+                    "dubcast_role_1" => $data['dubcast_role_1'] ?? '',
+                    "dubcast_role_2" => $data['dubcast_role_2'] ?? '',
+                    "dubcast_role_3" => $data['dubcast_role_3'] ?? '',
+                    "dubcast_role_4" => $data['dubcast_role_4'] ?? '',
+                    "dubcast_role_5" => $data['dubcast_role_5'] ?? '',
+                    "dubcast_role_6" => $data['dubcast_role_6'] ?? '',
+                    "dubcast_role_7" => $data['dubcast_role_7'] ?? '',
+                    "dubcast_role_8" => $data['dubcast_role_8'] ?? '',
+                    "dubcast_role_9" => $data['dubcast_role_9'] ?? '',
+                    "dubcast_role_10" => $data['dubcast_role_10'] ?? '',
+                    "dubcast_role_11" => $data['dubcast_role_11'] ?? '',
+                    "dubcast_role_12" => $data['dubcast_role_12'] ?? '',
+                    "dubcast_role_13" => $data['dubcast_role_13'] ?? '',
+                    "dubcast_role_14" => $data['dubcast_role_14'] ?? '',
+                    "dubcast_role_15" => $data['dubcast_role_15'] ?? '',
+                ], JSON_UNESCAPED_UNICODE),
+                'executive_producer' => json_encode([
+                    "executive_producer_1" => $data['executive_producer_1'] ?? '',
+                    "executive_producer_2" => $data['executive_producer_2'] ?? '',
+                    "executive_producer_3" => $data['executive_producer_3'] ?? '',
+                ], JSON_UNESCAPED_UNICODE),
             ];
 
             $processed_data[] = $articleData;

@@ -208,7 +208,7 @@ function custom_content_page()
                                 </td>
                             </tr>
                             <tr>
-                                <th><label for="editorjs">記事内容</label></th>
+                                <th><label for="editorjs_news">記事内容</label></th>
                                 <td>
                                     <!-- <div id="editorjs-container"> -->
                                     <div id="editorjs_news"></div>
@@ -262,6 +262,60 @@ function custom_content_scripts()
     <script>
         let editor;
         jQuery(document).ready(function($) {
+            function initEditor() {
+                if ($('#editorjs_news').length) {
+                    editor = new EditorJS({
+                        holder: 'editorjs_news',
+                        tools: {
+                            paragraph: {
+                                class: Paragraph
+                            },
+                            image: {
+                                class: ImageTool,
+                                config: {
+                                    endpoints: {
+                                        byFile: "<?php echo get_template_directory_uri(); ?>/custom_function/news/save_images_news.php",
+                                    }
+                                }
+                            },
+                            table: {
+                                class: Table
+                            },
+                            quote: {
+                                class: Quote
+                            },
+                            embed: {
+                                class: Embed
+                            },
+                            linkTool: {
+                                class: LinkTool,
+                                config: {
+                                    endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
+                                    fetchData: (url) => {
+                                        return fetch('<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                url: url
+                                            })
+                                        }).then(response => response.json());
+                                    }
+                                }
+                            }
+                        },
+                        onReady: () => {
+                            console.log('✅ Editor.js is ready');
+                        },
+                        onChange: () => {
+                            console.log('✏️ Content changed');
+                        }
+                    });
+                }
+            }
+            initEditor()
+
             $('#custom-content-form').hide()
             var table = $('#contentTable').DataTable({
                 "processing": true,
@@ -362,6 +416,7 @@ function custom_content_scripts()
                             $('#custom-content-form').show(1000)
 
                             var data = response.data;
+                            clearForm()
                             $('input[name="title"]').val(data.title);
                             $('input[name="slug"]').val(data.slug);
                             $('input[name="date"]').val(data.date_news.split(' ')[0]);
@@ -444,7 +499,9 @@ function custom_content_scripts()
                 $('textarea').val('');
                 $('input[type="hidden"]').val('');
                 $('#first_view_preview, #author_preview').html('');
-                editor.clear()
+                if (typeof editor !== 'undefined') {
+                    editor.clear()
+                }
             }
 
             function mediaUploader(buttonId, inputId, previewId) {
@@ -470,19 +527,14 @@ function custom_content_scripts()
             // Handle Form Submission
             $('#custom-content-form').submit(function(e) {
                 // e.preventDefault(); // Prevent page reload
-
-                // Get data from Editor.js
                 editor.save().then((outputData) => {
-                    // Serialize form data
                     var formData = $(this).serializeArray();
 
-                    // Append Editor.js content as JSON string
                     formData.push({
                         name: "article_content",
                         value: JSON.stringify(outputData)
                     });
 
-                    // Send data via AJAX
                     $.ajax({
                         type: 'POST',
                         url: ajaxurl, // WordPress built-in AJAX URL
@@ -510,57 +562,57 @@ function custom_content_scripts()
                 });
             });
 
-            editor = new EditorJS({
-                holder: 'editorjs_news',
-                // data: articleData.blocks || [], // If no data, initializes with an empty array
-                tools: {
-                    paragraph: {
-                        class: Paragraph
-                    },
-                    image: {
-                        class: ImageTool,
-                        config: {
-                            endpoints: {
-                                byFile: "<?php echo get_template_directory_uri(); ?>/custom_function/news/save_images_news.php",
-                            }
-                        }
-                    },
-                    table: {
-                        class: Table
-                    },
-                    quote: {
-                        class: Quote
-                    },
-                    embed: {
-                        class: Embed
-                    },
-                    linkTool: {
-                        class: LinkTool,
-                        config: {
-                            // endpoint: '/path/to/your/link-parser.php', // Update to your actual endpoint
-                            endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
-                            fetchData: (url) => {
-                                return fetch('<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            url: url
-                                        })
-                                    })
-                                    .then(response => response.json());
-                            }
-                        }
-                    }
-                },
-                onReady: () => {
-                    console.log('✅ Editor.js is ready');
-                },
-                onChange: () => {
-                    console.log('✏️ Content changed');
-                }
-            });
+            // editor = new EditorJS({
+            //     holder: 'editorjs_news',
+            //     // data: articleData.blocks || [], // If no data, initializes with an empty array
+            //     tools: {
+            //         paragraph: {
+            //             class: Paragraph
+            //         },
+            //         image: {
+            //             class: ImageTool,
+            //             config: {
+            //                 endpoints: {
+            //                     byFile: "< ?php echo get_template_directory_uri(); ?>/custom_function/news/save_images_news.php",
+            //                 }
+            //             }
+            //         },
+            //         table: {
+            //             class: Table
+            //         },
+            //         quote: {
+            //             class: Quote
+            //         },
+            //         embed: {
+            //             class: Embed
+            //         },
+            //         linkTool: {
+            //             class: LinkTool,
+            //             config: {
+            //                 // endpoint: '/path/to/your/link-parser.php', // Update to your actual endpoint
+            //                 endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
+            //                 fetchData: (url) => {
+            //                     return fetch('<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php', {
+            //                             method: 'POST',
+            //                             headers: {
+            //                                 'Content-Type': 'application/json'
+            //                             },
+            //                             body: JSON.stringify({
+            //                                 url: url
+            //                             })
+            //                         })
+            //                         .then(response => response.json());
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     onReady: () => {
+            //         console.log('✅ Editor.js is ready');
+            //     },
+            //     onChange: () => {
+            //         console.log('✏️ Content changed');
+            //     }
+            // });
         });
     </script>
 <?php
