@@ -99,7 +99,6 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $tagType = "episode";
                 $tag_type_id = 3;
                 $seasonParentid = get_transient($titlePath . '/' . $season);
-                error_log($seasonParentid);
                 $titlePath .= '/' . $season . '/' . $data['episode_path'];
                 if (!empty($seasonParentid)) {
                     $parentId = $seasonParentid;
@@ -223,7 +222,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $castRole = trim($data[$roleKey] ?? "");
 
                 if ($castName === "") break;
-                // insertCast($wpdb, $id, $castName, $castRole);
+                insertCast($wpdb, $id, $castName, $castRole);
             }
 
             // === Insert Authors (author_1 to author_3)

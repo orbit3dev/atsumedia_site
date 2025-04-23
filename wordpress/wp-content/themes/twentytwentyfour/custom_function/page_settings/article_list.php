@@ -4,6 +4,9 @@ if (!defined('ABSPATH')) {
 }
 
 global $wpdb;
+if (function_exists('wp_cache_flush')) {
+    wp_cache_flush(); // Clears the object cache.
+}
 
 $term = isset($_GET['term']) ? sanitize_text_field($_GET['term']) : '';
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
@@ -36,7 +39,7 @@ $response = [
         return [
             'id' => $row->id,
             'text' => $row->name,
-            'image' => get_template_directory_uri() . '/assets/assets/'. $row->image,
+            'image' => get_template_directory_uri() . '/assets/assets/'. $row->image .'?v='. time(),
             'vod' => $row->vod,
         ];
     }, $results),

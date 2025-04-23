@@ -377,7 +377,6 @@ function custom_process_csv_function($file_path, $file_type)
             $result = process_music_csv($file_path);
             $columns = Constants::MUSIC_COLUMNS; // Ensure proper column mapping
             $columns_jp = Constants::MUSIC_COLUMNS_JP; // Ensure proper column mapping
-            error_log(json_encode($result));
         }
         if ($file_type === "page_settings") {
             require_once get_template_directory() . "/custom_function/process_csv/page_setting_csv.php";

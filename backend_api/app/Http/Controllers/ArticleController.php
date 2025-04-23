@@ -11,6 +11,7 @@ use App\Models\AtArticleProducer;
 use App\Models\AtArticleScreenwriter;
 use App\Models\AtArticleCast;
 use App\Models\AtArticleOriginalWork;
+use App\Models\AtArticleFreeText;
 use App\Models\Network;
 use App\Models\Person;
 use App\Models\Vod;
@@ -316,6 +317,8 @@ class ArticleController extends Controller
                     ]
                 ];
             });
+        $articleChilds10 = AtArticleFreeText::where('article_id', $articles[0]['id'])
+            ->get();
         // 3. For each child, get productions and group
         $articleChilds = $articleChilds->map(function ($child) {
             // Get productions for each child
@@ -372,6 +375,7 @@ class ArticleController extends Controller
             $articleChilds7,
             $articleChilds8,
             $articleChilds9,
+            $articleChilds10,
         ) {
             $article->childs = $articleChilds;
             $article->network = $articleChilds2;
@@ -474,6 +478,11 @@ class ArticleController extends Controller
             unset($article->category_name);
             $article->casts = $articleChilds8;
             $article->sns = !empty($article->sns) ? $article->sns : [];
+            $article->freeTexts = $articleChilds10->map(function ($item) {
+                return [
+                    'freeText' => $item
+                ];
+            });
             return $article;
         });
 

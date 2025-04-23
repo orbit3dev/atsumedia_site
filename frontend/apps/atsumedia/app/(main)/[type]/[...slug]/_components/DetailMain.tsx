@@ -329,9 +329,10 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 					</span>
 				</div>
 				<H3Line text={`${data.titleMeta}のキャスト`} />
-				<div className="my-6 mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4 lg:grid-cols-4">
+				<div className="my-6 mb-8 grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+				{/* <div className="my-6 mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4 lg:grid-cols-4"> */}
 					{(castsLimitFlag ? data.casts.slice(0, 5) : data.casts).map((item, index) => (
-						<div key={index} className="mb-3 flex items-center">
+						<div key={index} className="mb-3 flex items-center bbb">
 							<div className=" h-[62px] w-[62px] shrink-0 grow-0 basis-[62px] overflow-hidden rounded-full lg:h-[70px] lg:w-[70px] lg:basis-[70px]">
 								<MyImage
 									className="h-[62px] w-[62px] lg:h-[70px] lg:w-[70px]"

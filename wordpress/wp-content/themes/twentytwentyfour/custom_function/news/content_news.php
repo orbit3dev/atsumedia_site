@@ -4,18 +4,8 @@
 function custom_content_page()
 {
 ?>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
 
-    <!-- Tools -->
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@latest"></script>
+    <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/custom_function/custom_css/editor_container.css">
     <style>
         .header-container {
             display: flex;
@@ -110,13 +100,19 @@ function custom_content_page()
             margin-top: 20px;
         }
 
-        #editorjs {
+        #editorjs_news {
             border: 1px solid #ddd;
-            /* Add border for visibility */
             min-height: 200px;
-            /* Ensure it's clickable */
             padding: 10px;
             background: #fff;
+            direction: ltr !important;
+            text-align: left;
+        }
+
+        #editorjs_news {
+            text-align: left;
+            margin: 0 auto;
+            max-width: 800px;
         }
     </style>
     <div class="wrap" id="table_panel">
@@ -214,9 +210,9 @@ function custom_content_page()
                             <tr>
                                 <th><label for="editorjs">記事内容</label></th>
                                 <td>
-                                    <div id="editorjs-container" style="border: 1px solid #ccc; padding: 10px; min-height: 200px; background: #fff;">
-                                        <div id="editorjs"></div>
-                                    </div>
+                                    <!-- <div id="editorjs-container"> -->
+                                    <div id="editorjs_news"></div>
+                                    <!-- </div> -->
                                     <input type="hidden" name="article_content" id="article_content">
                                 </td>
                             </tr>
@@ -320,6 +316,7 @@ function custom_content_scripts()
             $('#add_new_news').on('click', function() {
                 $('#table_panel').hide(500)
                 $('#custom-content-form').show(1000)
+                clearForm()
             })
             $('#cancel_news').on('click', function() {
                 $('#custom-content-form').hide(500)
@@ -447,6 +444,7 @@ function custom_content_scripts()
                 $('textarea').val('');
                 $('input[type="hidden"]').val('');
                 $('#first_view_preview, #author_preview').html('');
+                editor.clear()
             }
 
             function mediaUploader(buttonId, inputId, previewId) {
@@ -512,69 +510,57 @@ function custom_content_scripts()
                 });
             });
 
-
             editor = new EditorJS({
-                holder: "editorjs",
+                holder: 'editorjs_news',
+                // data: articleData.blocks || [], // If no data, initializes with an empty array
                 tools: {
                     paragraph: {
-                        class: Paragraph,
-                        inlineToolbar: true
+                        class: Paragraph
                     },
                     image: {
                         class: ImageTool,
                         config: {
                             endpoints: {
-                                byFile: "your-upload-endpoint.php", // Backend for image uploads
-                                byUrl: "your-upload-endpoint.php" // Backend for URL-based images
+                                byFile: "<?php echo get_template_directory_uri(); ?>/custom_function/news/save_images_news.php",
                             }
                         }
                     },
                     table: {
-                        class: Table,
-                        inlineToolbar: true
+                        class: Table
                     },
                     quote: {
-                        class: Quote,
-                        inlineToolbar: true,
-                        config: {
-                            quotePlaceholder: "Enter a quote",
-                            captionPlaceholder: "Quote author"
-                        }
+                        class: Quote
                     },
                     embed: {
-                        class: Embed,
-                        config: {
-                            services: {
-                                youtube: true,
-                                twitter: true,
-                                instagram: true,
-                                facebook: true,
-                                vimeo: true
-                            }
-                        }
+                        class: Embed
                     },
                     linkTool: {
                         class: LinkTool,
                         config: {
-                            endpoint: "<?php echo admin_url('admin-ajax.php?action=fetch_url_metadata'); ?>"
+                            // endpoint: '/path/to/your/link-parser.php', // Update to your actual endpoint
+                            endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
+                            fetchData: (url) => {
+                                return fetch('<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            url: url
+                                        })
+                                    })
+                                    .then(response => response.json());
+                            }
                         }
                     }
                 },
-
+                onReady: () => {
+                    console.log('✅ Editor.js is ready');
+                },
+                onChange: () => {
+                    console.log('✏️ Content changed');
+                }
             });
-
-
-            // Form Submission: Save Editor.js Content
-            // $("#custom-content-form").submit(async function(event) {
-            //     event.preventDefault(); // Prevent default form submission
-
-            //     // Get Editor.js data
-            //     const outputData = await editor.save();
-            //     $("#article_content").val(JSON.stringify(outputData)); // Store in hidden input
-
-            //     // Now submit the form
-            //     this.submit();
-            // });
         });
     </script>
 <?php
@@ -586,7 +572,6 @@ function insert_at_news()
 
     // Parse and sanitize form data
     parse_str($_POST['form_data'], $form_data);
-    error_log('Data form_data :' . json_encode($form_data));
 
     $news_id = isset($form_data['news_id']) ? intval($form_data['news_id']) : null;
     $title = sanitize_text_field($form_data['title']);
@@ -641,8 +626,6 @@ function insert_at_news()
         'type_name' => $genre, // Type_name field mapping
         'updated_at' => $datetime,
     ];
-    error_log(json_encode($data, JSON_UNESCAPED_UNICODE));
-    error_log($news_id);
 
 
     if ($news_id) {

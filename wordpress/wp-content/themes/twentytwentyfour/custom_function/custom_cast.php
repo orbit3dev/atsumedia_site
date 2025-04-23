@@ -77,6 +77,16 @@ function call_cast_order()
         jQuery(document).ready(function($) {
             const $select = $('#article-select');
 
+            function formatOptionWithImage(option) {
+                if (!option.image) return option.text;
+                return `<img src="${option.image}" style="height: 20px; width: auto; vertical-align: middle; margin-right: 5px;" /> ${option.text}`;
+            }
+
+
+            function formatSelectedOption(option) {
+                return option.text;
+            }
+
             $select.select2({
                 placeholder: '記事を選択',
                 ajax: {
