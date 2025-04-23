@@ -7,7 +7,6 @@ global $wpdb;
 $table = 'at_article_cast';
 
 $castOrder = isset($_POST['cast_order']) ? json_decode(stripslashes($_POST['cast_order']), true) : [];
-error_log(json_encode($castOrder));
 
 if (empty($castOrder)) {
     echo json_encode(['success' => false, 'message' => 'データが空です']);
@@ -31,11 +30,6 @@ foreach ($castOrder as $cast) {
 
     if (in_array($personId, $existingPersonIds)) {
         // Update
-        error_log($sort);
-        error_log($roleName);
-        error_log($articleId);
-        error_log($personId);
-        error_log('-------------------');
         $wpdb->update(
             $table,
             [ 'sort' => $sort, 'role_name' => $roleName ],

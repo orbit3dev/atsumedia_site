@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Twenty Twenty-Four functions and definitions
  *
@@ -12,20 +13,21 @@
  * Register block styles.
  */
 
-if ( ! function_exists( 'twentytwentyfour_block_styles' ) ) :
+if (! function_exists('twentytwentyfour_block_styles')) :
 	/**
 	 * Register custom block styles
 	 *
 	 * @since Twenty Twenty-Four 1.0
 	 * @return void
 	 */
-	function twentytwentyfour_block_styles() {
+	function twentytwentyfour_block_styles()
+	{
 
 		register_block_style(
 			'core/details',
 			array(
 				'name'         => 'arrow-icon-details',
-				'label'        => __( 'Arrow icon', 'twentytwentyfour' ),
+				'label'        => __('Arrow icon', 'twentytwentyfour'),
 				/*
 				 * Styles for the custom Arrow icon style of the Details block
 				 */
@@ -48,7 +50,7 @@ if ( ! function_exists( 'twentytwentyfour_block_styles' ) ) :
 			'core/post-terms',
 			array(
 				'name'         => 'pill',
-				'label'        => __( 'Pill', 'twentytwentyfour' ),
+				'label'        => __('Pill', 'twentytwentyfour'),
 				/*
 				 * Styles variation for post terms
 				 * https://github.com/WordPress/gutenberg/issues/24956
@@ -71,7 +73,7 @@ if ( ! function_exists( 'twentytwentyfour_block_styles' ) ) :
 			'core/list',
 			array(
 				'name'         => 'checkmark-list',
-				'label'        => __( 'Checkmark', 'twentytwentyfour' ),
+				'label'        => __('Checkmark', 'twentytwentyfour'),
 				/*
 				 * Styles for the custom checkmark list block style
 				 * https://github.com/WordPress/gutenberg/issues/51480
@@ -90,7 +92,7 @@ if ( ! function_exists( 'twentytwentyfour_block_styles' ) ) :
 			'core/navigation-link',
 			array(
 				'name'         => 'arrow-link',
-				'label'        => __( 'With arrow', 'twentytwentyfour' ),
+				'label'        => __('With arrow', 'twentytwentyfour'),
 				/*
 				 * Styles for the custom arrow nav link block style
 				 */
@@ -108,7 +110,7 @@ if ( ! function_exists( 'twentytwentyfour_block_styles' ) ) :
 			'core/heading',
 			array(
 				'name'         => 'asterisk',
-				'label'        => __( 'With asterisk', 'twentytwentyfour' ),
+				'label'        => __('With asterisk', 'twentytwentyfour'),
 				'inline_style' => "
 				.is-style-asterisk:before {
 					content: '';
@@ -144,20 +146,21 @@ if ( ! function_exists( 'twentytwentyfour_block_styles' ) ) :
 	}
 endif;
 
-add_action( 'init', 'twentytwentyfour_block_styles' );
+add_action('init', 'twentytwentyfour_block_styles');
 
 /**
  * Enqueue block stylesheets.
  */
 
-if ( ! function_exists( 'twentytwentyfour_block_stylesheets' ) ) :
+if (! function_exists('twentytwentyfour_block_stylesheets')) :
 	/**
 	 * Enqueue custom block stylesheets
 	 *
 	 * @since Twenty Twenty-Four 1.0
 	 * @return void
 	 */
-	function twentytwentyfour_block_stylesheets() {
+	function twentytwentyfour_block_stylesheets()
+	{
 		/**
 		 * The wp_enqueue_block_style() function allows us to enqueue a stylesheet
 		 * for a specific block. These will only get loaded when the block is rendered
@@ -170,40 +173,41 @@ if ( ! function_exists( 'twentytwentyfour_block_stylesheets' ) ) :
 			'core/button',
 			array(
 				'handle' => 'twentytwentyfour-button-style-outline',
-				'src'    => get_parent_theme_file_uri( 'assets/css/button-outline.css' ),
-				'ver'    => wp_get_theme( get_template() )->get( 'Version' ),
-				'path'   => get_parent_theme_file_path( 'assets/css/button-outline.css' ),
+				'src'    => get_parent_theme_file_uri('assets/css/button-outline.css'),
+				'ver'    => wp_get_theme(get_template())->get('Version'),
+				'path'   => get_parent_theme_file_path('assets/css/button-outline.css'),
 			)
 		);
 	}
 endif;
 
-add_action( 'init', 'twentytwentyfour_block_stylesheets' );
+add_action('init', 'twentytwentyfour_block_stylesheets');
 
 /**
  * Register pattern categories.
  */
 
-if ( ! function_exists( 'twentytwentyfour_pattern_categories' ) ) :
+if (! function_exists('twentytwentyfour_pattern_categories')) :
 	/**
 	 * Register pattern categories
 	 *
 	 * @since Twenty Twenty-Four 1.0
 	 * @return void
 	 */
-	function twentytwentyfour_pattern_categories() {
+	function twentytwentyfour_pattern_categories()
+	{
 
 		register_block_pattern_category(
 			'twentytwentyfour_page',
 			array(
-				'label'       => _x( 'Pages', 'Block pattern category', 'twentytwentyfour' ),
-				'description' => __( 'A collection of full page layouts.', 'twentytwentyfour' ),
+				'label'       => _x('Pages', 'Block pattern category', 'twentytwentyfour'),
+				'description' => __('A collection of full page layouts.', 'twentytwentyfour'),
 			)
 		);
 	}
 endif;
 
-add_action( 'init', 'twentytwentyfour_pattern_categories' );
+add_action('init', 'twentytwentyfour_pattern_categories');
 
 // Starts Here
 
@@ -415,9 +419,6 @@ if (isset($_POST['upload_csv']) && check_admin_referer('custom_csv_upload', 'cus
 
 		if (move_uploaded_file($_FILES['csv_file']['tmp_name'], $target_file)) {
 			update_option('uploaded_csv_path', $target_file);
-			// echo '<div class="updated"><p>CSV uploaded successfully and is now being processed...</p></div>';
-			error_log(444);
-			// Call processing function
 			custom_process_csv_function($target_file, $file_type);
 		} else {
 			echo '<div class="error"><p>Failed to upload CSV.</p></div>';
@@ -480,7 +481,6 @@ function custom_content_admin_scripts($hook)
 		return;
 	}
 	wp_enqueue_media(); // WordPress built-in media uploader
-	wp_enqueue_script('custom-content-script', plugin_dir_url(__FILE__) . 'script.js', ['jquery'], null, true);
 }
 add_action('admin_enqueue_scripts', 'custom_content_admin_scripts');
 
@@ -498,6 +498,12 @@ function enqueue_editorjs_assets()
 	wp_enqueue_script('editorjs-header', 'https://cdn.jsdelivr.net/npm/@editorjs/header@latest', array(), null, true);
 	wp_enqueue_script('editorjs-list', 'https://cdn.jsdelivr.net/npm/@editorjs/list@latest', array(), null, true);
 	wp_enqueue_script('editorjs-embed', 'https://cdn.jsdelivr.net/npm/@editorjs/embed', array(), null, true);
+	wp_enqueue_script('editorjs-paragraph', 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest', array('editorjs'), null, true);
+	wp_enqueue_script('editorjs-image', 'https://cdn.jsdelivr.net/npm/@editorjs/image@latest', array('editorjs'), null, true);
+	wp_enqueue_script('editorjs-quote', 'https://cdn.jsdelivr.net/npm/@editorjs/quote@latest', array('editorjs'), null, true);
+	wp_enqueue_script('editorjs-table', 'https://cdn.jsdelivr.net/npm/@editorjs/table@latest', array('editorjs'), null, true);
+	wp_enqueue_script('editorjs-embed', 'https://cdn.jsdelivr.net/npm/@editorjs/embed@latest', array('editorjs'), null, true);
+	wp_enqueue_script('editorjs-linktool', 'https://cdn.jsdelivr.net/npm/@editorjs/link@latest', array('editorjs'), null, true);
 }
 add_action('admin_enqueue_scripts', 'enqueue_editorjs_assets');
 
@@ -581,20 +587,52 @@ function custom_cast_menu()
 add_action('admin_menu', 'custom_cast_menu');
 require_once get_template_directory() . '/custom_function/custom_cast.php';
 
-function hide_admin_menus_for_all_users() {
-    remove_menu_page('edit.php');                     // Posts
-    remove_menu_page('upload.php');                   // Media
-    remove_menu_page('edit.php?post_type=page');      // Pages
-    remove_menu_page('edit-comments.php');            // Comments
-    remove_menu_page('plugins.php');                  // Plugins
-    remove_menu_page('tools.php');                    // Tools
+function custom_switch_images_menu()
+{
+	add_menu_page(
+		'Switch Images Menu', // Page title
+		'Switch Images Menu', // Menu title
+		'manage_options', // Capability
+		'switch-image', // Menu slug
+		'switch_image', // Callback function
+		'dashicons-admin-generic', // Icon
+		27 // Position
+	);
+}
+add_action('admin_menu', 'custom_switch_images_menu');
+require_once get_template_directory() . '/custom_function/switch_image.php';
+
+function custom_free_text_menu()
+{
+	add_menu_page(
+		'Free Texts Menu', // Page title
+		'Free Texts Menu', // Menu title
+		'manage_options', // Capability
+		'free-text-menu', // Menu slug
+		'free_text_menu', // Callback function
+		'dashicons-admin-generic', // Icon
+		28 // Position
+	);
+}
+add_action('admin_menu', 'custom_free_text_menu');
+require_once get_template_directory() . '/custom_function/free_text_menu.php';
+
+function hide_admin_menus_for_all_users()
+{
+	remove_menu_page('edit.php');                     // Posts
+	remove_menu_page('upload.php');                   // Media
+	remove_menu_page('edit.php?post_type=page');      // Pages
+	remove_menu_page('edit-comments.php');            // Comments
+	remove_menu_page('plugins.php');                  // Plugins
+	remove_menu_page('tools.php');                    // Tools
 }
 add_action('admin_menu', 'hide_admin_menus_for_all_users', 999);
 
-function remove_admin_toolbar_items_for_all_users($wp_admin_bar) {
-    $wp_admin_bar->remove_node('new-post');
-    $wp_admin_bar->remove_node('comments');
-    $wp_admin_bar->remove_node('updates');
+function remove_admin_toolbar_items_for_all_users($wp_admin_bar)
+{
+	$wp_admin_bar->remove_node('new-post');
+	$wp_admin_bar->remove_node('comments');
+	$wp_admin_bar->remove_node('updates');
 }
 add_action('admin_bar_menu', 'remove_admin_toolbar_items_for_all_users', 999);
 

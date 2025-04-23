@@ -78,6 +78,15 @@ function page_settings_config()
 
         <script>
             $(document).ready(function() {
+                function formatOptionWithImage(option) {
+                    if (!option.image) return option.text;
+                    return `<img src="${option.image}" style="height: 20px; width: auto; vertical-align: middle; margin-right: 5px;" /> ${option.text}`;
+                }
+
+
+                function formatSelectedOption(option) {
+                    return option.text;
+                }
                 const initialLink = ' <?php echo get_template_directory_uri(); ?> /assets/assets/public/anime/dummy_thumbnail.png';
                 const initialDataUrl = "<?php echo get_template_directory_uri(); ?>/custom_function/page_settings/initial_article.php";
                 // Fetch initial data and create rows

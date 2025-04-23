@@ -1,0 +1,99 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 30px;
+}
+
+.editor-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}
+
+#editorjs {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    min-height: 300px;
+    margin-bottom: 20px;
+}
+
+.submit-button {
+    background-color: #444;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.submit-button:hover {
+    background-color: #333;
+}
+
+.submit-button:active {
+    background-color: #222;
+}
+
+.submit-button:focus {
+    outline: none;
+}
+
+.submit-button:focus-visible {
+    outline: 2px solid #2d8be1;
+}
+
+#saveButton {
+    text-align: center;
+    margin-top: 20px;
+    padding: 12px 30px;
+    background-color: #2d8be1;
+    color: white;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#saveButton:hover {
+    background-color: #1e7bc5;
+}
+
+#saveButton:active {
+    background-color: #1a6d9f;
+}
+
+.select2-container--default .select2-selection--single {
+    height: 40px;
+    border-radius: 6px;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 40px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 38px;
+    right: 6px;
+}
+
+/* Fix Select2 dropdown overlapping issues */
+.select2-container {
+    z-index: 9999 !important;
+    position: relative;
+}
+
+.select2-dropdown {
+    z-index: 99999 !important;
+}
+

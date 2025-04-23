@@ -16,9 +16,6 @@ $article_id = intval($article_id);
 global $wpdb;
 
 $table_name = $wpdb->prefix . 'article'; // Assuming the table is 'at_article'
-error_log($table_name);
-error_log($vod_ids);
-error_log($article_id);
 $update_query = $wpdb->prepare(
     "UPDATE $table_name SET custom_vod = %s WHERE id = %d",
     $vod_ids,
