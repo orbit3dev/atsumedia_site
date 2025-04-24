@@ -230,7 +230,6 @@ class ArticleController extends Controller
                     'at_article.thumbnail',
                 )
                 ->get();
-                Log::info($request->path);
             $articleChilds = AtArticle::where('at_article.parent_id', $articles[0]['id'])
                 ->select(
                     DB::raw('CAST(at_article.id AS CHAR) AS id'),
@@ -486,7 +485,6 @@ class ArticleController extends Controller
                         'freeText' => $item
                     ];
                 });
-                Log::info('article', $article->toArray());
                 return $article;
             });
             return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);

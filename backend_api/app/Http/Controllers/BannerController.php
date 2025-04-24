@@ -94,7 +94,6 @@ class BannerController extends Controller
                 ];
             });
         }
-        Log::info('banner',$formattedData->toArray());
         return response()->json($formattedData);
     }
 }
