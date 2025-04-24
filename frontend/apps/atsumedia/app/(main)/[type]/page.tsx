@@ -121,7 +121,6 @@ const Page = async ({ params }: PageProps) => {
 		clickCount: item.clickCount,
 		genreType: item.article.genreType as CategoryType,
 	  }));
-
 	return (
 		<>
 			<MainPath paths={[{ name: categoryName }]} />

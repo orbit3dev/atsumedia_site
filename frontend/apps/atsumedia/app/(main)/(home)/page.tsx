@@ -86,7 +86,6 @@ export default async function Index() {
 	  if (fanGroupList && fanGroupList.length > 0) {
 		todayTopicList = fanGroupList.slice(0, 4);
 	  }
-
 	  return (
 		<>
 			{bannerList.length > 0 && <HomeBanner data={bannerList} />}
