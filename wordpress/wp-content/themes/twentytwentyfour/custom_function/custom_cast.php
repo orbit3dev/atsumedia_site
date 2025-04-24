@@ -242,6 +242,7 @@ function call_cast_order()
                                 // Show details on select
                                 $('#cast-select').off('select2:select').on('select2:select', function(e) {
                                     const selected = e.params.data;
+                                    $('#cast-order-table').DataTable().clear().draw();
                                     $('#cast-details').html(`
             <p><strong>ID:</strong> ${selected.id}</p>
             <p><strong>キャスト名:</strong> ${selected.text}</p>
