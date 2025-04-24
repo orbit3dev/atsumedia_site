@@ -14,7 +14,7 @@ class BannerController extends Controller
         $type = $request->input('type', 'anime-CAROUSEL'); // Default to 'anime-CAROUSEL'
         $limit = $request->input('limit', 5);
         $category = $request->input('category', 'anime');
-
+        $cat = 'anime';
         if($category == 'アニメ'){
             $cat = 'anime';
         } else if($category == '映画'){
@@ -34,6 +34,7 @@ class BannerController extends Controller
                 'at_article.path_name',
                 'at_article.thumbnail',
                 'at_article.thumbnail_link',
+                'at_article.thumbnail_url',
                 'at_network.name AS network_name',
                 'at_article.network_id',
                 'at_article_genre_type.name'
@@ -64,7 +65,7 @@ class BannerController extends Controller
                         'title' => $banner->title ?? 'Unknown Title',
                         'titleMeta' => $banner->title_meta ?? 'No Meta Title',
                         'thumbnail' => [
-                            'url' => !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : '', // Include thumbnail URL
+                            'url' => !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : (!empty($banner->thumbnail_url) ? $banner->thumbnail_url :''), // Include thumbnail URL
                         ],
                         'pathName' => $banner->path_name ?? 'unknown-path',
                     ],
@@ -83,7 +84,7 @@ class BannerController extends Controller
                     'title' => $item->title ?? '',
                     'titleMeta' => $item->title_meta ?? '',
                     'thumbnail' => [
-                        'url' => !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : '', // Include thumbnail URL
+                        'url' => !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : (!empty($item->thumbnail_url) ? $item->thumbnail_url :''), // Include thumbnail URL
                     ],
                     'network' => [
                         'id' => $item->network_id ?? '',
@@ -93,7 +94,6 @@ class BannerController extends Controller
                 ];
             });
         }
-
         return response()->json($formattedData);
     }
 }

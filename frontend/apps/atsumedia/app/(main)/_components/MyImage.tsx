@@ -27,7 +27,7 @@ const MyImage: FC<MyImageProps> = ({
                                      isMainImage = false,
                                    }) => {
   // const src = useMemo(() => `${S3Domain}/${path}`, [path]);
-  const BASE_URL = "http://localhost/atsumedia/apps/atsumedia/public/assets";
+  const BASE_URL = process.env.NEXT_PUBLIC_ASSET_BASE_URL;
   const src = useMemo(() => `${BASE_URL}/${path}`, [path]);
   return (
     isMainImage ?

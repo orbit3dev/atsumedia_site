@@ -23,6 +23,7 @@ wordpress/wp-content/uploads/
 # IDE and OS junk
 *.log
 *.tmp
+*.lnk
 .DS_Store
 .vscode/
 .idea/
