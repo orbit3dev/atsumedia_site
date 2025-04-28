@@ -591,7 +591,7 @@ function custom_switch_images_menu()
 {
 	add_menu_page(
 		'Switch Images Menu', // Page title
-		'画像を切り替える', // Menu title
+		'画像を差し替える', // Menu title
 		'manage_options', // Capability
 		'switch-image', // Menu slug
 		'switch_image', // Callback function

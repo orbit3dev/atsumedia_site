@@ -9,7 +9,6 @@ function insertProduction($id, $name,$sort, $type) {
 
     $table_name = $wpdb->prefix . 'production'; // Ensure proper table prefix
 
-
     $result = $wpdb->insert(
         $table_name,
         [

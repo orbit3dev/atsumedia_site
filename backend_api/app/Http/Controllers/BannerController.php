@@ -11,7 +11,7 @@ class BannerController extends Controller
     public function getBanner(Request $request)
     {
 
-        $type = $request->input('type', 'anime-CAROUSEL'); // Default to 'anime-CAROUSEL'
+        $type = $request->input('type', 'banner'); 
         $limit = $request->input('limit', 5);
         $category = $request->input('category', 'anime');
         $cat = 'anime';
@@ -20,8 +20,8 @@ class BannerController extends Controller
         } else if($category == '映画'){
             $cat = 'movie';
         }
+        Log::info($cat);
         
-
         $typePage = ($type == 'banner') ? 'CAROUSEL' : ($type == 'topic' ? 'SPOTLIGHT' : '');
         $banners = DB::table('at_page_setting')
             ->leftJoin('at_article', 'at_article.id', '=', 'at_page_setting.article_id')

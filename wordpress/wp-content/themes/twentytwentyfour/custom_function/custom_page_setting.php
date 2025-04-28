@@ -23,19 +23,26 @@ function page_settings_config()
         <div class="tabs">
             <div class="tab active" data-category="anime">アニメ</div>
             <div class="tab" data-category="movie">映画</div>
-            <div class="tab" data-category="jdrama">日本ドラマ</div>
+            <div class="tab" data-category="jdrama">国内ドラマ</div>
             <div class="tab" data-category="fdrama">海外ドラマ</div>
         </div>
 
         <!-- Table structure, shared across all tabs -->
         <div class="tab-content active" id="anime">
             <h3 id="tabTitle">アニメ</h3>
+            <div class="toggle-wrapper">
+                <label class="switch">
+                    <input type="checkbox" id="toggleButton">
+                    <span class="slider"></span>
+                </label>
+                <span class="status" id="toggleStatus">CAROUSEL</span>
+            </div>
             <table id="animeTable" class="anime-table">
                 <thead>
                     <tr>
-                        <th>記事名</th>
+                        <th>掲載ページ</th>
                         <th>画像</th>
-                        <th>ポジション</th>
+                        <th>順序</th>
                         <th>削除</th>
                     </tr>
                 </thead>
@@ -49,30 +56,8 @@ function page_settings_config()
             </div>
         </div>
 
-        <!-- <div id="anime" class="tab-content active">
-            <h3>アニメ</h3>
-            <table id="animeTable" class="anime-table">
-                <thead>
-                    <tr>
-                        <th>記事名</th>
-                        <th>画像</th>
-                        <th>ポジション</th>
-                        <th>削除</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    < !-- Dynamic rows go here -- >
-                </tbody>
-            </table>
-
-            <div id="addRowBtnWrapper">
-                <button id="addRowBtn">＋ 行を追加</button>
-            </div> -->
-
-
-
         <div class="submit-button">
-            <button id="submitDataBtn">送信</button>
+            <button id="submitDataBtn">保存</button>
         </div>
 
         <div class="image-modal" id="imageModal">
@@ -100,6 +85,19 @@ function page_settings_config()
                 fdrama: baseUrl + 'initial_article.php?category=fdrama',
             };
 
+            $('#toggleButton').change(function() {
+                const container = $('#anime');
+                const tableBody = container.find('table tbody');
+                tableBody.empty();
+                if ($(this).is(':checked')) {
+                    $('#toggleStatus').text('SPOTLIGHT');
+                    populateData('SPOTLIGHT')
+                } else {
+                    $('#toggleStatus').text('CAROUSEL');
+                    populateData('CAROUSEL')
+                }
+            });
+
 
             function createRow(selectedItem = null, category = 'anime') {
                 const container = $('#anime');
@@ -119,12 +117,6 @@ function page_settings_config()
         <td><button class="move-up">⬆</button><button class="move-down">⬇</button></td>
         <td><button class="delete-row">🗑</button></td>
     `);
-
-                // <td><select class="article-select" style="width: 350px;"></select></td>
-                //         <td><img src="` + initialLink + `" class="article-image" alt="No Image" /></td>
-                //         <td><button class="move-up">⬆</button><button class="move-down">⬇</button></td>
-                //         <td><button class="delete-row">🗑</button></td>
-
                 tableBody.append(newRow);
                 const $select = newRow.find('.article-select');
 
@@ -180,26 +172,54 @@ function page_settings_config()
                 createRow(null, category);
             });
 
-            // Fetch initial data and create rows
-            let category = $('.tab.active').data('category') || 'anime';
-            $.getJSON(categoryApiMap[category], function(initialItems) {
-                if (Array.isArray(initialItems)) {
-                    initialItems.forEach(item => {
-                        createRow(item); // Pre-populate each row
-                    });
-                } else {
-                    createRow(); // fallback empty row
+            function populateData(type = null) {
+                let category = $('.tab.active').data('category') || 'anime';
+                initialArticle = categoryApiMap[category]
+                if (type != null) {
+                    initialArticle += '&type=' + type
                 }
-            }).fail(function() {
-                console.error("初期データの取得に失敗しました");
-                createRow(); // fallback empty row
-            });
+                $.getJSON(initialArticle, function(initialItems) {
+                    if (Array.isArray(initialItems)) {
+                        initialItems.forEach(item => {
+                            createRow(item); // Pre-populate each row
+                        });
+                    } else {
+                        createRow(); // fallback empty row
+                    }
+                }).fail(function() {
+                    console.error("初期データの取得に失敗しました");
+                    createRow(); // fallback empty row
+                });
+            }
+            populateData()
 
             $('.tab').on('click', function() {
                 $('.tab').removeClass('active');
                 $(this).addClass('active');
+                $('#toggleButton').prop('checked', false);
 
                 const category = $(this).data('category');
+
+                let tabTitleText = '';
+                switch (category) {
+                    case 'anime':
+                        tabTitleText = 'アニメ';
+                        break;
+                    case 'movie':
+                        tabTitleText = '映画';
+                        break;
+                    case 'jdrama':
+                        tabTitleText = '国内ドラマ';
+                        break;
+                    case 'fdrama':
+                        tabTitleText = '海外ドラマ';
+                        break;
+                    default:
+                        tabTitleText = '';
+                        break;
+                }
+
+                $('#tabTitle').html(tabTitleText);
 
                 const container = $('#anime');
                 const tableBody = container.find('table tbody');
@@ -227,70 +247,6 @@ function page_settings_config()
 
             let rowCount = 0;
             const maxRows = 10;
-
-            //             function createRow(selectedItem = null) {
-            //                 if (rowCount >= maxRows) {
-            //                     alert('最大 10 行までです。');
-            //                     return;
-            //                 }
-
-            //                 const row = $(`
-            //     <tr>
-            //         <td><select class="article-select" style="width: 350px;"></select></td>
-            //         <td><img src="` + initialLink + `" class="article-image" alt="No Image" /></td>
-            //         <td><button class="move-up">⬆</button><button class="move-down">⬇</button></td>
-            //         <td><button class="delete-row">🗑</button></td>
-            //     </tr>
-            // `);
-
-            //                 $('#animeTable tbody').append(row);
-            //                 rowCount++;
-
-            // const $select = row.find('.article-select');
-
-            //                 // Initialize Select2
-            //                 $select.select2({
-            //                     placeholder: '記事を選択',
-            //                     ajax: {
-            //                         url: "< ?php echo get_template_directory_uri(); ?>/custom_function/page_settings/article_list.php",
-            //                         dataType: 'json',
-            //                         delay: 250,
-            //                         data: function(params) {
-            //                             return {
-            //                                 term: params.term || '',
-            //                                 page: params.page || 1
-            //                             };
-            //                         },
-            //                         processResults: function(data, params) {
-            //                             params.page = params.page || 1;
-            //                             return {
-            //                                 results: data.results,
-            //                                 pagination: {
-            //                                     more: data.more
-            //                                 }
-            //                             };
-            //                         },
-            //                         cache: true
-            //                     },
-            //                     templateResult: formatOptionWithImage,
-            //                     templateSelection: formatSelectedOption,
-            //                     escapeMarkup: markup => markup
-            //                 });
-
-            //                 // Preselect if data provided
-            //                 if (selectedItem) {
-            //                     const option = new Option(selectedItem.text, selectedItem.id, true, true);
-            //                     $select.append(option).trigger('change');
-            //                     row.find('.article-image').attr('src', selectedItem.image);
-            //                 }
-
-            //                 // Change image on selection
-            //                 $select.on('select2:select', function(e) {
-            //                     const selected = e.params.data;
-            //                     row.find('.article-image').attr('src', selected.image);
-            //                 });
-            //             }
-
 
             // For dropdown options
             function formatOptionWithImage(option) {
@@ -351,21 +307,42 @@ function page_settings_config()
             });
 
             $('#submitDataBtn').click(function() {
-                const postData = [];
+                let postData = {};
+                let articleIds = [];
+                let selectedType = $('#toggleStatus').text();
+
+                rowCount = 0;
 
                 $('#animeTable tbody tr').each(function() {
-                    const articleId = $(this).find('.article-select').val();
-                    console.log($(this).find('.article-select'))
+                    let articleId = $(this).find('.article-select').val();
                     if (articleId) {
-                        postData.push(articleId);
+                        rowCount++;
+                        articleIds.push(articleId);
                     }
-                });
 
-                if (postData.length === 0) {
-                    alert('少なくとも1つの記事を選択してください。');
-                    return;
+                });
+                if (rowCount < 2 && selectedType == 'CAROUSEL') {
+                    alert('CAROUSELの最小入力は3です。もう一度入力してください。');
+                    return false;
                 }
 
+                let articleIdString = articleIds.join(', ');
+                let selectedCategory = $('.tab.active').data('category');
+
+                // If no article is selected, show an alert and return
+                if (articleIds.length === 0) {
+                    alert('少なくとも1つの記事を選択してください。');
+                    return false;
+                }
+
+                // Create the post data object
+                postData = {
+                    'article_id': articleIdString,
+                    'selected_category': selectedCategory,
+                    'selected_type': selectedType,
+                };
+
+                // Send the POST request using AJAX
                 $.ajax({
                     url: "<?php echo get_template_directory_uri(); ?>/custom_function/page_settings/save_selected_articles.php",
                     method: "POST",
@@ -373,7 +350,7 @@ function page_settings_config()
                         articles: postData
                     },
                     success: function(response) {
-                        console.log(response)
+                        console.log(response);
                         alert("データが保存されました！");
                     },
                     error: function(xhr, status, error) {
@@ -382,9 +359,6 @@ function page_settings_config()
                     }
                 });
             });
-
-
-
         });
     </script>
 

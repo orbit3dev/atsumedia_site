@@ -74,6 +74,9 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
             }
 
             $id = isset($data['id']) ? (string)($data['id']) : uniqid();
+            if($id != '29122'){
+                continue;
+            }
             if ($type_upload == 1) {
                 if (($key = array_search($id, $idArticle)) !== false) {
                     unset($idArticleArr[$key]);
@@ -121,19 +124,22 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $tempParentId = $id;
                 $parentId = null;
             }
-
+            $categoryName = 'anime';
             if($data['genre'] == 'アニメ'){
                 $genre_type_id = Constants::CATEGORY['anime'];
+                $categoryName = 'anime';
             } elseif($data['genre'] == '映画'){
                 $genre_type_id = Constants::CATEGORY['movie'];
+                $categoryName = 'movie';
+
             } elseif($data['genre'] == '国内ドラマ'){
                 $genre_type_id = Constants::CATEGORY['drama_japan'];
-
+                $categoryName = 'drama_japan';
             };
 
             // Thumbnail
-            $thumbnailUrl = !empty($data['thumbnail']) && !empty($titlePath) ? $data['thumbnail'] : ('public/anime/' . $titlePath);
-            $thumbnailUrl = ('public/anime/' . $titlePath);
+            $thumbnailUrl = !empty($data['thumbnail']) && !empty($titlePath) ? $data['thumbnail'] : ('public/' . $categoryName . '/' . $titlePath);
+            $thumbnailUrl = ('public/'. $categoryName . '/' . $titlePath);
             if (empty($data['series_path']) && empty($data['episode_path'])) {
                 $thumbnailUrl .= '/program_thumbnail_' . $id . '.png';
             } elseif (!empty($data['series_path']) && empty($data['episode_path'])) {
@@ -151,7 +157,8 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 'title_meta' => $data['title_meta'] ?? "",
                 'description_meta' => $data['description_meta'] ?? "",
                 'network_id' => $data['network_1'] ?? "",
-                'season_id' => $data['series_number'] ?? "",
+                'season_id' => $data['season'] ?? "",
+                'series_number' => $data['series_number'] ?? "",
                 'thumbnail_url' => $thumbnailUrl,
                 'content' => json_encode(["genre" => $data['content_genre'] ?? "", "subgenre" => ""], JSON_UNESCAPED_UNICODE),
                 'website' => $data['website'] ?? "",
@@ -272,6 +279,8 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 ], JSON_UNESCAPED_UNICODE),
             ];
 
+            
+
             $processed_data[] = $articleData;
 
             // Step 2: Dynamic CSV row handling
@@ -286,7 +295,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $castRole = trim($data[$roleKey] ?? "");
 
                 if ($castName === "") break;
-                insertCast($wpdb, $id, $castName, $castRole);
+                // insertCast($wpdb, $id, $castName, $castRole);
             }
 
             // === Insert Authors (author_1 to author_3)
@@ -296,7 +305,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
 
                 $authorName = trim($data[$authorKey] ?? "");
                 if ($authorName === "") continue;
-                insertAuthor($wpdb, $id, $authorName);
+                // insertAuthor($wpdb, $id, $authorName);
             }
 
             // === Insert Directors (director_1 to director_3)
@@ -306,7 +315,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
 
                 $director = trim($data[$directorKey] ?? "");
                 if ($director === "") continue;
-                insertDirector($wpdb, $id, $director);
+                // insertDirector($wpdb, $id, $director);
             }
 
             // === Insert Producers (producer_1 to producer_9)
@@ -317,7 +326,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $producer = trim($data[$producerKey] ?? "");
 
                 if ($producer === "") continue;
-                insertProducer($wpdb, $id, $producer);
+                // insertProducer($wpdb, $id, $producer);
             }
 
             // === Insert Screenwriters (screenwriter_1 to screenwriter_2)
@@ -328,7 +337,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $writer = trim($data[$writerKey] ?? "");
                 if ($writer === "") continue;
 
-                insertScreenWriter($wpdb, $id, $writer);
+                // insertScreenWriter($wpdb, $id, $writer);
             }
 
             // === Insert Production Companies (comma-separated in production_1)
@@ -338,7 +347,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 foreach ($arrayProduction as $company) {
                     $company = trim($company);
                     if ($company !== "") {
-                        insertArticleProduction($wpdb, $id, $company);
+                        // insertArticleProduction($wpdb, $id, $company);
                     }
                 }
             }
@@ -350,12 +359,13 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 foreach ($arrayVod as $vod) {
                     $vod = trim($vod);
                     if ($vod !== "") {
-                        insertVodArticle($wpdb, $id, $vod);
+                        // insertVodArticle($wpdb, $id, $vod);
                     }
                 }
             }
 
             insertOrUpdateArticle($wpdb, $articleData);
+            break;
         }
         fclose($handle);
     }

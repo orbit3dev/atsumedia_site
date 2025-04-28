@@ -12,6 +12,7 @@ use App\Models\AtArticleScreenwriter;
 use App\Models\AtArticleCast;
 use App\Models\AtArticleOriginalWork;
 use App\Models\AtArticleFreeText;
+use App\Models\Season;
 use App\Models\Network;
 use App\Models\Person;
 use App\Models\Vod;
@@ -60,11 +61,15 @@ class ArticleController extends Controller
     {
         $request->validate([
             'season_id' => 'required|string',
-            'genre_type_id' => 'required|integer',
+            'genre_type' => 'required|string',
             'tag_type_id' => 'required|integer',
         ]);
+        $season_id = !empty($request->season_id) ? $request->season_id : '';
+        if(isset($request->genre_type)  && ($request->genre_type != 'anime')){
+            $season_id = '';
+        }
 
-        $articles = AtArticle::where('at_article.season_id', $request->season_id)
+        $articles = AtArticle::where('at_article.season_id', $season_id)
             ->leftjoin('at_network', 'at_article.network_id', '=', 'at_network.id')
             ->leftjoin('at_article_genre_type', 'at_article_genre_type.id', '=', 'at_article.genre_type_id')
             ->select(
@@ -72,7 +77,7 @@ class ArticleController extends Controller
                 'at_network.name AS network_name',
                 'at_article_genre_type.name AS genre_name',
             )
-            ->where('at_article.genre_type_id', $request->genre_type_id)
+            ->where('at_article_genre_type.name', $request->genre_type)
             ->where('at_article.tag_type_id', $request->tag_type_id)
             ->orderBy('at_article.sort', 'asc')
             ->get();
@@ -87,11 +92,7 @@ class ArticleController extends Controller
             if (!$thumbnailUrl && $article->path && $article->id) {
                 // $thumbnailUrl = 'public/anime/' . $this->slugify($article->path) . '/season' . $article->season_id . '/series_thumbnail_' . $article->id . '.png';
             }
-
-            // build the pathname
-
-            // get network info
-
+            Log::info($article->path_name);
             return [
                 'id' => (string)$article->id,
                 'pathName' => $article->path_name,
@@ -118,11 +119,13 @@ class ArticleController extends Controller
         //     'genre_type_year_week_tag_type' => 'required|string',
         // ]);
         $genreTypeYearWeek = $request->genre_type_year_week;
+        $genreType = isset($request->genre_type) ?  $request->genre_type : 'anime';
         $genreTypeYearWeek = '202449';
+
         $combinations = [
-            'anime-' . $genreTypeYearWeek . '-series',
-            'anime-' . $genreTypeYearWeek . '-episode',
-            'anime-' . $genreTypeYearWeek . '-root',
+            $genreType .'-' . $genreTypeYearWeek . '-series',
+            $genreType .'-' . $genreTypeYearWeek . '-episode',
+            $genreType .'-' . $genreTypeYearWeek . '-root',
         ];
 
         $stats = AtArticleStatistic::whereIn('genre_type_year_week_tag_type', $combinations)
@@ -138,18 +141,16 @@ class ArticleController extends Controller
             )
             ->orderBy('click_count', 'desc')
             ->get();
-        $shapedData = $stats->map(function ($article) {
+        $shapedData = $stats->map(function ($article , $genreType) {
             // Decode thumbnail JSON if exists
             $thumbnail = json_decode($article->thumbnail, true);
             $thumbnailUrl = $thumbnail['url'] ?? null;
 
             // fallback to generate URL if not present
             if (!$thumbnailUrl && $article->path_name && $article->id) {
-                $thumbnailUrl = 'public/anime/' . $article->path_name . '/program_thumbnail_' . $article->article_id_data . '.png';
+                $thumbnailUrl = 'public/' . $genreType . '/' . $article->path_name . '/program_thumbnail_' . $article->article_id_data . '.png';
             }
 
-            // You can also fetch network name if you want, or leave blank
-            // $network = \App\Models\Network::find($article->network_id);
 
             return [
                 'yearWeek'   => $article->year_week,
@@ -185,7 +186,7 @@ class ArticleController extends Controller
             // 1. Get the parent article
             $articles = AtArticle::where('at_article.path_name', $request->path)
                 ->leftJoin('at_article_genre_type', 'at_article_genre_type.id', '=', 'at_article.genre_type_id')
-                ->leftJoin('at_article_tag_type', 'at_article_tag_type.id', '=', 'at_article.genre_type_id')
+                ->leftJoin('at_article_tag_type', 'at_article_tag_type.id', '=', 'at_article.tag_type_id')
                 ->leftJoin('at_category', 'at_category.id', '=', 'at_article.category_id')
                 ->select(
                     DB::raw('CAST(at_article.id AS CHAR) AS id'),
@@ -228,9 +229,25 @@ class ArticleController extends Controller
                     'at_article.created_at as createdAt',
                     'at_article.updated_at as updatedAt',
                     'at_article.thumbnail',
+                    'at_article.tag_type_id as tag_types',
+                    'at_article.id as articles_id',
                 )
                 ->get();
-            $articleChilds = AtArticle::where('at_article.parent_id', $articles[0]['id'])
+
+            if ($articles[0]['id'] == 0 && !empty($articles[0]['articles_id']) && $articles[0]['articles_id'] != 0) {
+                $articlesId = $articles[0]['articles_id'];
+            } else {
+                $articlesId = $articles[0]['id'];
+            }
+            //Episodes needs all its peers to show
+            if ($articles[0]['tag_types'] != 3) {
+                $parentId = $articlesId;
+            } else {
+                $parentId = $articles[0]['parentId'];
+            }
+
+            $articleChilds = AtArticle::where('at_article.parent_id', $parentId)
+                ->where('at_article.id', '!=', $articlesId)
                 ->select(
                     DB::raw('CAST(at_article.id AS CHAR) AS id'),
                     'at_article.title',
@@ -252,7 +269,7 @@ class ArticleController extends Controller
                 ->orderByRaw('FIELD(id, ' . implode(',', $intArray) . ')')
                 ->get();
 
-            $articleChilds4 = AtArticleAuthor::where('article_id', $articles[0]['id'])
+            $articleChilds4 = AtArticleAuthor::where('article_id', $articlesId)
                 ->leftJoin('at_person', 'at_article_author.person_id', '=', 'at_person.id')
                 ->select(
                     DB::raw('CAST(at_person.id AS CHAR) AS id'),
@@ -261,7 +278,7 @@ class ArticleController extends Controller
                     'at_person.sort',
                 )
                 ->get();
-            $articleChilds5 = AtArticleDirector::where('article_id', $articles[0]['id'])
+            $articleChilds5 = AtArticleDirector::where('article_id', $articlesId)
                 ->leftJoin('at_person', 'at_article_director.person_id', '=', 'at_person.id')
                 ->select(
                     DB::raw('CAST(at_person.id AS CHAR) AS id'),
@@ -270,7 +287,7 @@ class ArticleController extends Controller
                     'at_person.sort',
                 )
                 ->get();
-            $articleChilds6 = AtArticleProducer::where('article_id', $articles[0]['id'])
+            $articleChilds6 = AtArticleProducer::where('article_id', $articlesId)
                 ->leftJoin('at_person', 'at_article_producer.person_id', '=', 'at_person.id')
                 ->select(
                     DB::raw('CAST(at_person.id AS CHAR) AS id'),
@@ -279,7 +296,7 @@ class ArticleController extends Controller
                     'at_person.sort',
                 )
                 ->get();
-            $articleChilds7 = AtArticleScreenwriter::where('article_id', $articles[0]['id'])
+            $articleChilds7 = AtArticleScreenwriter::where('article_id', $articlesId)
                 ->leftJoin('at_person', 'at_article_screenwriter.person_id', '=', 'at_person.id')
                 ->select(
                     DB::raw('CAST(at_person.id AS CHAR) AS id'),
@@ -288,7 +305,7 @@ class ArticleController extends Controller
                     'at_person.sort',
                 )
                 ->get();
-            $articleChilds9 = AtArticleOriginalWork::where('article_id', $articles[0]['id'])
+            $articleChilds9 = AtArticleOriginalWork::where('article_id', $articlesId)
                 ->leftJoin('at_person', 'at_article_original_work.person_id', '=', 'at_person.id')
                 ->select(
                     DB::raw('CAST(at_person.id AS CHAR) AS id'),
@@ -297,7 +314,7 @@ class ArticleController extends Controller
                     'at_person.sort',
                 )
                 ->get();
-            $articleChilds8 = AtArticleCast::where('article_id', $articles[0]['id'])
+            $articleChilds8 = AtArticleCast::where('article_id', $articlesId)
                 ->select('at_article_cast.role_name', 'at_article_cast.person_id')
                 ->orderBy('at_article_cast.sort', 'asc')
                 ->orderBy('at_article_cast.id', 'asc')
@@ -317,7 +334,9 @@ class ArticleController extends Controller
                         ]
                     ];
                 });
-            $articleChilds10 = AtArticleFreeText::where('article_id', $articles[0]['id'])
+            $articleChilds10 = AtArticleFreeText::where('article_id', $articlesId)
+                ->get();
+            $articleChilds11 = Season::where('id', $articles[0]['season'])
                 ->get();
             // 3. For each child, get productions and group
             $articleChilds = $articleChilds->map(function ($child) {
@@ -376,6 +395,8 @@ class ArticleController extends Controller
                 $articleChilds8,
                 $articleChilds9,
                 $articleChilds10,
+                $articleChilds11,
+                $articlesId,
             ) {
                 $article->childs = $articleChilds;
                 $article->network = $articleChilds2;
@@ -457,6 +478,7 @@ class ArticleController extends Controller
                 ];
 
                 $cleanedArticle = trim($article->summary, '"');
+                $cleanedArticle = str_replace('\n', ' ', $cleanedArticle);
                 $innerJsonArticle = stripslashes($cleanedArticle);
                 $summaryArr = json_decode($innerJsonArticle, true);
                 $article->summary = [
@@ -485,6 +507,12 @@ class ArticleController extends Controller
                         'freeText' => $item
                     ];
                 });
+                if (!empty($articleChilds11) && !empty($articleChilds11[0]) && !empty($articleChilds11[0]['season'])) {
+                    $article->season = ['name' => $articleChilds11[0]['season']];
+                } else {
+                    $article->season = ['name' => ''];
+                }
+                $article->id = $articlesId;
                 return $article;
             });
             return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);

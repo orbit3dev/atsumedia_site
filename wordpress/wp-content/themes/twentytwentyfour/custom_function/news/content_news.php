@@ -6,115 +6,10 @@ function custom_content_page()
 ?>
 
     <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/custom_function/custom_css/editor_container.css">
-    <style>
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            /* Ensures space between title and button */
-            align-items: center;
-            /* Aligns items vertically in the center */
-            margin-bottom: 10px;
-        }
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/custom_function/custom_css/content_news.css">
 
-        /* Button Styling */
-        .news_button {
-            padding: 8px 16px;
-            background-color: #0073aa;
-            /* WordPress blue */
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        /* Hover effect */
-        .news_button:hover {
-            background-color: #005177;
-        }
-
-        .form-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .form-table th {
-            text-align: left;
-            font-weight: bold;
-            padding: 8px;
-            width: 180px;
-            background: #f9f9f9;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .form-table td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        /* Input & Textarea Styling */
-        input[type="text"],
-        input[type="date"],
-        textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        /* Checkboxes & Radios */
-        input[type="radio"],
-        input[type="checkbox"] {
-            margin-right: 5px;
-        }
-
-        /* Image Preview */
-        #first_view_preview img,
-        #author_preview img {
-            display: block;
-            margin-top: 10px;
-            max-width: 150px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Submit Button */
-        .button-primary {
-            padding: 10px 20px;
-            background-color: #0073aa;
-            color: white;
-            font-size: 16px;
-            border-radius: 4px;
-            transition: background 0.3s ease;
-        }
-
-        .button-primary:hover {
-            background-color: #005177;
-        }
-
-        .submit-container {
-            display: flex;
-            justify-content: flex-end;
-            /* Moves button to the right */
-            margin-top: 20px;
-        }
-
-        #editorjs_news {
-            border: 1px solid #ddd;
-            min-height: 200px;
-            padding: 10px;
-            background: #fff;
-            direction: ltr !important;
-            text-align: left;
-        }
-
-        #editorjs_news {
-            text-align: left;
-            margin: 0 auto;
-            max-width: 800px;
-        }
-    </style>
     <div class="wrap" id="table_panel">
         <div class="header-container">
             <h1><b>コンテンツ一覧</b></h1>
@@ -202,6 +97,7 @@ function custom_content_page()
                             <tr>
                                 <th><label>ファーストビュー画像(OGP画像としても利用)</label></th>
                                 <td>
+                                    <input type="file" id="first_view_image_input" name="first_view_image_input" accept="image/*">
                                     <input type="hidden" name="first_view_image" id="first_view_image">
                                     <button type="button" id="upload_first_view_button">画像をアップロード</button>
                                     <div id="first_view_preview"></div>
@@ -223,8 +119,9 @@ function custom_content_page()
                                 <td><textarea name="banner" rows="2" class="large-text"></textarea></td>
                             </tr>
                             <tr>
-                                <th><label for="related_titles">関連作品</label></th>
-                                <td><textarea name="related_titles" rows="2" class="large-text"></textarea></td>
+                                <th><label for="article-select">関連作品</label></th>
+                                <td><select id="article-select" style="width: 400px;"></select></td>
+                                <!-- <td><textarea name="related_titles" rows="2" class="large-text"></textarea></td> -->
                             </tr>
                             <tr>
                                 <th><label for="author_name">著者名</label></th>
@@ -237,6 +134,7 @@ function custom_content_page()
                             <tr>
                                 <th><label>著者画像</label></th>
                                 <td>
+                                    <input type="file" id="author_image_input" name="author_image_input" accept="image/*">
                                     <input type="hidden" name="author_image" id="author_image">
                                     <button type="button" id="upload_author_button">画像をアップロード</button>
                                     <div id="author_preview"></div>
@@ -262,6 +160,231 @@ function custom_content_scripts()
     <script>
         let editor;
         jQuery(document).ready(function($) {
+            const $select = $('#article-select');
+            selectedData = ''
+
+            function formatSelectedOption(option) {
+                if (!option.id) return option.text;
+                return option.text;
+            }
+
+            function formatOptionWithImage(option) {
+                if (!option.image) return option.text;
+                return `<img src="${option.image}" style="height: 20px; width: auto; vertical-align: middle; margin-right: 5px;" /> ${option.text}`;
+            }
+
+            $select.select2({
+                placeholder: '記事を選択',
+                ajax: {
+                    url: "<?php echo get_template_directory_uri(); ?>/custom_function/page_settings/article_list.php",
+                    dataType: 'json',
+                    delay: 250,
+                    cache: false,
+                    data: function(params) {
+                        return {
+                            term: params.term || '',
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.results,
+                            pagination: {
+                                more: data.more
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                templateResult: formatOptionWithImage,
+                templateSelection: formatSelectedOption,
+                escapeMarkup: markup => markup
+            });
+            let originalImageUrl = '';
+            let originalImageFilename = '';
+            $select.on('select2:select', function(e) {
+                var selectedData = e.params.data;
+            });
+
+            class ButtonTool {
+                static get toolbox() {
+                    return {
+                        title: 'Button Block',
+                        icon: '<svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="3" ry="3" style="fill:gray"></rect></svg>'
+                    };
+                }
+
+                constructor({
+                    data
+                }) {
+                    this.data = data || {};
+                    this.barText = this.data.barText || '';
+                    this.buttonText = this.data.buttonText || '';
+                    this.link = this.data.link || '';
+                    this.isSet = this.data.isSet || false; // <-- new flag: has user clicked 'セット'?
+                }
+
+                render() {
+                    this.$wrapper = $('<div>');
+
+                    // Input for bar text
+                    this.$inputBarText = $('<input>', {
+                        type: 'text',
+                        placeholder: 'Text between bars (| text |)',
+                        value: this.barText,
+                        class: 'cdx-input'
+                    });
+
+                    // Input for button text
+                    this.$inputButtonText = $('<input>', {
+                        type: 'text',
+                        placeholder: 'Button Text',
+                        value: this.buttonText,
+                        class: 'cdx-input',
+                        style: 'margin-top: 8px;'
+                    });
+
+                    // Input for link
+                    this.$inputLink = $('<input>', {
+                        type: 'text',
+                        placeholder: 'Button Link (href)',
+                        value: this.link,
+                        class: 'cdx-input',
+                        style: 'margin-top: 8px;'
+                    });
+
+                    // セット button
+                    this.$setButton = $('<button>', {
+                        type: 'button',
+                        text: 'セット',
+                        style: 'margin-top:10px; display:block; background-color:#FF6534; color:white; padding:6px 12px; border:none; border-radius:4px; cursor:pointer;'
+                    });
+
+                    this.$setButton.on('click', () => {
+                        this.barText = this.$inputBarText.val();
+                        this.buttonText = this.$inputButtonText.val();
+                        this.link = this.$inputLink.val();
+                        this.isSet = true;
+
+                        this.$wrapper.empty(); // clear inputs
+                        this.renderPreview(); // show button
+                    });
+
+                    if (this.isSet) {
+                        this.renderPreview();
+                    } else {
+                        this.$wrapper.append(
+                            this.$inputBarText,
+                            this.$inputButtonText,
+                            this.$inputLink,
+                            this.$setButton
+                        );
+                    }
+
+                    return this.$wrapper[0];
+                }
+
+
+                renderPreview() {
+                    // Build preview HTML
+                    const $a = $('<a>', {
+                        href: this.link,
+                        target: '_blank',
+                        class: 'custom-group'
+                    });
+
+                    const $bar = $('<div>', {
+                        text: `\\ ${this.barText} /`,
+                        style: 'font-weight: bold; color: #FF6534; margin-bottom: 10px;'
+                    });
+
+                    const $button = $('<button>', {
+                        class: 'custom-button',
+                        text: this.buttonText
+                    });
+
+                    $a.append($bar, $button);
+                    this.$wrapper.append($a); // Only button shown, no more input
+                }
+
+                save() {
+                    return {
+                        barText: this.barText,
+                        buttonText: this.buttonText,
+                        link: this.link,
+                        isSet: this.isSet
+                    };
+                }
+            }
+
+            class HeadlineTool {
+                static get toolbox() {
+                    return {
+                        title: 'Headline Block',
+                        icon: '<svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="3" ry="3" style="fill:black"></rect></svg>'
+                    };
+                }
+
+                constructor({
+                    data
+                }) {
+                    this.data = data || {};
+                    this.headlineText = this.data.headlineText || '';
+                }
+
+                render() {
+                    this.$wrapper = $('<div>');
+
+                    // Create the input field for the headline
+                    this.$inputHeadline = $('<h2>', {
+                        text: this.headlineText,
+                        contenteditable: true,
+                        placeholder: 'Type your headline here...',
+                        style: `
+                background-color: black;
+                color: white;
+                font-weight: bold;
+                padding: 10px;
+                border-radius: 5px;
+                text-align: center;
+                margin: 0;
+                width: 100%;
+            `
+                    });
+
+                    // Append the input to the wrapper
+                    this.$wrapper.append(this.$inputHeadline);
+
+                    // Handle Enter key press to add new block
+                    this.$inputHeadline.on('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault(); // Prevent the default Enter behavior (line break)
+                            this.addNewBlock(); // Create a new block when Enter is pressed
+                        }
+                    });
+
+                    return this.$wrapper[0];
+                }
+
+                addNewBlock() {
+                    // Create a new block when Enter is pressed
+                    const newBlock = new HeadlineTool({
+                        data: {
+                            headlineText: ''
+                        }
+                    });
+                    editor.blocks.insert(newBlock, {}, true); // Insert the new headline block into the editor
+                }
+
+                save() {
+                    return {
+                        headlineText: this.$inputHeadline.text()
+                    };
+                }
+            }
+
+
             function initEditor() {
                 if ($('#editorjs_news').length) {
                     editor = new EditorJS({
@@ -269,6 +392,20 @@ function custom_content_scripts()
                         tools: {
                             paragraph: {
                                 class: Paragraph
+                            },
+                            header: {
+                                class: Header, // ➡️ added Header tool
+                                inlineToolbar: true,
+                                config: {
+                                    levels: [2, 3, 4],
+                                    defaultLevel: 2
+                                }
+                            },
+                            button: {
+                                class: ButtonTool // ➡️ custom Button tool (I'll show below)
+                            },
+                            headline: {
+                                class: HeadlineTool
                             },
                             image: {
                                 class: ImageTool,
@@ -414,8 +551,8 @@ function custom_content_scripts()
                         if (response.success) {
                             $('#table_panel').hide(500)
                             $('#custom-content-form').show(1000)
-
                             var data = response.data;
+                            console.log(data)
                             clearForm()
                             $('input[name="title"]').val(data.title);
                             $('input[name="slug"]').val(data.slug);
@@ -425,7 +562,7 @@ function custom_content_scripts()
                             $('textarea[name="meta_description"]').val(data.description_meta);
 
                             $('textarea[name="banner"]').val(data.banner);
-                            $('textarea[name="related_titles"]').val(data.related_titles);
+                            // $('textarea[name="related_titles"]').val(data.related_titles);
                             $('input[name="author_name"]').val(data.author);
                             $('textarea[name="author_description"]').val(data.author_description);
 
@@ -440,10 +577,23 @@ function custom_content_scripts()
 
                             // Images
                             $('#first_view_image').val(data.image);
-                            $('#first_view_preview').html('<img src="http://localhost/wordpress/wp-content/themes/twentyfourteen' + data.image + '" width="150">');
-                            $('#author_image').val(data.author_image);
-                            $('#author_preview').html('<img src="http://localhost/wordpress/wp-content/themes/twentyfourteen' + data.author_image + '" width="150">');
+                            if (data.image != '' && data.image != null) {
+                                $('#first_view_preview').html('<img src="' + data.image + '" width="150">');
+                            }
+                            if (data.author_image != '' && data.author_image != null) {
+                                $('#author_image').val(data.author_image);
+                                $('#author_preview').html('<img src="' + data.author_image + '" width="150">');
+                            }
+                            var savedRelatedTitles = typeof data.related_articles != 'undefined' ? JSON.parse(data.related_articles) : null;
+                            if (savedRelatedTitles != null) {
+                                var option = new Option(savedRelatedTitles.text, savedRelatedTitles.id, true, true); // true sets the option as selected
+                                $select.append(option).trigger('change');
+                            }
+                            if (data.related_titles && data.related_titles !== '') {
 
+                            } else {
+                                console.log('No related titles or empty string');
+                            }
                             $('#news_id').val(data.id)
 
                             let fixedContent = data.content.replace(/<a href="(.*?)">/g, '<a href=\\"$1\\">');
@@ -524,95 +674,161 @@ function custom_content_scripts()
             mediaUploader('upload_first_view_button', 'first_view_image', 'first_view_preview');
             mediaUploader('upload_author_button', 'author_image', 'author_preview');
 
-            // Handle Form Submission
-            $('#custom-content-form').submit(function(e) {
-                // e.preventDefault(); // Prevent page reload
-                editor.save().then((outputData) => {
-                    var formData = $(this).serializeArray();
+            function handleImagePreview(inputId, previewId) {
+                $(`#${inputId}`).on("change", function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            $(`#${previewId}`).html(`<img src="${event.target.result}" width="150">`);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
 
-                    formData.push({
-                        name: "article_content",
-                        value: JSON.stringify(outputData)
-                    });
+            function uploadImage(inputId, hiddenFieldId, callback) {
+                const imageFile = $(`#${inputId}`).prop("files")[0];
 
-                    $.ajax({
-                        type: 'POST',
-                        url: ajaxurl, // WordPress built-in AJAX URL
-                        data: {
-                            action: 'insert_at_news', // WordPress AJAX action
-                            form_data: $.param(formData) // Convert formData array to URL-encoded string
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                alert('データが正常にアップロードされました');
-                                $('#custom-content-form')[0].reset(); // Reset form after success
-                            } else {
-                                alert('エラー: ' + response.data.message);
-                            }
-                            windows.reload()
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("Error:", error);
-                            alert('フォームを送信中にエラーが発生しました');
+                if (!imageFile) {
+                    callback(null);
+                    return;
+                }
+
+                const imageFormData = new FormData();
+                imageFormData.append("file", imageFile);
+
+                $.ajax({
+                    url: "<?php echo get_template_directory_uri(); ?>/custom_function/news/upload_image_news.php",
+                    type: "POST",
+                    data: imageFormData,
+                    processData: false,
+                    contentType: false,
+                    success: function(uploadResponse) {
+                        if (uploadResponse.success) {
+                            $(`#${hiddenFieldId}`).val(uploadResponse.data.url);
+                            callback(uploadResponse.data.url);
+                        } else {
+                            alert("画像アップロードに失敗しました: " + uploadResponse.data.message);
+                            callback(null);
                         }
-                    });
-                }).catch((error) => {
-                    console.error("Editor.js Saving failed:", error);
-                    alert('記事内容の保存に失敗しました');
+                    },
+                    error: function() {
+                        alert("画像アップロード中にエラーが発生しました");
+                        callback(null);
+                    }
+                });
+            }
+
+            // Apply preview handling to both image inputs
+            handleImagePreview("first_view_image_input", "first_view_preview");
+            handleImagePreview("author_image_input", "author_preview");
+
+            // Modify form submission to wait for both uploads before proceeding
+            $("#custom-content-form").submit(function(e) {
+                e.preventDefault();
+
+                let firstViewImageUploaded = false;
+                let authorImageUploaded = false;
+
+                function checkUploads() {
+                    if (firstViewImageUploaded && authorImageUploaded) {
+                        submitArticleForm();
+                    }
+                }
+
+                uploadImage("first_view_image_input", "first_view_image", function() {
+                    firstViewImageUploaded = true;
+                    checkUploads();
+                });
+
+                uploadImage("author_image_input", "author_image", function() {
+                    authorImageUploaded = true;
+                    checkUploads();
                 });
             });
 
-            // editor = new EditorJS({
-            //     holder: 'editorjs_news',
-            //     // data: articleData.blocks || [], // If no data, initializes with an empty array
-            //     tools: {
-            //         paragraph: {
-            //             class: Paragraph
-            //         },
-            //         image: {
-            //             class: ImageTool,
-            //             config: {
-            //                 endpoints: {
-            //                     byFile: "< ?php echo get_template_directory_uri(); ?>/custom_function/news/save_images_news.php",
+            function submitArticleForm() {
+                editor.save().then((outputData) => {
+                    const formData = $("#custom-content-form").serializeArray();
+
+                    articleId = selectedData
+                    console.log(articleId)
+                    formData.push({
+                        name: "article_content",
+                        value: JSON.stringify(outputData),
+                    });
+                    formData.push({
+                        name: "article_select",
+                        value: articleId,
+                    });
+
+                    $.ajax({
+                        type: "POST",
+                        url: ajaxurl,
+                        data: {
+                            action: "insert_at_news",
+                            form_data: $.param(formData),
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                alert("データが正常にアップロードされました");
+                                $("#custom-content-form")[0].reset();
+                                $("#first_view_preview").html("");
+                                $("#author_preview").html("");
+                            } else {
+                                alert("エラー: " + response.data.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error:", error);
+                            alert("フォームを送信中にエラーが発生しました");
+                        },
+                    });
+                }).catch((error) => {
+                    console.error("Editor.js Saving failed:", error);
+                    alert("記事内容の保存に失敗しました");
+                });
+            }
+
+
+            // Handle Form Submission
+            // $('#custom-content-form').submit(function(e) {
+            //     e.preventDefault(); // Prevent default for now
+
+            //     const imageFile = $('#first_view_image_input').prop('files')[0];
+
+            //     // If there's an image, upload it first
+            //     if (imageFile) {
+            //         const imageFormData = new FormData();
+            //         imageFormData.append('file', imageFile);
+
+            //         // Upload to your custom PHP file in theme directory
+            //         $.ajax({
+            //             url: "< ?php echo get_template_directory_uri(); ?>/custom_function/news/upload_image_news.php",
+            //             type: 'POST',
+            //             data: imageFormData,
+            //             processData: false,
+            //             contentType: false,
+            //             success: function(uploadResponse) {
+            //                 if (uploadResponse.success) {
+            //                     // Set hidden input for form submission
+            //                     $('#first_view_image').val(uploadResponse.data.url);
+            //                     submitArticleForm(); // Proceed with final form submit
+            //                 } else {
+            //                     alert('画像アップロードに失敗しました: ' + uploadResponse.data.message);
             //                 }
+            //             },
+            //             error: function() {
+            //                 alert('画像アップロード中にエラーが発生しました');
             //             }
-            //         },
-            //         table: {
-            //             class: Table
-            //         },
-            //         quote: {
-            //             class: Quote
-            //         },
-            //         embed: {
-            //             class: Embed
-            //         },
-            //         linkTool: {
-            //             class: LinkTool,
-            //             config: {
-            //                 // endpoint: '/path/to/your/link-parser.php', // Update to your actual endpoint
-            //                 endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
-            //                 fetchData: (url) => {
-            //                     return fetch('<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php', {
-            //                             method: 'POST',
-            //                             headers: {
-            //                                 'Content-Type': 'application/json'
-            //                             },
-            //                             body: JSON.stringify({
-            //                                 url: url
-            //                             })
-            //                         })
-            //                         .then(response => response.json());
-            //                 }
-            //             }
-            //         }
-            //     },
-            //     onReady: () => {
-            //         console.log('✅ Editor.js is ready');
-            //     },
-            //     onChange: () => {
-            //         console.log('✏️ Content changed');
+            //         });
+            //     } else {
+            //         submitArticleForm(); // No image? Just submit.
             //     }
             // });
+
+
         });
     </script>
 <?php
@@ -638,7 +854,7 @@ function insert_at_news()
     $first_view_image = !empty($form_data['first_view_image']) ? esc_url_raw($form_data['first_view_image']) : null;
     $article_content = !empty($form_data['article_content']) ? wp_unslash($form_data['article_content']) : null;
     $banner = sanitize_textarea_field($form_data['banner']);
-    $related_titles = sanitize_textarea_field($form_data['related_titles']);
+    $article_select = sanitize_textarea_field($form_data['article_select']);
     $author_name = sanitize_text_field($form_data['author_name']);
     $author_description = sanitize_textarea_field($form_data['author_description']);
     $author_image = !empty($form_data['author_image']) ? esc_url_raw(trim($form_data['author_image'])) : null;
@@ -670,7 +886,7 @@ function insert_at_news()
         'image' => $first_view_image,
         'content' => $article_content,
         'banner' => $banner,
-        'related_titles' => $related_titles,
+        'related_titles' => $article_select,
         'author' => $author_name,
         'author_description' => $author_description,
         'author_image' => $author_image,
@@ -678,7 +894,6 @@ function insert_at_news()
         'type_name' => $genre, // Type_name field mapping
         'updated_at' => $datetime,
     ];
-
 
     if ($news_id) {
         // Check if record exists before updating

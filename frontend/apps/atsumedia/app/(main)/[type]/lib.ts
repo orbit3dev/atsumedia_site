@@ -170,12 +170,12 @@ export const getPersonList = async () => {
 	return dataResult;
 };
 
-export const getTopicData = async () => {
+export const getTopicData = async (categoryName: string) => {
 	//v1
 	const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/get-banner",
 		{
 			method: "POST",
-			body: JSON.stringify({ type: 'topic' }),
+			body: JSON.stringify({ type: 'topic' , category:categoryName }),
 			headers: {
 				"Content-Type": "application/json", // Ensure JSON is sent
 				"Accept": "application/json",
@@ -226,7 +226,7 @@ export const getBannerList = async (categoryName: string) => {
 
 
 export const getNewList = async (
-	seasonId: string,
+	genreType: string,
 	// genreTypeId: number,
 	// tagTypeId: number
 ) => {
@@ -236,7 +236,7 @@ export const getNewList = async (
 			method: "POST",
 			body: JSON.stringify({
 				season_id: '22',
-				genre_type_id: 1,
+				genre_type: genreType,
 				tag_type_id: 2,
 			}),
 			headers: {

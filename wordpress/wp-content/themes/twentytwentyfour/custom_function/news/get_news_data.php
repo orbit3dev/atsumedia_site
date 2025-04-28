@@ -82,7 +82,19 @@ function get_news_by_id()
         $result['is_public'] = $result['is_public'] ? "公開" : "非公開";
         $result['is_top'] = $result['is_top'] ? "表示" : "非表示";
         $result['location'] = site_url();
-
+        if($result['related_titles']){
+            $data_related_titles = $wpdb->get_row($wpdb->prepare(
+                "SELECT 
+                id, path_name AS text, thumbnail_url as image,vod
+                FROM at_article WHERE id = %d",
+                $result['related_titles']
+            ), ARRAY_A);
+            $data_related_titles['image'] = get_template_directory_uri() . '/assets/assets/'. $data_related_titles['image'] ."v=" .time();
+            $result['related_articles'] = !empty($data_related_titles) ? json_encode($data_related_titles) : null;
+            // $result['related_articles'][]
+        } else {
+            $result['related_articles'] = 1;
+        }
         error_log("Data fetched successfully: " . print_r($result, true));
         echo json_encode(["success" => true, "data" => $result]);
     } else {

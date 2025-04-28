@@ -15,10 +15,10 @@ function custom_csv_upload_page()
                     <option value="category">カテゴリ</option>
                     <option value="season_master">シーズン</option>
                     <option value="broadcast_master">放送局</option>
-                    <option value="cast_master">キャストマスタ</option>
+                    <option value="cast_master">キャスト</option>
                     <option value="vod">VOD</option>
                     <option value="song">曲</option>
-                    <option value="page_settings">ページ表示設定</option>
+                    <option value="page_settings">ページ設定</option>
                     <option value="production">制作会社</option>
                     <!-- <option value="news">ニュース</option> -->
                 </select>

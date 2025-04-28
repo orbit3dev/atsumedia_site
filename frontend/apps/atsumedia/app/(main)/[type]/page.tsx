@@ -111,7 +111,7 @@ const Page = async ({ params }: PageProps) => {
 		getPersonList(),
 		getBannerList(categoryName),
 		getRootArticleListByGenreTypeOrderByClickCount(params.type, 10, TagType.series),
-		getTopicData(),
+		getTopicData(categoryName),
 		getNewList(params.type),
 		getNewsListByGenreType(params.type, 10),
 	]);

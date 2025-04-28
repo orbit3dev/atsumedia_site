@@ -12,8 +12,16 @@ try {
         throw new Exception('Method not allowed', 405);
     }
 
-    $articles = $_POST['articles'] ?? [];
+    $articleData = $_POST['articles'] ?? [];  
+    $articlesString = $articleData['article_id'] ?? '';  
+    $genre = $articleData['selected_category'] ?? 'anime';  
+    $type = $articleData['selected_type'] ?? 'CAROUSEL';  
 
+    // Step 2: Convert comma-separated article IDs to an array
+    $articles = explode(',', $articlesString);
+    $articles = array_map('trim', $articles);  
+
+    // Step 3: Check if articles are valid
     if (!is_array($articles) || empty($articles)) {
         throw new Exception('No articles received', 400);
     }
@@ -21,29 +29,27 @@ try {
     // Constants
     $table_name = $wpdb->prefix . 'page_setting';
     $article_table = $wpdb->prefix . 'article';
-    $type = 'CAROUSEL';
-    $genre = 'anime';
 
-    // Step 1: Delete existing CAROUSEL rows
-    $wpdb->delete($table_name, ['type' => $type]);
+    $wpdb->delete($table_name, ['type' => $type , 'genre' =>  $genre]);
 
-    // Step 2: Get smallest available IDs
+    // Step 4: Get existing rows from the table and determine the next available IDs
     $existing_ids = $wpdb->get_col("SELECT id FROM {$table_name} ORDER BY id ASC");
     $next_ids = [];
     $next_id = 1;
 
     foreach ($articles as $index => $article_id) {
+        // Find the next available ID
         while (in_array($next_id, $existing_ids) || in_array($next_id, $next_ids)) {
             $next_id++;
         }
         $next_ids[] = $next_id;
     }
 
-    // Step 3: Fetch program titles
-    $placeholders = implode(',', array_fill(0, count($articles), '%d'));
-    $query = "SELECT id, program_title FROM {$article_table} WHERE id IN ($placeholders)";
+    // Step 5: Fetch program titles based on article IDs
+    $placeholders = implode(',', array_fill(0, count($articles), '%s'));
+    $query = "SELECT id, program_title FROM {$article_table} WHERE id IN ({$placeholders})";
     $prepared = $wpdb->prepare($query, $articles);
-    $programs = $wpdb->get_results($prepared, OBJECT_K); // object keyed by id
+    $programs = $wpdb->get_results($prepared, OBJECT_K);  // Object keyed by id
 
     // Step 4: Insert new rows
     $inserted_count = 0;

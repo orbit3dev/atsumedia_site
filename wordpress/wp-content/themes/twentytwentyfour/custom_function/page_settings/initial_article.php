@@ -7,21 +7,14 @@ global $wpdb;
 header('Content-Type: application/json');
 $getParam = !empty($_GET) ? $_GET : [];
 $category = !empty($getParam) && !empty($getParam['category']) ? $getParam['category'] : 'anime';
+$type = !empty($getParam) && !empty($getParam['type']) ? $getParam['type'] : 'CAROUSEL';
 
 // Get multiple initial articles
 $results = $wpdb->get_results("
     SELECT a.article_id as id, b.path AS name, b.thumbnail_url AS image
     FROM at_page_setting a
     LEFT JOIN at_article b ON a.article_id = b.id
-    WHERE a.type = 'CAROUSEL'
-    and a.genre = '" . $category . "'
-");
-
-error_log("
-    SELECT a.article_id as id, b.path AS name, b.thumbnail_url AS image
-    FROM at_page_setting a
-    LEFT JOIN at_article b ON a.article_id = b.id
-    WHERE a.type = 'CAROUSEL'
+    WHERE a.type = '" . $type . "'
     and a.genre = '" . $category . "'
 ");
 

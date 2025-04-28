@@ -109,6 +109,7 @@ export const getRootArticleListByGenreTypeOrderByClickCount = async (
 			method: "POST",
 			body: JSON.stringify({
 				genre_type_year_week_tag_type: 'genreTypeYearWeekTagType',
+				genre_type: genreType,
 			}),
 			headers: {
 				"Content-Type": "application/json",

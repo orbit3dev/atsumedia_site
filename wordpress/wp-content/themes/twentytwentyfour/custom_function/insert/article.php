@@ -61,6 +61,7 @@ function insertOrUpdateArticle($wpdb, $data)
         'dubcast_role' =>  $data['dubcast_role'] ?? '',
         'executive_producer' =>  $data['executive_producer'] ?? '',
         'title' =>  $data['title'] ?? '',
+        'sns' =>  $data['sns'] ?? '',
     ];
 
     $formats = array_fill(0, count($insert_data), '%s');

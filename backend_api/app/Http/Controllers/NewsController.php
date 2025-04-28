@@ -31,8 +31,10 @@ class NewsController extends Controller
         $page = 1;
         $offset    = ($page - 1) * $limit;
 
-        $query = News::where('genre_type_public', $genreType)
-            ->where('datetime', '<', Carbon::now())
+        $query = News::where('genre_type', $genreType)
+            // ->where('datetime', '<', Carbon::now())
+            ->where('is_public', 1)
+            ->where('is_top', 1)
             ->select('id', 'title', 'type', 'genre_type as genreType', 'title_meta as titleMeta', 'description_meta', 'image', 'path_name as pathName', 'author')
             ->orderBy('datetime', 'desc');
 
@@ -44,11 +46,11 @@ class NewsController extends Controller
 
         $hasNextPage = ($offset + $limit) < $totalRecords;
         $nextPage    = $hasNextPage ? $page + 1 : null;
-
-        return response()->json([
+        $dataResult = [
             'newsList' => $newsList,
             'nextToken' => $nextPage,
-        ]);
+        ];
+        return response()->json($dataResult);
     }
 
     public function getNewsByPathName(Request $request)
@@ -88,7 +90,7 @@ class NewsController extends Controller
         ];
         unset($query->author_image);
         unset($query->author_description);
-        return $query;
+        // return $query;
         return response()->json($query, 200, [], JSON_UNESCAPED_UNICODE);
     }
 }
