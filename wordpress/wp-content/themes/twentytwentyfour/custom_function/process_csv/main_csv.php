@@ -295,7 +295,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $castRole = trim($data[$roleKey] ?? "");
 
                 if ($castName === "") break;
-                // insertCast($wpdb, $id, $castName, $castRole);
+                insertCast($wpdb, $id, $castName, $castRole);
             }
 
             // === Insert Authors (author_1 to author_3)
@@ -305,7 +305,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
 
                 $authorName = trim($data[$authorKey] ?? "");
                 if ($authorName === "") continue;
-                // insertAuthor($wpdb, $id, $authorName);
+                insertAuthor($wpdb, $id, $authorName);
             }
 
             // === Insert Directors (director_1 to director_3)
@@ -315,7 +315,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
 
                 $director = trim($data[$directorKey] ?? "");
                 if ($director === "") continue;
-                // insertDirector($wpdb, $id, $director);
+                insertDirector($wpdb, $id, $director);
             }
 
             // === Insert Producers (producer_1 to producer_9)
@@ -326,7 +326,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $producer = trim($data[$producerKey] ?? "");
 
                 if ($producer === "") continue;
-                // insertProducer($wpdb, $id, $producer);
+                insertProducer($wpdb, $id, $producer);
             }
 
             // === Insert Screenwriters (screenwriter_1 to screenwriter_2)
@@ -337,7 +337,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $writer = trim($data[$writerKey] ?? "");
                 if ($writer === "") continue;
 
-                // insertScreenWriter($wpdb, $id, $writer);
+                insertScreenWriter($wpdb, $id, $writer);
             }
 
             // === Insert Production Companies (comma-separated in production_1)
@@ -359,7 +359,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 foreach ($arrayVod as $vod) {
                     $vod = trim($vod);
                     if ($vod !== "") {
-                        // insertVodArticle($wpdb, $id, $vod);
+                        insertVodArticle($wpdb, $id, $vod);
                     }
                 }
             }
