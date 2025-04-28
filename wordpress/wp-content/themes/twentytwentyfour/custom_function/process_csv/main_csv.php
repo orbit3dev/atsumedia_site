@@ -25,7 +25,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
     if (!file_exists($target_input)) {
         return ["num_row_processed" => 0, "data" => []];
     }
-
+    error_log(123);
     $processed_data = [];
     $rowCount = 0;
 
@@ -74,9 +74,6 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
             }
 
             $id = isset($data['id']) ? (string)($data['id']) : uniqid();
-            if($id != '29122'){
-                continue;
-            }
             if ($type_upload == 1) {
                 if (($key = array_search($id, $idArticle)) !== false) {
                     unset($idArticleArr[$key]);
@@ -365,7 +362,6 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
             }
 
             insertOrUpdateArticle($wpdb, $articleData);
-            break;
         }
         fclose($handle);
     }
