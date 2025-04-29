@@ -28,7 +28,10 @@ const MyImage: FC<MyImageProps> = ({
                                    }) => {
   // const src = useMemo(() => `${S3Domain}/${path}`, [path]);
   const BASE_URL = process.env.NEXT_PUBLIC_ASSET_BASE_URL;
-  const src = useMemo(() => `${BASE_URL}/${path}`, [path]);
+  const timestamp = new Date().getTime(); // or use a version number
+  const src = useMemo(() => {
+    return `${BASE_URL}/${path}?v=${timestamp}`;
+  }, [path, timestamp]);
   return (
     isMainImage ?
       <div

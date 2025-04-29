@@ -16,7 +16,7 @@ import { isExternalDomainExtended } from '../../../../../_lib/config';
 interface ArticlesMainInfoProps {
 	data: News;
 }
-console.log(222)
+
 const dateFormat = (dateStr: string) => {
 	return format(new Date(dateStr), 'yyyy年MM月dd日');
 };

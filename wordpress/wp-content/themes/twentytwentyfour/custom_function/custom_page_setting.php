@@ -25,6 +25,7 @@ function page_settings_config()
             <div class="tab" data-category="movie">映画</div>
             <div class="tab" data-category="jdrama">国内ドラマ</div>
             <div class="tab" data-category="fdrama">海外ドラマ</div>
+            <div class="tab" data-category="public">TOP</div>
         </div>
 
         <!-- Table structure, shared across all tabs -->
@@ -83,6 +84,7 @@ function page_settings_config()
                 movie: baseUrl + 'initial_article.php?category=movie',
                 jdrama: baseUrl + 'initial_article.php?category=jdrama',
                 fdrama: baseUrl + 'initial_article.php?category=fdrama',
+                public: baseUrl + 'initial_article.php?category=public',
             };
 
             $('#toggleButton').change(function() {

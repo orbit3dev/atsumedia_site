@@ -92,7 +92,6 @@ class ArticleController extends Controller
             if (!$thumbnailUrl && $article->path && $article->id) {
                 // $thumbnailUrl = 'public/anime/' . $this->slugify($article->path) . '/season' . $article->season_id . '/series_thumbnail_' . $article->id . '.png';
             }
-            Log::info($article->path_name);
             return [
                 'id' => (string)$article->id,
                 'pathName' => $article->path_name,

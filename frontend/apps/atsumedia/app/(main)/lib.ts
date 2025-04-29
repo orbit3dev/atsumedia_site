@@ -11,11 +11,11 @@ export const getPersonList = async () => {
 
 
 
-export const getBannerList = async () => {
+export const getBannerList = async (data:string) => {
 	const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/get-banner",
 		{
 			method: "POST",
-			body: JSON.stringify({ type: 'banner' }),
+			body: JSON.stringify({ type: 'banner' ,category:data}),
 			headers: {
 				"Content-Type": "application/json", // Ensure JSON is sent
 				"Accept": "application/json",
@@ -27,11 +27,11 @@ export const getBannerList = async () => {
 
 
 
-export const getTopicData = async () => {
+export const getTopicData = async (data:string) => {
 	const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/get-banner",
 		{
 			method: "POST",
-			body: JSON.stringify({ type: 'topic' }),
+			body: JSON.stringify({ type: 'topic' , category:data}),
 			headers: {
 				"Content-Type": "application/json", // Ensure JSON is sent
 				"Accept": "application/json",

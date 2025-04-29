@@ -14,13 +14,15 @@ class BannerController extends Controller
         $type = $request->input('type', 'banner'); 
         $limit = $request->input('limit', 5);
         $category = $request->input('category', 'anime');
+
         $cat = 'anime';
         if($category == 'アニメ'){
             $cat = 'anime';
         } else if($category == '映画'){
             $cat = 'movie';
+        } else if($category == 'public'){
+            $cat = 'public';
         }
-        Log::info($cat);
         
         $typePage = ($type == 'banner') ? 'CAROUSEL' : ($type == 'topic' ? 'SPOTLIGHT' : '');
         $banners = DB::table('at_page_setting')
@@ -37,12 +39,12 @@ class BannerController extends Controller
                 'at_article.thumbnail_url',
                 'at_network.name AS network_name',
                 'at_article.network_id',
-                'at_article_genre_type.name'
+                'at_article_genre_type.name as genre_name'
             )
             ->where('at_page_setting.type', $typePage)
             ->where('at_page_setting.genre', $cat)
             ->whereNotNull('at_page_setting.article_id')
-            ->orderBy('at_page_setting.article_id', 'ASC')
+            ->orderBy('at_page_setting.sort', 'ASC')
             ->get();
 
         // Ensure at least 4 items by duplicating entries
@@ -57,6 +59,9 @@ class BannerController extends Controller
         if ($typePage == 'CAROUSEL') {
             $formattedData = $banners->map(function ($banner) {
                 $banner->thumbnail = json_decode($banner->thumbnail, true);
+                if($banner->genre == 'public'){
+                    $banner->genre = $banner->genre_name;
+                }
                 $thumbnail = !empty($banner->thumbnail) && is_string($banner->thumbnail) ? json_decode($banner->thumbnail, true) : '';
                 return [
                     'article' => [
@@ -76,7 +81,9 @@ class BannerController extends Controller
             $formattedData = $banners->map(function ($item) {
                 $item->thumbnail = json_decode($item->thumbnail, true);
                 $thumbnail = !empty($item->thumbnail) && is_string($item->thumbnail) ? json_decode($item->thumbnail, true) : '';
-
+                if($item->genre == 'public'){
+                    $item->genre = $item->genre_name;
+                }
                 return [
                     'id' => $item->article_id,
                     'pathName' => $item->path_name ?? '', // fallback if null
@@ -94,6 +101,7 @@ class BannerController extends Controller
                 ];
             });
         }
+
         return response()->json($formattedData);
     }
 }

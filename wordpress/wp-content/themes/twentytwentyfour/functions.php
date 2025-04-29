@@ -223,8 +223,9 @@ function remove_admin_menus()
 }
 add_action('admin_menu', 'remove_admin_menus');
 
-function force_favicon() {
-    echo '<link rel="icon" href="' . get_template_directory_uri() . '/assets/images/favicon.ico" type="image/x-icon">';
+function force_favicon()
+{
+	echo '<link rel="icon" href="' . get_template_directory_uri() . '/assets/images/favicon.ico" type="image/x-icon">';
 }
 add_action('wp_head', 'force_favicon');
 add_action('admin_head', 'force_favicon');
@@ -401,21 +402,22 @@ function enqueue_datatables_assets()
 }
 add_action('admin_enqueue_scripts', 'enqueue_datatables_assets'); // Load only in admin pages
 
-function load_flatpickr_globally() {
-    wp_enqueue_style(
-        'flatpickr-css',
-        'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
-        array(),
-        null
-    );
+function load_flatpickr_globally()
+{
+	wp_enqueue_style(
+		'flatpickr-css',
+		'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
+		array(),
+		null
+	);
 
-    wp_enqueue_script(
-        'flatpickr-js',
-        'https://cdn.jsdelivr.net/npm/flatpickr',
-        array('jquery'),
-        null,
-        true
-    );
+	wp_enqueue_script(
+		'flatpickr-js',
+		'https://cdn.jsdelivr.net/npm/flatpickr',
+		array('jquery'),
+		null,
+		true
+	);
 }
 add_action('wp_enqueue_scripts', 'load_flatpickr_globally');
 
@@ -511,18 +513,23 @@ add_action('admin_enqueue_scripts', 'custom_content_admin_scripts');
 // Admin page content
 add_action('admin_footer', 'custom_content_scripts');
 
-function enqueue_editorjs_assets()
-{
-	wp_enqueue_script('editorjs', 'https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest', array(), null, true);
-	wp_enqueue_script('editorjs-header', 'https://cdn.jsdelivr.net/npm/@editorjs/header@latest', array(), null, true);
-	wp_enqueue_script('editorjs-list', 'https://cdn.jsdelivr.net/npm/@editorjs/list@latest', array(), null, true);
-	wp_enqueue_script('editorjs-embed', 'https://cdn.jsdelivr.net/npm/@editorjs/embed', array(), null, true);
-	wp_enqueue_script('editorjs-paragraph', 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest', array('editorjs'), null, true);
-	wp_enqueue_script('editorjs-image', 'https://cdn.jsdelivr.net/npm/@editorjs/image@latest', array('editorjs'), null, true);
-	wp_enqueue_script('editorjs-quote', 'https://cdn.jsdelivr.net/npm/@editorjs/quote@latest', array('editorjs'), null, true);
-	wp_enqueue_script('editorjs-table', 'https://cdn.jsdelivr.net/npm/@editorjs/table@latest', array('editorjs'), null, true);
-	wp_enqueue_script('editorjs-embed', 'https://cdn.jsdelivr.net/npm/@editorjs/embed@latest', array('editorjs'), null, true);
-	wp_enqueue_script('editorjs-linktool', 'https://cdn.jsdelivr.net/npm/@editorjs/link@latest', array('editorjs'), null, true);
+function enqueue_editorjs_assets() {
+    // Enqueue Editor.js and its core tools
+    wp_enqueue_script('editorjs', 'https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest', array(), null, true);
+    wp_enqueue_script('editorjs-header', 'https://cdn.jsdelivr.net/npm/@editorjs/header@latest', array('editorjs'), null, true);
+    wp_enqueue_script('editorjs-list', 'https://cdn.jsdelivr.net/npm/@editorjs/list@latest', array('editorjs'), null, true);
+    wp_enqueue_script('editorjs-embed', 'https://cdn.jsdelivr.net/npm/@editorjs/embed', array('editorjs'), null, true);
+    wp_enqueue_script('editorjs-paragraph', 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest', array('editorjs'), null, true);
+    wp_enqueue_script('editorjs-image', 'https://cdn.jsdelivr.net/npm/@editorjs/image@latest', array('editorjs'), null, true);
+    wp_enqueue_script('editorjs-quote', 'https://cdn.jsdelivr.net/npm/@editorjs/quote@latest', array('editorjs'), null, true);
+    wp_enqueue_script('editorjs-table', 'https://cdn.jsdelivr.net/npm/@editorjs/table@latest', array('editorjs'), null, true);
+    wp_enqueue_script('editorjs-linktool', 'https://cdn.jsdelivr.net/npm/@editorjs/link@latest', array('editorjs'), null, true);
+
+    // Load the Alignment Plugin (Make sure it comes after Editor.js)
+	wp_enqueue_script(
+        'editorjs-text-alignment-blocktune', get_template_directory_uri() . '/lib/bundle.js',array('editorjs'), null, true
+    );
+    wp_enqueue_script('editorjs-text-alignment-blocktune', 'https://cdn.jsdelivr.net/npm/@editorjs/text-alignment-blocktune@latest/dist/bundle.js', array('editorjs'), null, true);
 }
 add_action('admin_enqueue_scripts', 'enqueue_editorjs_assets');
 
@@ -655,8 +662,9 @@ function remove_admin_toolbar_items_for_all_users($wp_admin_bar)
 }
 add_action('admin_bar_menu', 'remove_admin_toolbar_items_for_all_users', 999);
 
-function add_custom_favicon() {
-    echo '<link rel="icon" href="' . get_template_directory_uri() . '/assets/images/favicon.ico" type="image/x-icon">';
+function add_custom_favicon()
+{
+	echo '<link rel="icon" href="' . get_template_directory_uri() . '/assets/images/favicon.ico" type="image/x-icon">';
 }
 add_action('wp_head', 'add_custom_favicon');
 

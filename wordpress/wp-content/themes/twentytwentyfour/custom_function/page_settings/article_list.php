@@ -11,7 +11,7 @@ if (function_exists('wp_cache_flush')) {
 
 $term = isset($_GET['term']) ? sanitize_text_field($_GET['term']) : '';
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$category = isset($_GET['category']) ? $_GET['category'] : 'anime';
+$category = isset($_GET['category']) ? $_GET['category'] : 'public';
 $per_page = 10;
 $offset = ($page - 1) * $per_page;
 
@@ -20,11 +20,15 @@ $table_name = $wpdb->prefix . 'article';
 
 // Build query
 $like_query = $wpdb->esc_like($term) . '%';
+$genre_query = "and genre_type_id = " . Constants::CATEGORY[$category] . "";
+if($category =='public'){
+    $genre_query = '';
+}
 
+$query = "SELECT id, vod, path as name, thumbnail_url as image FROM $table_name WHERE path LIKE %s and path <> ''  $genre_query  ORDER BY name ASC LIMIT %d OFFSET %d";
 $sql = $wpdb->prepare(
-    "SELECT id, vod, path as name, thumbnail_url as image FROM $table_name WHERE path LIKE %s and path <> ''  and genre_type_id = %d ORDER BY name ASC LIMIT %d OFFSET %d",
+    $query,
     $like_query,
-    Constants::CATEGORY[$category],
     $per_page + 1, 
     $offset
 );

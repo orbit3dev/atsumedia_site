@@ -28,8 +28,8 @@ export function generateMetadata(): Metadata {
 export default async function Index() {
 	const [personList, bannerList, topicData, fanGroupListDbResult, { newsList }] = await Promise.all([
 		getPersonList(),
-		getBannerList(),
-		getTopicData(),
+		getBannerList('public'),
+		getTopicData('public'),
 		getArticleListOrderByClickCount(TagType.series),
 		getIsTopNewsList(10),
 	]);

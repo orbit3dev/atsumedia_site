@@ -166,8 +166,8 @@ function custom_content_scripts()
             selectedData = ''
             if (typeof flatpickr !== "undefined") {
                 flatpickr("#customDate", {
-                dateFormat: "Y/m/d" // Force format to yyyy/mm/dd
-            });
+                    dateFormat: "Y/m/d" // Force format to yyyy/mm/dd
+                });
             }
 
             function formatSelectedOption(option) {
@@ -292,7 +292,6 @@ function custom_content_scripts()
                     return this.$wrapper[0];
                 }
 
-
                 renderPreview() {
                     // Build preview HTML
                     const $a = $('<a>', {
@@ -317,10 +316,9 @@ function custom_content_scripts()
 
                 save() {
                     return {
-                        barText: this.barText,
-                        buttonText: this.buttonText,
                         link: this.link,
-                        isSet: this.isSet
+                        text: this.buttonText, 
+                        title: ` ${this.barText} `
                     };
                 }
             }
@@ -337,128 +335,142 @@ function custom_content_scripts()
                     data
                 }) {
                     this.data = data || {};
-                    this.headlineText = this.data.headlineText || '';
+                    this.text = this.data.text || this.data.headlineText || '';
+                    this.level = this.data.level || 2;
+                    this.alignment = this.data.alignment || 'left';
                 }
 
                 render() {
                     this.$wrapper = $('<div>');
 
-                    // Create the input field for the headline
-                    this.$inputHeadline = $('<h2>', {
-                        text: this.headlineText,
+                    this.$headline = $('<h2>', {
+                        text: this.text,
                         contenteditable: true,
                         placeholder: 'Type your headline here...',
+                        class: 'cdx-input',
                         style: `
                 background-color: black;
                 color: white;
                 font-weight: bold;
                 padding: 10px;
                 border-radius: 5px;
-                text-align: center;
                 margin: 0;
                 width: 100%;
+                text-align: ${this.alignment};
             `
                     });
 
-                    // Append the input to the wrapper
-                    this.$wrapper.append(this.$inputHeadline);
+                    // Optional: support text alignment UI (buttons)
+                    // const $alignmentControls = $('<div>', {
+                    //     style: 'margin-top: 5px;'
+                    // });
+                    // ['left', 'center', 'right'].forEach(alignment => {
+                    //     const $btn = $('<button>', {
+                    //         text: alignment,
+                    //         style: 'margin-right: 5px;',
+                    //         click: () => {
+                    //             this.alignment = alignment;
+                    //             this.$headline.css('text-align', alignment);
+                    //         }
+                    //     });
+                    //     $alignmentControls.append($btn);
+                    // });
 
-                    // Handle Enter key press to add new block
-                    this.$inputHeadline.on('keydown', (e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault(); // Prevent the default Enter behavior (line break)
-                            this.addNewBlock(); // Create a new block when Enter is pressed
-                        }
-                    });
-
+                    this.$wrapper.append(this.$headline);
                     return this.$wrapper[0];
-                }
-
-                addNewBlock() {
-                    // Create a new block when Enter is pressed
-                    const newBlock = new HeadlineTool({
-                        data: {
-                            headlineText: ''
-                        }
-                    });
-                    editor.blocks.insert(newBlock, {}, true); // Insert the new headline block into the editor
                 }
 
                 save() {
                     return {
-                        headlineText: this.$inputHeadline.text()
+                        text: this.$headline.text().trim(),
+                        level: this.level,
+                        alignment: this.alignment
                     };
                 }
             }
 
 
-            function initEditor() {
-                if ($('#editorjs_news').length) {
-                    editor = new EditorJS({
-                        holder: 'editorjs_news',
-                        tools: {
-                            paragraph: {
-                                class: Paragraph
-                            },
-                            header: {
-                                class: Header, // ➡️ added Header tool
-                                inlineToolbar: true,
-                                config: {
-                                    levels: [2, 3, 4],
-                                    defaultLevel: 2
-                                }
-                            },
-                            button: {
-                                class: ButtonTool // ➡️ custom Button tool (I'll show below)
-                            },
-                            headline: {
-                                class: HeadlineTool
-                            },
-                            image: {
-                                class: ImageTool,
-                                config: {
-                                    endpoints: {
-                                        byFile: "<?php echo get_template_directory_uri(); ?>/custom_function/news/save_images_news.php",
-                                    }
-                                }
-                            },
-                            table: {
-                                class: Table
-                            },
-                            quote: {
-                                class: Quote
-                            },
-                            embed: {
-                                class: Embed
-                            },
-                            linkTool: {
-                                class: LinkTool,
-                                config: {
-                                    endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
-                                    fetchData: (url) => {
-                                        return fetch('<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json'
-                                            },
-                                            body: JSON.stringify({
-                                                url: url
-                                            })
-                                        }).then(response => response.json());
-                                    }
-                                }
+            editor = new EditorJS({
+                holder: 'editorjs_news',
+                tools: {
+                    paragraph: {
+                        class: Paragraph,
+                        tunes: ['alignmentTune'],
+                    },
+                    header: {
+                        class: Header,
+                        inlineToolbar: true,
+                        config: {
+                            levels: [2, 3, 4],
+                            defaultLevel: 2
+                        },
+                        tunes: ['alignmentTune'],
+                    },
+                    AnyButton: { // ✅ change from "button"
+                        class: ButtonTool
+                    },
+                    header: { // ✅ change from "headline"
+                        class: HeadlineTool, // your custom tool
+                        tunes: ['alignmentTune'],
+                    },
+                    image: {
+                        class: ImageTool,
+                        config: {
+                            endpoints: {
+                                byFile: "<?php echo get_template_directory_uri(); ?>/custom_function/news/save_images_news.php",
                             }
-                        },
-                        onReady: () => {
-                            console.log('✅ Editor.js is ready');
-                        },
-                        onChange: () => {
-                            console.log('✏️ Content changed');
                         }
-                    });
+                    },
+                    table: {
+                        class: Table
+                    },
+                    quote: {
+                        class: Quote
+                    },
+                    embed: {
+                        class: Embed
+                    },
+                    linkTool: {
+                        class: LinkTool,
+                        config: {
+                            endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
+                            fetchData: (url) => {
+                                return fetch('<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        url: url
+                                    })
+                                }).then(response => response.json());
+                            }
+                        }
+                    },
+                    alignmentTune: {
+                        class: AlignmentBlockTune,
+                        config: {
+                            blocks: {
+                                paragraph: 'left',
+                                header: 'center',
+                            }
+                        }
+                    }
+                },
+                onReady: () => {
+                    console.log('✅ Editor.js is ready');
+                    if (typeof AlignmentBlockTune !== 'undefined') {
+                        console.log('Alignment BlockTune is loaded and ready.');
+                    } else {
+                        console.error('Alignment BlockTune is not loaded.');
+                    }
+                },
+                onChange: () => {
+                    console.log('✏️ Content changed');
                 }
-            }
-            initEditor()
+            });
+
+
 
             $('#custom-content-form').hide()
             var table = $('#contentTable').DataTable({
@@ -857,7 +869,7 @@ function insert_at_news()
     $meta_title = sanitize_text_field($form_data['meta_title']);
     $meta_description = sanitize_textarea_field($form_data['meta_description']);
     $first_view_image = !empty($form_data['first_view_image']) ? esc_url_raw($form_data['first_view_image']) : null;
-    $article_content = !empty($form_data['article_content']) ? wp_unslash($form_data['article_content']) : null;
+    $article_content = !empty($form_data['article_content']) ? ($form_data['article_content']) : null;
     $banner = sanitize_textarea_field($form_data['banner']);
     $article_select = sanitize_textarea_field($form_data['article_select']);
     $author_name = sanitize_text_field($form_data['author_name']);
