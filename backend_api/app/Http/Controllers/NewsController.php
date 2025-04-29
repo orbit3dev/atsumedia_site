@@ -12,7 +12,7 @@ class NewsController extends Controller
     public function newsListByGenre(Request $request)
     {
 
-        $genreType = 'anime';
+        $genreType = !empty($request->genre_type) ? $request->genre_type : 'anime';
         $limit = 10;
         $page = 1;
         $offset    = ($page - 1) * $limit;
