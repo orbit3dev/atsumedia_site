@@ -20,7 +20,7 @@ if (!isset($_FILES['file'])) {
 $file = $_FILES['file'];
 $theme_dir  = get_template_directory();
 $theme_uri  = get_template_directory_uri();
-$subfolder  = '/assets/news/content/image/';
+$subfolder  = '/assets/assets/news/content/image/';
 $upload_dir = $theme_dir . $subfolder;
 $upload_url = $theme_uri . $subfolder;
 

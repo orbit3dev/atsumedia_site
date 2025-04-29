@@ -15,12 +15,10 @@ try {
         exit;
     }
 
-    // Trim the URL to remove any unnecessary spaces
+    // Clean and validate original URL
     $original_url = trim(esc_url_raw($_POST['original_url']));
-    $parsed_url_path = parse_url($original_url, PHP_URL_PATH);
-
-    // Get relative file system path from the URL
     $site_url = site_url();
+
     if (strpos($original_url, $site_url) !== 0) {
         http_response_code(400);
         echo json_encode([
@@ -32,61 +30,73 @@ try {
 
     $relative_path = ltrim(parse_url($original_url, PHP_URL_PATH), '/');
     $relative_path = preg_replace('#[\\\\/]+#', '/', $relative_path);
-    $site_path = parse_url(site_url(), PHP_URL_PATH); // e.g. /atsumedia_site/atsumedia_site/wordpress
+
+    $site_path = parse_url($site_url, PHP_URL_PATH);
     $relative_path = preg_replace("#^" . preg_quote(ltrim($site_path, '/')) . "#", '', $relative_path);
     $absolute_path = ABSPATH . $relative_path;
-    $absolute_path = str_replace('\\', '/', $absolute_path); // Normalize for Windows
-
-    if (!file_exists($absolute_path)) {
-        http_response_code(404);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Original image not found on server.',
-            'path' => $absolute_path
-        ]);
-        exit;
-    }
+    $absolute_path = str_replace('\\', '/', $absolute_path);
 
     $ext = pathinfo($absolute_path, PATHINFO_EXTENSION);
     $basename = pathinfo($absolute_path, PATHINFO_FILENAME);
     $dir = dirname($absolute_path);
 
-    // Versioning: soft delete original
-    $version = 1;
-    do {
-        $versioned_path = "$dir/{$basename}_v{$version}.{$ext}";
-        $version++;
-    } while (file_exists($versioned_path));
+    $backup_done = false;
 
-    if (!rename($absolute_path, $versioned_path)) {
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Failed to rename (soft-delete) original image.'
-        ]);
-        exit;
+    // If file exists, backup first
+    if (file_exists($absolute_path)) {
+        $version = 1;
+        do {
+            $versioned_path = "$dir/{$basename}_v{$version}.{$ext}";
+            $version++;
+        } while (file_exists($versioned_path));
+
+        if (!rename($absolute_path, $versioned_path)) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to back up the original image.'
+            ]);
+            exit;
+        }
+
+        $backup_done = true;
     }
 
-    // Trim uploaded file name to avoid any unwanted spaces
-    $new_image_path = trim($_FILES['new_image']['tmp_name']);
+    // Create directory if it doesn't exist
+    if (!is_dir($dir)) {
+        if (!mkdir($dir, 0755, true)) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to create directory for image upload.'
+            ]);
+            exit;
+        }
+    }
 
-    if (!move_uploaded_file($new_image_path, $absolute_path)) {
-        // Try to restore the original if move fails
-        rename($versioned_path, $absolute_path);
+    // Move uploaded file
+    $tmp_name = $_FILES['new_image']['tmp_name'];
+    if (!is_uploaded_file($tmp_name) || !move_uploaded_file($tmp_name, $absolute_path)) {
+        // Restore backup if move fails
+        if ($backup_done && isset($versioned_path) && file_exists($versioned_path)) {
+            rename($versioned_path, $absolute_path);
+        }
+
         http_response_code(500);
         echo json_encode([
             'success' => false,
-            'message' => 'Failed to replace image with new upload.'
+            'message' => 'Failed to upload new image.'
         ]);
         exit;
     }
 
     echo json_encode([
         'success' => true,
-        'message' => 'Image replaced successfully.',
+        'message' => $backup_done ? 'Original image replaced successfully.' : 'Image uploaded successfully.',
         'new_url' => $original_url
     ]);
     exit;
+
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([

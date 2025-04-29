@@ -65,7 +65,7 @@ function custom_content_page()
                                 <td><input type="date" name="date" id="customDate"></td>
                             </tr>
                             <tr>
-                                <th>ジャンル選択</th>
+                                <th>カテゴリー選択</th>
                                 <td>
                                     <label><input type="radio" name="genre" value="anime"> アニメ</label>
                                     <label><input type="radio" name="genre" value="movie"> 映画</label>
@@ -101,7 +101,7 @@ function custom_content_page()
                                 <td>
                                     <input type="file" id="first_view_image_input" name="first_view_image_input" accept="image/*">
                                     <input type="hidden" name="first_view_image" id="first_view_image">
-                                    <button type="button" id="upload_first_view_button">画像をアップロード</button>
+                                    <!-- <button type="button" id="upload_first_view_button">画像をアップロード</button> -->
                                     <div id="first_view_preview"></div>
                                 </td>
                             </tr>
@@ -138,7 +138,7 @@ function custom_content_page()
                                 <td>
                                     <input type="file" id="author_image_input" name="author_image_input" accept="image/*">
                                     <input type="hidden" name="author_image" id="author_image">
-                                    <button type="button" id="upload_author_button">画像をアップロード</button>
+                                    <!-- <button type="button" id="upload_author_button">画像をアップロード</button> -->
                                     <div id="author_preview"></div>
                                 </td>
                             </tr>
@@ -708,8 +708,8 @@ function custom_content_scripts()
                 });
             }
 
-            mediaUploader('upload_first_view_button', 'first_view_image', 'first_view_preview');
-            mediaUploader('upload_author_button', 'author_image', 'author_preview');
+            // mediaUploader('upload_first_view_button', 'first_view_image', 'first_view_preview');
+            // mediaUploader('upload_author_button', 'author_image', 'author_preview');
 
             function handleImagePreview(inputId, previewId) {
                 $(`#${inputId}`).on("change", function(e) {
@@ -876,7 +876,7 @@ function insert_at_news()
 
     // Parse and sanitize form data
     parse_str($_POST['form_data'], $form_data);
-
+    $base_url = IMAGE_LOCATION_STORE;
     $news_id = isset($form_data['news_id']) ? intval($form_data['news_id']) : null;
     $title = sanitize_text_field($form_data['title']);
     $slug = sanitize_text_field($form_data['slug']);
@@ -888,12 +888,18 @@ function insert_at_news()
     $meta_title = sanitize_text_field($form_data['meta_title']);
     $meta_description = sanitize_textarea_field($form_data['meta_description']);
     $first_view_image = !empty($form_data['first_view_image']) ? esc_url_raw($form_data['first_view_image']) : null;
+    if(isset($first_view_image)){
+        $first_view_image = str_replace($base_url,'',$first_view_image);
+    }
     $article_content = !empty($form_data['article_content']) ? ($form_data['article_content']) : null;
     $banner = sanitize_textarea_field($form_data['banner']);
     $article_select = sanitize_textarea_field($form_data['article_select']);
     $author_name = sanitize_text_field($form_data['author_name']);
     $author_description = sanitize_textarea_field($form_data['author_description']);
     $author_image = !empty($form_data['author_image']) ? esc_url_raw(trim($form_data['author_image'])) : null;
+    if(isset($author_image)){
+        $author_image = str_replace($base_url,'',$author_image);
+    }
 
     // Simulate author ID & username (Replace with actual logged-in user data)
     $author_id = get_current_user_id(); // WordPress function to get logged-in user ID
