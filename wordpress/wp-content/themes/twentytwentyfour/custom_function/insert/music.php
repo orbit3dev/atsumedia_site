@@ -8,28 +8,26 @@ function insertMusic($wpdb, $articleId, $course, $edArtist, $opArtist, $opSong, 
 {
     $table = $wpdb->prefix . 'article_music';
 
-    $result = $wpdb->insert(
-        $table,
-        [
-            'article_id'     => $articleId,
-            'course'         => $course,
-            'ed_artist'      => $edArtist,
-            'op_artist'      => $opArtist,
-            'op_song'        => $opSong,
-            'other_artist'   => $otherArtist,
-            'other_song'     => $otherSong,
-            'sort'           => $articleId, // Assuming sort = article_id
-            'type'           => $type,
-            'updated_at'     => current_time('mysql'),
-            'created_at'     => current_time('mysql')
-        ],
-        [
-            '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s'
-        ]
-    );
+    $data = [
+        'article_id'     => $articleId,       // Unique key
+        'course'         => $course,
+        'ed_artist'      => $edArtist,
+        'op_artist'      => $opArtist,
+        'op_song'        => $opSong,
+        'other_artist'   => $otherArtist,
+        'other_song'     => $otherSong,
+        'sort'           => $articleId,       // Optional: same as article_id
+        'type'           => $type,
+        'updated_at'     => current_time('mysql'),
+        'created_at'     => current_time('mysql'),
+    ];
+
+    $formats = ['%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s'];
+
+    $result = $wpdb->replace($table, $data, $formats);
 
     if ($result === false) {
-        error_log("Error inserting music: " . $wpdb->last_error);
+        error_log("Error replacing music: " . $wpdb->last_error);
     }
 
     return $result;

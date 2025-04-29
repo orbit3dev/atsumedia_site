@@ -43,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $processed_data[] = ["id" => $id, "season" => $season];
             }
             if ($file_type === 'song') {
-                error_log($id);
                 $id = $data['id'] ?? "";
                 $course = $data['course'] ?? "";
                 $op_artist = $data['op_artist'] ?? "";
@@ -53,9 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $other_artist = $data['other_artist'] ?? "";
                 $other_song = $data['other_song'] ?? "";
                 $type = "ArticleMusic";
-
+                $id_pk = $rowCount + 1;
                 insertMusic($wpdb, $id, $course, $op_artist,  $op_song, $ed_artist, $ed_song, $other_artist, $other_song, $type);
-
 
                 $processed_data[] = ["id" => $id, "course" => $course];
             }
@@ -75,7 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $genre = $data['genre'] ?? "";
                 $role = $data['role'] ?? "";
                 $type = $data['type'] ?? "";
-                insertPerson($id, $name, $image, $type, $role, $group, $genre);
+                $id_pk = $rowCount + 1;
+                insertPerson($id, $name, $image, $type, $role, $group, $genre, $id_pk);
 
                 $processed_data[] = [
                     "id" => $id,
