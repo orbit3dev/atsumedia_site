@@ -65,7 +65,7 @@ class ArticleController extends Controller
             'tag_type_id' => 'required|integer',
         ]);
         $season_id = !empty($request->season_id) ? $request->season_id : '';
-        if(isset($request->genre_type)  && ($request->genre_type != 'anime')){
+        if (isset($request->genre_type)  && ($request->genre_type != 'anime')) {
             $season_id = '';
         }
 
@@ -122,9 +122,9 @@ class ArticleController extends Controller
         $genreTypeYearWeek = '202449';
 
         $combinations = [
-            $genreType .'-' . $genreTypeYearWeek . '-series',
-            $genreType .'-' . $genreTypeYearWeek . '-episode',
-            $genreType .'-' . $genreTypeYearWeek . '-root',
+            $genreType . '-' . $genreTypeYearWeek . '-series',
+            $genreType . '-' . $genreTypeYearWeek . '-episode',
+            $genreType . '-' . $genreTypeYearWeek . '-root',
         ];
 
         $stats = AtArticleStatistic::whereIn('genre_type_year_week_tag_type', $combinations)
@@ -140,7 +140,7 @@ class ArticleController extends Controller
             )
             ->orderBy('click_count', 'desc')
             ->get();
-        $shapedData = $stats->map(function ($article , $genreType) {
+        $shapedData = $stats->map(function ($article, $genreType) {
             // Decode thumbnail JSON if exists
             $thumbnail = json_decode($article->thumbnail, true);
             $thumbnailUrl = $thumbnail['url'] ?? null;
@@ -322,13 +322,20 @@ class ArticleController extends Controller
                     $person = Person::select('id', 'name', 'image', 'sort')
                         ->where('id', $cast->person_id)
                         ->first();
+                    $image_person = !empty($person->image) ? '/public/cast/' . $person->image : '';
 
+                    $image_link = env('IMAGE_LINK', 'default_value');
+
+                    $imageTest = $image_link . 'public/cast' . $image_person;
+                    if (!file_exists($imageTest)) {
+                        $image_person =  '/public/cast/author.png';
+                    }
                     return [
                         'roleName' => $cast->role_name,
                         'person' => [
                             'id' => $person->id,
                             'name' => $person->name,
-                            'image' => $person->image ?? '',
+                            'image' => $image_person ?? '',
                             'sort' => $person->sort,
                         ]
                     ];

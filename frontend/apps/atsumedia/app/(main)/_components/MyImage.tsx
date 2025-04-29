@@ -27,11 +27,14 @@ const MyImage: FC<MyImageProps> = ({
                                      isMainImage = false,
                                    }) => {
   // const src = useMemo(() => `${S3Domain}/${path}`, [path]);
-  const BASE_URL = process.env.NEXT_PUBLIC_ASSET_BASE_URL;
-  const timestamp = new Date().getTime(); // or use a version number
-  const src = useMemo(() => {
-    return `${BASE_URL}/${path}?v=${timestamp}`;
-  }, [path, timestamp]);
+const BASE_URL = process.env.NEXT_PUBLIC_ASSET_BASE_URL;
+const timestamp = new Date().getTime();
+
+const src = useMemo(() => {
+  const rawUrl = `${BASE_URL}/${path}?v=${timestamp}`;
+  // Replace all double slashes, except after http(s):
+  return rawUrl.replace(/([^:]\/)\/+/g, '$1');
+}, [path, timestamp]);
   return (
     isMainImage ?
       <div

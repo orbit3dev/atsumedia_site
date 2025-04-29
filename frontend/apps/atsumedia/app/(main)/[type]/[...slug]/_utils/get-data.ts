@@ -50,7 +50,6 @@ export const getArticle = async(pathName:string) =>{
 		}
 	);
 	const dataResult = await response.json();
-	console.log(dataResult)
 	return dataSort(dataResult[0]);
 }
 
