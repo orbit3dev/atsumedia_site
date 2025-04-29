@@ -80,6 +80,7 @@ const ArticlesMainInfo: React.FC<ArticlesMainInfoProps> = ({ data }) => {
 	const category = getCategoryByType(data.genreType);
 
 	const editedData = processLinks(data.content);
+	const author_images = data.author?.image
 
 	return (
 		<div className="pb-1">
@@ -128,7 +129,7 @@ const ArticlesMainInfo: React.FC<ArticlesMainInfoProps> = ({ data }) => {
 				<div className={'rounded-md border p-5 md:p-8'}>
 					<div className={'flex items-center md:items-start'}>
 						<MyImage // path={item.image ? item.image : 'public/cast/dummy_cast_image.png'}
-							path={'public/cast/author.png'}
+							path={author_images ?? 'public/cast/author.png'}
 							alt={''}
 							className="relative h-[88px] w-[88px] shrink-0 grow-0 basis-[88px] overflow-hidden rounded-full object-cover p-0"
 						/>
