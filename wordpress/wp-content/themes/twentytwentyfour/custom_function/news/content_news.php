@@ -69,8 +69,8 @@ function custom_content_page()
                                 <td>
                                     <label><input type="radio" name="genre" value="anime"> アニメ</label>
                                     <label><input type="radio" name="genre" value="movie"> 映画</label>
-                                    <label><input type="radio" name="genre" value="japanese_drama">国内ドラマ</label>
-                                    <label><input type="radio" name="genre" value="foreign_drama"> 海外ドラマ</label>
+                                    <label><input type="radio" name="genre" value="drama_japan">国内ドラマ</label>
+                                    <label><input type="radio" name="genre" value="drama_global"> 海外ドラマ</label>
                                 </td>
                             </tr>
                             <tr>

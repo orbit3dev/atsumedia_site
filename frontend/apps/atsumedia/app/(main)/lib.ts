@@ -162,7 +162,7 @@ export const getNewsListByGenreType = async (
 		{
 			method: "POST",
 			body: JSON.stringify({
-				genre_type_public: `${genreType}-1`,
+				genre_type: genreType,
 				limit: limit,
 			}),
 			headers: {
@@ -179,7 +179,7 @@ export const getNewsListByGenreType = async (
 
 
 
-export const getIsTopNewsList = async (data:number) => {
+export const getIsTopNewsList = async (category:string, data:number) => {
 	const response = await fetch(
 		process.env.NEXT_PUBLIC_API_URL + "/news-list-by-genre",
 		{
@@ -188,6 +188,7 @@ export const getIsTopNewsList = async (data:number) => {
 				season_id: '21',
 				genre_type_id: 1,
 				tag_type_id: 2,
+				category:category,
 			}),
 			headers: {
 				"Content-Type": "application/json",

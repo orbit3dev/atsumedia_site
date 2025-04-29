@@ -13,7 +13,7 @@ async function getNewsData(isCategory: boolean, type: CategoryType, limit: numbe
 	if (isCategory) {
 		return await getNewsListByGenreType(type, limit);
 	} else {
-		return await getIsTopNewsList(limit);
+		return await getIsTopNewsList(type,limit);
 	}
 }
 

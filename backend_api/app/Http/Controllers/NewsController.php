@@ -11,32 +11,20 @@ class NewsController extends Controller
 {
     public function newsListByGenre(Request $request)
     {
-        // return response()->json([
-        //     'newsList' => 1,
-        //     'nextPage' => 2,
-        // ]);
-        // $request->validate([
-        //     'genre_type' => 'required|string',
-        //     'limit'      => 'required|integer|min:1|max:100',
-        //     'page'       => 'nullable|integer|min:1',
-        // ]);
-
-        // $genreType = $request->genre_type . '-1';
-        // $limit     = $request->limit;
-        // $page      = $request->page ?? 1;
-        // $offset    = ($page - 1) * $limit;
 
         $genreType = 'anime';
         $limit = 10;
         $page = 1;
         $offset    = ($page - 1) * $limit;
 
-        $query = News::where('genre_type', $genreType)
-            ->where('datetime', '<', Carbon::now()) // if it is set for future
+        $query = News::where('datetime', '<', Carbon::now()) // if it is set for future
             ->where('is_public', 1)
             ->where('is_top', 1)
             ->select('id', 'title', 'type', 'genre_type as genreType', 'title_meta as titleMeta', 'description_meta', 'image', 'path_name as pathName', 'author')
             ->orderBy('created_at', 'desc');
+        if($request->category != 'public'){
+            $query->where('genre_type', $genreType);
+        };
 
         $totalRecords = $query->count();
 

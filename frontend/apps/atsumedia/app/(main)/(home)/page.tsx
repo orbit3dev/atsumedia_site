@@ -31,7 +31,7 @@ export default async function Index() {
 		getBannerList('public'),
 		getTopicData('public'),
 		getArticleListOrderByClickCount(TagType.series),
-		getIsTopNewsList(10),
+		getIsTopNewsList('public',10),
 	]);
 
 	type FanGroupArticle = {
