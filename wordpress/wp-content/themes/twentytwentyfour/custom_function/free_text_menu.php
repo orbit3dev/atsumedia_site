@@ -74,22 +74,52 @@ function free_text_menu()
             // Fetch existing content
             $select.on('select2:select', function(e) {
                 articleId = $('#article-select').val();
-                console.log(articleId);
                 $('.editor-container').show();
 
-                // Initialize only once
-                if (!editor) {
-                    $.ajax({
-                        url: "<?php echo get_template_directory_uri(); ?>/custom_function/free_text/get_free_text.php",
-                        method: 'GET',
-                        data: {
-                            article_id: articleId
-                        },
-                        success: function(response) {
-                            const articleData = JSON.parse(response);
+                if (editor) {
+                    editor.isReady
+                        .then(() => editor.clear())
+                        .then(() => loadArticleData())
+                        .catch(err => {
+                            console.error('❌ Error during editor reset:', err);
+                            loadArticleData(); // Fallback
+                        });
+                } else {
+                    loadArticleData();
+                }
+            });
+
+
+            function loadArticleData() {
+                $.ajax({
+                    url: "<?php echo get_template_directory_uri(); ?>/custom_function/free_text/get_free_text.php",
+                    method: 'GET',
+                    data: {
+                        article_id: articleId
+                    },
+                    success: function(response) {
+                        let rawData = {};
+                        try {
+                            rawData = JSON.parse(response);
+                        } catch (e) {
+                            console.error('❌ Failed to parse article data:', e);
+                            rawData = {};
+                        }
+
+                        // If it's nested like { blocks: { time, blocks: [], version } }, extract it
+                        let articleData = rawData.blocks && rawData.blocks.blocks ?
+                            rawData.blocks :
+                            rawData;
+
+                        // Ensure articleData.blocks is an array
+                        if (!Array.isArray(articleData.blocks)) {
+                            articleData.blocks = [];
+                        }
+
+                        if (!editor) {
                             editor = new EditorJS({
                                 holder: 'editorjs_article',
-                                data: articleData.blocks || [], // If no data, initializes with an empty array
+                                data: articleData,
                                 tools: {
                                     paragraph: {
                                         class: Paragraph
@@ -98,8 +128,7 @@ function free_text_menu()
                                         class: ImageTool,
                                         config: {
                                             endpoints: {
-                                                byFile: "<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_images_free_text.php",
-
+                                                byFile: "<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_images_free_text.php"
                                             },
                                             additionalRequestData: {
                                                 article_id: articleId
@@ -118,25 +147,17 @@ function free_text_menu()
                                     linkTool: {
                                         class: LinkTool,
                                         config: {
-                                            // endpoint: '< ?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php'
-                                        }
-                                    },
-                                    linkTool: {
-                                        class: LinkTool,
-                                        config: {
-                                            // endpoint: '/path/to/your/link-parser.php', // Update to your actual endpoint
                                             endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
                                             fetchData: (url) => {
                                                 return fetch('<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php', {
-                                                        method: 'POST',
-                                                        headers: {
-                                                            'Content-Type': 'application/json'
-                                                        },
-                                                        body: JSON.stringify({
-                                                            url: url
-                                                        })
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json'
+                                                    },
+                                                    body: JSON.stringify({
+                                                        url: url
                                                     })
-                                                    .then(response => response.json());
+                                                }).then(res => res.json());
                                             }
                                         }
                                     }
@@ -148,13 +169,20 @@ function free_text_menu()
                                     console.log('✏️ Content changed');
                                 }
                             });
-                        },
-                        error: function() {
-                            alert("Error fetching article data.");
+                        } else {
+                            editor.isReady
+                                .then(() => editor.render(articleData))
+                                .catch(err => console.error('❌ Render failed:', err));
                         }
-                    });
-                }
-            });
+                    },
+                    error: function() {
+                        alert("Error fetching article data.");
+                    }
+                });
+            }
+
+
+
 
             // Save edited content
             $('#saveButton').on('click', function() {
@@ -169,6 +197,7 @@ function free_text_menu()
                         },
                         success: function(response) {
                             alert('Article saved successfully');
+                            window.location.reload();
                         },
                         error: function() {
                             alert("Error saving article.");

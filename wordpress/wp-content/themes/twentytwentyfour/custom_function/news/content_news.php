@@ -226,10 +226,15 @@ function custom_content_scripts()
                     data
                 }) {
                     this.data = data || {};
-                    this.barText = this.data.barText || '';
-                    this.buttonText = this.data.buttonText || '';
                     this.link = this.data.link || '';
-                    this.isSet = this.data.isSet || false; // <-- new flag: has user clicked 'セット'?
+                    this.buttonText = this.data.text || ''; // map saved `text` to buttonText
+
+                    // Extract barText from title (strip slashes: "\ a /" → "a")
+                    const title = this.data.title || '';
+                    this.barText = title.replace(/\\?\s*(.*?)\s*\/?/g, '$1').trim();
+
+                    // If title exists, assume it was saved — mark as set
+                    this.isSet = !!title;
                 }
 
                 render() {
@@ -317,8 +322,8 @@ function custom_content_scripts()
                 save() {
                     return {
                         link: this.link,
-                        text: this.buttonText, 
-                        title: ` ${this.barText} `
+                        text: this.buttonText,
+                        title: `\\ ${this.barText} /`
                     };
                 }
             }
@@ -389,86 +394,87 @@ function custom_content_scripts()
                 }
             }
 
-
-            editor = new EditorJS({
-                holder: 'editorjs_news',
-                tools: {
-                    paragraph: {
-                        class: Paragraph,
-                        tunes: ['alignmentTune'],
-                    },
-                    header: {
-                        class: Header,
-                        inlineToolbar: true,
-                        config: {
-                            levels: [2, 3, 4],
-                            defaultLevel: 2
+            if ($('#editorjs_news').length) {
+                editor = new EditorJS({
+                    holder: 'editorjs_news',
+                    tools: {
+                        paragraph: {
+                            class: Paragraph,
+                            tunes: ['alignmentTune'],
                         },
-                        tunes: ['alignmentTune'],
-                    },
-                    AnyButton: { // ✅ change from "button"
-                        class: ButtonTool
-                    },
-                    header: { // ✅ change from "headline"
-                        class: HeadlineTool, // your custom tool
-                        tunes: ['alignmentTune'],
-                    },
-                    image: {
-                        class: ImageTool,
-                        config: {
-                            endpoints: {
-                                byFile: "<?php echo get_template_directory_uri(); ?>/custom_function/news/save_images_news.php",
+                        header: {
+                            class: Header,
+                            inlineToolbar: true,
+                            config: {
+                                levels: [2, 3, 4],
+                                defaultLevel: 2
+                            },
+                            tunes: ['alignmentTune'],
+                        },
+                        AnyButton: { // ✅ change from "button"
+                            class: ButtonTool
+                        },
+                        header: { // ✅ change from "headline"
+                            class: HeadlineTool, // your custom tool
+                            tunes: ['alignmentTune'],
+                        },
+                        image: {
+                            class: ImageTool,
+                            config: {
+                                endpoints: {
+                                    byFile: "<?php echo get_template_directory_uri(); ?>/custom_function/news/save_images_news.php",
+                                }
+                            }
+                        },
+                        table: {
+                            class: Table
+                        },
+                        quote: {
+                            class: Quote
+                        },
+                        embed: {
+                            class: Embed
+                        },
+                        linkTool: {
+                            class: LinkTool,
+                            config: {
+                                endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
+                                fetchData: (url) => {
+                                    return fetch('<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            url: url
+                                        })
+                                    }).then(response => response.json());
+                                }
+                            }
+                        },
+                        alignmentTune: {
+                            class: AlignmentBlockTune,
+                            config: {
+                                blocks: {
+                                    paragraph: 'left',
+                                    header: 'center',
+                                }
                             }
                         }
                     },
-                    table: {
-                        class: Table
-                    },
-                    quote: {
-                        class: Quote
-                    },
-                    embed: {
-                        class: Embed
-                    },
-                    linkTool: {
-                        class: LinkTool,
-                        config: {
-                            endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
-                            fetchData: (url) => {
-                                return fetch('<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        url: url
-                                    })
-                                }).then(response => response.json());
-                            }
+                    onReady: () => {
+                        console.log('✅ Editor.js is ready');
+                        if (typeof AlignmentBlockTune !== 'undefined') {
+                            console.log('Alignment BlockTune is loaded and ready.');
+                        } else {
+                            console.error('Alignment BlockTune is not loaded.');
                         }
                     },
-                    alignmentTune: {
-                        class: AlignmentBlockTune,
-                        config: {
-                            blocks: {
-                                paragraph: 'left',
-                                header: 'center',
-                            }
-                        }
+                    onChange: () => {
+                        console.log('✏️ Content changed');
                     }
-                },
-                onReady: () => {
-                    console.log('✅ Editor.js is ready');
-                    if (typeof AlignmentBlockTune !== 'undefined') {
-                        console.log('Alignment BlockTune is loaded and ready.');
-                    } else {
-                        console.error('Alignment BlockTune is not loaded.');
-                    }
-                },
-                onChange: () => {
-                    console.log('✏️ Content changed');
-                }
-            });
+                });
+            }
 
 
 
@@ -618,7 +624,20 @@ function custom_content_scripts()
 
                             try {
                                 jsonData = JSON.parse(fixedContent);
-                                editor.render(jsonData)
+                                if (typeof editor !== 'undefined' && editor.isReady) {
+                                    editor.isReady
+                                        .then(() => {
+                                            return editor.clear();
+                                        })
+                                        .then(() => {
+                                            return editor.render(jsonData);
+                                        })
+                                        .catch(error => {
+                                            console.error("Editor rendering error:", error);
+                                        });
+                                } else {
+                                    console.warn("Editor is not initialized yet.");
+                                }
                             } catch (error) {
                                 console.error("JSON Parse Error:", error);
                             }

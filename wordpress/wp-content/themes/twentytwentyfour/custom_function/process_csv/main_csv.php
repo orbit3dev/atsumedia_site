@@ -25,7 +25,6 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
     if (!file_exists($target_input)) {
         return ["num_row_processed" => 0, "data" => []];
     }
-    error_log(123);
     $processed_data = [];
     $rowCount = 0;
 
@@ -157,6 +156,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 'season_id' => $data['season'] ?? "",
                 'series_number' => $data['series_number'] ?? "",
                 'thumbnail_url' => $thumbnailUrl,
+                'thumbnail_text' => $data['thumbnail_text'] ?? '',
                 'content' => json_encode(["genre" => $data['content_genre'] ?? "", "subgenre" => ""], JSON_UNESCAPED_UNICODE),
                 'website' => $data['website'] ?? "",
                 'category_id' => isset($data['category']) && is_numeric($data['category']) ? (string)intval($data['category']) : "1",
