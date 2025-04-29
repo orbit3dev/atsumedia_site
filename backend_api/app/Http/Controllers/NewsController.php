@@ -22,7 +22,7 @@ class NewsController extends Controller
             ->where('is_top', 1)
             ->select('id', 'title', 'type', 'genre_type as genreType', 'title_meta as titleMeta', 'description_meta', 'image', 'path_name as pathName', 'author')
             ->orderBy('created_at', 'desc');
-        if($request->category != 'public'){
+        if ($request->category != 'public') {
             $query->where('genre_type', $genreType);
         };
 
@@ -66,19 +66,21 @@ class NewsController extends Controller
             )
             ->first();
 
-        $query->article = [];
-        $query->outline = trim($query->outline,"'");
-        $query->content = trim($query->content,"'");
+        if (!empty($query)) {
+            $query->article = [];
+            $query->outline = trim($query->outline, "'");
+            $query->content = trim($query->content, "'");
 
-        $query->article = [];
-        $query->author = [
-            'name' => $query->author,
-            'image' => $query->author_image,
-            'description' => $query->author_description,
-        ];
-        unset($query->author_image);
-        unset($query->author_description);
-        // return $query;
+            $query->article = [];
+            $query->author = [
+                'name' => $query->author,
+                'image' => $query->author_image,
+                'description' => $query->author_description,
+            ];
+            unset($query->author_image);
+            unset($query->author_description);
+        }
+
         return response()->json($query, 200, [], JSON_UNESCAPED_UNICODE);
     }
 }
