@@ -9,11 +9,11 @@ class Constants
     public const SEASON_COLUMNS_JP = ['ID', 'シーズン'];
     public const BROADCAST_COLUMNS = ['id', 'name'];
     public const PERSON_COLUMNS = ['id', 'name', 'sort', 'type','group', 'genre' , 'role'];
-    public const PERSON_COLUMNS_JP = ['ID','名前', '並び順', 'タイプ', 'グループ', 'ジャンル', '役割'];
+    public const PERSON_COLUMNS_JP = ['ID','名前', '並び順', 'タイプ', 'グループ', 'カテゴリー', '役割'];
     public const VOD_COLUMNS = ['id', 'name', 'type', 'sort', 'microcopy','custom_microcopy', 'url'];
     public const VOD_COLUMNS_JP = ['ID', '名前', 'タイプ', '並び順', 'マイクロコピー', 'カスタムマイクロコピー', 'URL'];
     public const PAGE_SETTINGS_COLUMNS = ['article_id','genre','type','sort','notes'];
-    public const PAGE_SETTINGS_COLUMNS_JP = ['記事ID', 'ジャンル', 'タイプ', '並び順', '備考'];
+    public const PAGE_SETTINGS_COLUMNS_JP = ['記事ID', 'カテゴリー', 'タイプ', '並び順', '備考'];
     public const PRODUCTION_COLUMNS = ['production_id','name','type','sort'];
     public const PRODUCTION_COLUMNS_JP = ['制作ID', '名前', 'タイプ', '並び順'];
     public const CATEGORY_COLUMNS = ['id','name','type','sort'];

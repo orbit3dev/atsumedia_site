@@ -587,7 +587,7 @@ function custom_vod_menu()
 {
 	add_menu_page(
 		'Vod Menu', // Page title
-		'VODの注文を変更する', // Menu title
+		'VODの順序変更', // Menu title
 		'manage_options', // Capability
 		'call-vod-order', // Menu slug
 		'call_vod_order', // Callback function
