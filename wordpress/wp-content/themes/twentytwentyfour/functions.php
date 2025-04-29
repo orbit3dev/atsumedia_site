@@ -223,6 +223,12 @@ function remove_admin_menus()
 }
 add_action('admin_menu', 'remove_admin_menus');
 
+function force_favicon() {
+    echo '<link rel="icon" href="' . get_template_directory_uri() . '/assets/images/favicon.ico" type="image/x-icon">';
+}
+add_action('wp_head', 'force_favicon');
+add_action('admin_head', 'force_favicon');
+
 function customize_admin_bar()
 {
 	global $wp_admin_bar;
@@ -386,7 +392,7 @@ function enqueue_datatables_assets()
 {
 	// DataTables CSS
 	wp_enqueue_style('datatables-css', 'https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css');
-
+	
 	// jQuery (WordPress already includes it, but we ensure it's available)
 	wp_enqueue_script('jquery');
 
@@ -394,6 +400,24 @@ function enqueue_datatables_assets()
 	wp_enqueue_script('datatables-js', 'https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js', array('jquery'), null, true);
 }
 add_action('admin_enqueue_scripts', 'enqueue_datatables_assets'); // Load only in admin pages
+
+function load_flatpickr_globally() {
+    wp_enqueue_style(
+        'flatpickr-css',
+        'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
+        array(),
+        null
+    );
+
+    wp_enqueue_script(
+        'flatpickr-js',
+        'https://cdn.jsdelivr.net/npm/flatpickr',
+        array('jquery'),
+        null,
+        true
+    );
+}
+add_action('wp_enqueue_scripts', 'load_flatpickr_globally');
 
 
 if (is_admin()) { // Only loads in the admin panel
@@ -487,11 +511,6 @@ add_action('admin_enqueue_scripts', 'custom_content_admin_scripts');
 // Admin page content
 add_action('admin_footer', 'custom_content_scripts');
 
-function add_custom_favicon()
-{
-	echo '<link rel="icon" href="' . get_stylesheet_directory_uri() . '/images/favicon.ico" type="image/png">';
-}
-add_action('wp_head', 'add_custom_favicon');
 function enqueue_editorjs_assets()
 {
 	wp_enqueue_script('editorjs', 'https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest', array(), null, true);
@@ -635,6 +654,11 @@ function remove_admin_toolbar_items_for_all_users($wp_admin_bar)
 	$wp_admin_bar->remove_node('updates');
 }
 add_action('admin_bar_menu', 'remove_admin_toolbar_items_for_all_users', 999);
+
+function add_custom_favicon() {
+    echo '<link rel="icon" href="' . get_template_directory_uri() . '/assets/images/favicon.ico" type="image/x-icon">';
+}
+add_action('wp_head', 'add_custom_favicon');
 
 // Register WordPress API Endpoint
 add_action('wp_ajax_fetch_url_metadata', 'fetch_url_metadata');

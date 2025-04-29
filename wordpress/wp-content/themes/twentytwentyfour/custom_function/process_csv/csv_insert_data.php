@@ -43,14 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $processed_data[] = ["id" => $id, "season" => $season];
             }
             if ($file_type === 'song') {
+                error_log($id);
                 $id = $data['id'] ?? "";
                 $course = $data['course'] ?? "";
-                $op_artist = $data['season'] ?? "";
-                $op_song = $data['season'] ?? "";
-                $ed_artist = $data['season'] ?? "";
-                $ed_song = $data['season'] ?? "";
-                $other_artist = $data['season'] ?? "";
-                $other_song = $data['season'] ?? "";
+                $op_artist = $data['op_artist'] ?? "";
+                $op_song = $data['op_song'] ?? "";
+                $ed_artist = $data['ed_artist'] ?? "";
+                $ed_song = $data['ed_song'] ?? "";
+                $other_artist = $data['other_artist'] ?? "";
+                $other_song = $data['other_song'] ?? "";
                 $type = "ArticleMusic";
 
                 insertMusic($wpdb, $id, $course, $op_artist,  $op_song, $ed_artist, $ed_song, $other_artist, $other_song, $type);
@@ -69,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($file_type === 'cast_master') {
                 $id = $data['id'] ?? "";
                 $name = $data['name'] ?? "";
-                $image = $data['image'] ?? "";
+                $image =  !empty($id) ? "cast_image_" . $id .".png" : "";
                 $group = $data['group'] ?? "";
                 $genre = $data['genre'] ?? "";
                 $role = $data['role'] ?? "";

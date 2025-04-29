@@ -8,6 +8,8 @@ function custom_content_page()
     <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/custom_function/custom_css/editor_container.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/custom_function/custom_css/content_news.css">
 
     <div class="wrap" id="table_panel">
@@ -60,7 +62,7 @@ function custom_content_page()
                             </tr>
                             <tr>
                                 <th><label for="date">日付</label></th>
-                                <td><input type="date" name="date"></td>
+                                <td><input type="date" name="date" id="customDate"></td>
                             </tr>
                             <tr>
                                 <th>ジャンル選択</th>
@@ -114,7 +116,7 @@ function custom_content_page()
                             </tr>
 
 
-                            <tr>
+                            <tr style='display:none;'>
                                 <th><label for="banner">バナー</label></th>
                                 <td><textarea name="banner" rows="2" class="large-text"></textarea></td>
                             </tr>
@@ -162,6 +164,11 @@ function custom_content_scripts()
         jQuery(document).ready(function($) {
             const $select = $('#article-select');
             selectedData = ''
+            if (typeof flatpickr !== "undefined") {
+                flatpickr("#customDate", {
+                dateFormat: "Y/m/d" // Force format to yyyy/mm/dd
+            });
+            }
 
             function formatSelectedOption(option) {
                 if (!option.id) return option.text;
@@ -480,7 +487,7 @@ function custom_content_scripts()
                         "data": "is_top"
                     },
                     {
-                        "data": "created_at"
+                        "data": "datetime"
                     },
                     {
                         "data": "id",
@@ -552,7 +559,6 @@ function custom_content_scripts()
                             $('#table_panel').hide(500)
                             $('#custom-content-form').show(1000)
                             var data = response.data;
-                            console.log(data)
                             clearForm()
                             $('input[name="title"]').val(data.title);
                             $('input[name="slug"]').val(data.slug);
@@ -753,7 +759,6 @@ function custom_content_scripts()
                     const formData = $("#custom-content-form").serializeArray();
 
                     articleId = selectedData
-                    console.log(articleId)
                     formData.push({
                         name: "article_content",
                         value: JSON.stringify(outputData),
@@ -762,7 +767,6 @@ function custom_content_scripts()
                         name: "article_select",
                         value: articleId,
                     });
-
                     $.ajax({
                         type: "POST",
                         url: ajaxurl,
@@ -776,6 +780,7 @@ function custom_content_scripts()
                                 $("#custom-content-form")[0].reset();
                                 $("#first_view_preview").html("");
                                 $("#author_preview").html("");
+                                window.location.reload();
                             } else {
                                 alert("エラー: " + response.data.message);
                             }

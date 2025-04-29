@@ -24,7 +24,7 @@ function insertMusic($wpdb, $articleId, $course, $edArtist, $opArtist, $opSong, 
             'created_at'     => current_time('mysql')
         ],
         [
-            '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s'
+            '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s'
         ]
     );
 

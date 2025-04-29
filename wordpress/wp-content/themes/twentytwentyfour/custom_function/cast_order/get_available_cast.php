@@ -13,7 +13,6 @@ $casts = [];
 if ($article_id > 0) {
     $query = $wpdb->prepare("SELECT * FROM at_article_cast WHERE article_id = %s ORDER BY sort", $article_id);
     $result = $wpdb->get_results($query);
-    error_log(json_encode($result));
 
     foreach ($result as $row) {
         $casts[] = [

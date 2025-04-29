@@ -35,6 +35,12 @@ if ($manual_entry) {
         echo json_encode(['columns' => $columns, 'data' => [], 'columns_jp' => $columns_jp , $type = 'article']);
         exit;
     }
+    if ($file_type === 'song') {
+        $columns = Constants::MUSIC_COLUMNS; // Ensure proper column mapping
+        $columns_jp = Constants::MUSIC_COLUMNS_JP; // Ensure proper column mapping
+        echo json_encode(['columns' => $columns, 'data' => [], 'columns_jp' => $columns_jp , $type = 'article']);
+        exit;
+    }
 }
 
 // Handle AJAX request

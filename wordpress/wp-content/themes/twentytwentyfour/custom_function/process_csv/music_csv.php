@@ -1,47 +1,61 @@
 <?php
 
-require_once "db/db.php";
-require_once "constants/constants.php";
-require_once "insert/music.php";
-require_once "utils_csv/utils.php";
+// require_once __DIR__ . "/../db/db.php";
+require_once __DIR__ . "/../constants/constants.php";
+require_once __DIR__ . "/../insert/music.php";
+require_once __DIR__ . "/../utils_csv/utils.php";
 
-$csvFile = "csv/data_music.csv";
-
-if (($handle = fopen($csvFile, "r")) !== false) {
-    fgetcsv($handle); // Skip first row
-    fgetcsv($handle);
-    fgetcsv($handle);
-    $totalRows = getCsvRowCount($csvFile);
-
-    $rowCount = 0;
-    while (($data = fgetcsv($handle)) !== false && $rowCount < $totalRows) {
-        
-        $rowCount++;
-
-        $id = $data[1] ?? "";
-        // if($id == '21198'){
-        //     var_dump($data);
-        //     break;
-        // }
-        $course = $data[2] ?? "";
-        $opArtist = $data[3] ?? "";
-        $opSong = $data[4] ?? "";
-        $edArtist = $data[5] ?? "";
-        $edSong = $data[6] ?? "";
-        $otherArtist = $data[7] ?? "";
-        $otherSong = $data[8] ?? "";
-        $type = 'ArticleMusic';
-
-        // if ($name === "") continue; // Skip empty names
-
-        $createdAt = date("Y-m-d H:i:s");
-        $updatedAt = date("Y-m-d H:i:s");
-
-        insertMusic($id, $course, $edArtist, $opArtist, $opSong, $otherArtist , $otherSong , $type, $updatedAt , $createdAt);
+function process_music_csv($target_input) {
+    if (!file_exists($target_input)) {
+        return ["num_row_processed" => 0, "data" => []];
     }
 
-    fclose($handle);
-}
+    $processed_data = [];
+    $rowCount = 0;
+    $totalRows = getCsvRowCount($target_input);
 
-$conn->close();
-echo "CSV data inserted or updated in MySQL.\n";
+    if (($handle = fopen($target_input, "r")) !== false) {
+        fgetcsv($handle); // Skip first row
+        $kanji_headers = fgetcsv($handle);
+        $headers = fgetcsv($handle);
+
+        if ( !in_array("オープニング_制作", $kanji_headers) && !in_array("主題歌_制作", $kanji_headers) ) {
+            return ["num_row_processed" => 0, 'data'=> [], 'match_file' => false];
+        }
+
+        while (($data = fgetcsv($handle)) !== false && $rowCount < $totalRows) {
+            $rowCount++;
+
+            $id = $data[1] ?? "";
+            $course = $data[2] ?? "";
+            $opArtist = $data[3] ?? "";
+            $opSong = $data[4] ?? "";
+            $edArtist = $data[5] ?? "";
+            $edSong = $data[6] ?? "";
+            $otherArtist = $data[7] ?? "";
+            $otherSong = $data[8] ?? "";
+            $type = 'ArticleMusic';
+
+            $createdAt = date("Y-m-d H:i:s");
+            $updatedAt = date("Y-m-d H:i:s");
+
+            $processed_data[] = [
+                "id" => $id,
+                "course" => $course,
+                "op_artist" => $opArtist,
+                "op_song" => $opSong,
+                "ed_artist" => $edArtist,
+                "ed_song" => $edSong,
+                "other_artist" => $otherArtist,
+                "other_song" => $otherSong,
+                "type" => $type,
+                "created_at" => $createdAt,
+                "updated_at" => $updatedAt,
+            ];
+        }
+
+        fclose($handle);
+    }
+
+    return ["num_row_processed" => $rowCount, "data" => $processed_data,'match_file' => true];
+}
