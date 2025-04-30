@@ -188,6 +188,7 @@ export const getIsTopNewsList = async (category:string, data:number) => {
 				season_id: '21',
 				genre_type_id: 1,
 				tag_type_id: 2,
+				is_top:1,
 				category:category,
 			}),
 			headers: {

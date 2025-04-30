@@ -328,7 +328,7 @@ class ArticleController extends Controller
 
                     $imageTest = $image_link . 'public/cast' . $image_person;
                     if (!file_exists($imageTest)) {
-                        $image_person =  '/public/cast/author.png';
+                        $image_person =  '/public/cast/dummy_cast_image.png';
                     }
                     return [
                         'roleName' => $cast->role_name,
