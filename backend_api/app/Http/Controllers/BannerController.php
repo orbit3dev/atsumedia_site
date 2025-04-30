@@ -20,6 +20,10 @@ class BannerController extends Controller
             $cat = 'anime';
         } else if ($category == '映画') {
             $cat = 'movie';
+        } else if ($category == '国内ドラマ') {
+            $cat = 'drama_japan';
+        } else if ($category == '海外ドラマ') {
+            $cat = 'drama_global';
         } else if ($category == 'public') {
             $cat = 'public';
         }
