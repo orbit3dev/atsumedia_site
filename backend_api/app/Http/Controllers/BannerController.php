@@ -11,19 +11,19 @@ class BannerController extends Controller
     public function getBanner(Request $request)
     {
 
-        $type = $request->input('type', 'banner'); 
+        $type = $request->input('type', 'banner');
         $limit = $request->input('limit', 5);
         $category = $request->input('category', 'anime');
 
         $cat = 'anime';
-        if($category == 'アニメ'){
+        if ($category == 'アニメ') {
             $cat = 'anime';
-        } else if($category == '映画'){
+        } else if ($category == '映画') {
             $cat = 'movie';
-        } else if($category == 'public'){
+        } else if ($category == 'public') {
             $cat = 'public';
         }
-        
+
         $typePage = ($type == 'banner') ? 'CAROUSEL' : ($type == 'topic' ? 'SPOTLIGHT' : '');
         $banners = DB::table('at_page_setting')
             ->leftJoin('at_article', 'at_article.id', '=', 'at_page_setting.article_id')
@@ -59,10 +59,19 @@ class BannerController extends Controller
         if ($typePage == 'CAROUSEL') {
             $formattedData = $banners->map(function ($banner) {
                 $banner->thumbnail = json_decode($banner->thumbnail, true);
-                if($banner->genre == 'public'){
+                if ($banner->genre == 'public') {
                     $banner->genre = $banner->genre_name;
                 }
                 $thumbnail = !empty($banner->thumbnail) && is_string($banner->thumbnail) ? json_decode($banner->thumbnail, true) : '';
+                $image_link = env('ABSOLUTE_PATH');
+                if (empty($image_link)) {
+                    $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                }
+                $thumbnail_urls =  !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : (!empty($banner->thumbnail_url) ? $banner->thumbnail_url : '');
+                $imageTestUrl = $image_link . $thumbnail_urls;
+                if (!file_exists($imageTestUrl)) {
+                    $thumbnail_urls =  '/public/anime/dummy_thumbnail.png';
+                }
                 return [
                     'article' => [
                         'id' => (string) $banner->article_id,
@@ -70,7 +79,7 @@ class BannerController extends Controller
                         'title' => $banner->title ?? 'Unknown Title',
                         'titleMeta' => $banner->title_meta ?? 'No Meta Title',
                         'thumbnail' => [
-                            'url' => !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : (!empty($banner->thumbnail_url) ? $banner->thumbnail_url :''), // Include thumbnail URL
+                            'url' => $thumbnail_urls,
                         ],
                         'pathName' => $banner->path_name ?? 'unknown-path',
                     ],
@@ -81,8 +90,17 @@ class BannerController extends Controller
             $formattedData = $banners->map(function ($item) {
                 $item->thumbnail = json_decode($item->thumbnail, true);
                 $thumbnail = !empty($item->thumbnail) && is_string($item->thumbnail) ? json_decode($item->thumbnail, true) : '';
-                if($item->genre == 'public'){
+                if ($item->genre == 'public') {
                     $item->genre = $item->genre_name;
+                }
+                $image_link = env('ABSOLUTE_PATH');
+                if (empty($image_link)) {
+                    $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                }
+                $thumbnail_urls =  !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : (!empty($item->thumbnail_url) ? $item->thumbnail_url : '');
+                $imageTestUrl = $image_link . $thumbnail_urls;
+                if (!file_exists($imageTestUrl)) {
+                    $thumbnail_urls =  '/public/anime/dummy_thumbnail.png';
                 }
                 return [
                     'id' => $item->article_id,
@@ -91,7 +109,7 @@ class BannerController extends Controller
                     'title' => $item->title ?? '',
                     'titleMeta' => $item->title_meta ?? '',
                     'thumbnail' => [
-                        'url' => !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : (!empty($item->thumbnail_url) ? $item->thumbnail_url :''), // Include thumbnail URL
+                        'url' => $thumbnail_urls, // Include thumbnail URL
                     ],
                     'network' => [
                         'id' => $item->network_id ?? '',

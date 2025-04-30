@@ -52,18 +52,15 @@ class ArticleStatisticController extends Controller
 
     public function getArticleStatisticByCountClick(Request $request)
     {
-        // Get input data
         $parentArticleIdYearWeek = $request->input('parentArticleIdYearWeek');
         $YearWeek = $request->input('YearWeek');
         $parentIds = $request->input('parent_id');
         $limit = $request->input('limit', 10); // Default limit to 10 if not provided
 
-        // Validate input
         if (!$parentArticleIdYearWeek) {
             return response()->json(['error' => 'Missing parentArticleIdYearWeek'], 400);
         }
 
-        // Query article statistics
         $query = AtArticleStatistic::select([
             'at_article_statistic.article_id AS id',
             'at_article.path_name AS pathName',
@@ -88,6 +85,15 @@ class ArticleStatisticController extends Controller
             ->limit($limit)->get();
         $response = $query->map(function ($item) {
             $thumbnail = json_decode($item->thumbnail, true);
+            $image_link = env('ABSOLUTE_PATH');
+            if (empty($image_link)) {
+                $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+            }
+            $thumbnail_urls =  $thumbnail['url'];
+            $imageTestUrl = $image_link . $thumbnail_urls;
+            if (!file_exists($imageTestUrl)) {
+                $thumbnail_urls =  '/public/anime/dummy_thumbnail.png';
+            }
             return [
                 'yearWeek' => $item->yearWeek,
                 'clickCount' => $item->clickCount,
@@ -99,7 +105,7 @@ class ArticleStatisticController extends Controller
                     'title' => $item->title,
                     'thumbnail' => [
                         'link' => $thumbnail['link'],  // Get the 'link' from the decoded JSON
-                        'url' => $thumbnail['url'],    // Optionally, you can also return the 'url' if needed
+                        'url' => $thumbnail_urls,    // Optionally, you can also return the 'url' if needed
                         'text' => $thumbnail['text']   // Return the 'text' if needed
                     ], // Assuming thumbnail is stored as JSON string
                     'titleMeta' => $item->titleMeta,

@@ -47,10 +47,7 @@ class ArticleController extends Controller
             $query->where('tag_type_id', $request->input('tag_type_id'));
         }
 
-        // Sort by 'sort' field ascending
         $query->orderBy('sort', 'asc');
-
-        // Pagination with optional per_page param
         $perPage = $request->query('per_page', 20);
         $articles = $query->paginate($perPage);
 
@@ -84,13 +81,20 @@ class ArticleController extends Controller
 
 
         $shapedData = $articles->map(function ($article) {
-            // decode thumbnail JSON if exists
             $thumbnail = json_decode($article->thumbnail, true);
             $thumbnailUrl = $thumbnail['url'] ?? null;
 
-            // fallback for thumbnail URL if not provided
             if (!$thumbnailUrl && $article->path && $article->id) {
                 // $thumbnailUrl = 'public/anime/' . $this->slugify($article->path) . '/season' . $article->season_id . '/series_thumbnail_' . $article->id . '.png';
+            }
+            $image_link = env('ABSOLUTE_PATH');
+            if (empty($image_link)) {
+                $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+            }
+            $thumbnailUrl = $article->thumbnail_url;
+            $imageTestUrl = $image_link .$article->thumbnail_url;
+            if (!file_exists($imageTestUrl)) {
+                $thumbnailUrl =  '/public/anime/dummy_thumbnail.png';
             }
             return [
                 'id' => (string)$article->id,
@@ -98,7 +102,7 @@ class ArticleController extends Controller
                 'genreType' => $article->genre_name,
                 'title' => $article->program_title ?: $article->path,
                 'thumbnail' => [
-                    'url' => $article->thumbnail_url,
+                    'url' => $thumbnailUrl,
                 ],
                 'titleMeta' => $article->title_meta,
                 'sort' => $article->sort > 0 ? $article->sort : $article->id,
@@ -151,6 +155,14 @@ class ArticleController extends Controller
                 $thumbnailUrl = $article->path_thumbnail;
             }
 
+            $image_link = env('ABSOLUTE_PATH');
+            if (empty($image_link)) {
+                $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+            }
+            $imageTestUrl = $image_link . $thumbnailUrl;
+            if (!file_exists($imageTestUrl)) {
+                $thumbnailUrl =  '/public/anime/dummy_thumbnail.png';
+            }
 
             return [
                 'yearWeek'   => $article->year_week,
@@ -331,7 +343,7 @@ class ArticleController extends Controller
                     $image_person = !empty($person->image) ? '/public/cast/' . $person->image : '';
 
                     $image_link = env('ABSOLUTE_PATH');
-                    if(empty($image_link)){
+                    if (empty($image_link)) {
                         $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
                     }
                     $imageTest = $image_link . 'public/cast' . $image_person;
@@ -393,7 +405,7 @@ class ArticleController extends Controller
                 $child->id = (string)$child->ids;
                 $child->ids = $temp_id;
                 $image_link = env('ABSOLUTE_PATH');
-                if(empty($image_link)){
+                if (empty($image_link)) {
                     $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
                 }
                 $imageTest = $image_link . $child->thumbnail_url;
@@ -518,7 +530,7 @@ class ArticleController extends Controller
                 $innerJsonThumbnail = stripslashes($cleanedThumbnail);
                 $thumbnailArr = (json_decode($innerJsonThumbnail, true));
                 $image_link = env('ABSOLUTE_PATH');
-                if(empty($image_link)){
+                if (empty($image_link)) {
                     $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
                 }
                 $imageTestUrl = $image_link . $thumbnailArr['url'];
