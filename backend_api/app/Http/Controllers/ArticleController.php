@@ -191,6 +191,7 @@ class ArticleController extends Controller
                 ->select(
                     DB::raw('CAST(at_article.id AS CHAR) AS id'),
                     'at_article_genre_type.name AS genreType',
+                    'at_article.genre_type_id AS genre_type_ids',
                     'at_article_tag_type.name AS tagType',
                     'at_article.path_name AS pathName',
                     'at_article.parent_id AS parentId',
@@ -245,11 +246,14 @@ class ArticleController extends Controller
             } else {
                 $parentId = $articles[0]['parentId'];
             }
+            if ($articles[0]['tag_types'] == 2 && $articles[0]['genre_type_ids'] == 2) {
+                $parentId = $articles[0]['parentId'];
+            }
 
             $articleChilds = AtArticle::where('at_article.parent_id', $parentId)
                 ->where('at_article.id', '!=', $articlesId)
                 ->select(
-                    DB::raw('CAST(at_article.id AS CHAR) AS id'),
+                    DB::raw('CAST(at_article.id AS CHAR) AS ids'),
                     'at_article.title',
                     'at_article.title_meta AS titleMeta',
                     'at_article.path_name AS pathName',
@@ -257,6 +261,7 @@ class ArticleController extends Controller
                     'at_article.thumbnail_url',
                     'at_article.thumbnail_text',
                     'at_article.thumbnail_link',
+                    'at_article.id AS id',
                 )
                 ->get();
 
@@ -362,7 +367,7 @@ class ArticleController extends Controller
                         'at_production.created_at AS productionCreatedAt',
                         'at_production.updated_at AS productionUpdatedAt'
                     )
-                    ->where('at_article_production.article_id', $child->id)
+                    ->where('at_article_production.article_id', $child->ids)
                     ->get()
                     ->map(function ($prod) {
                         return [
@@ -382,8 +387,18 @@ class ArticleController extends Controller
                     });
 
                 $child->productions = $productions;
+                $temp_id = $child->id;
+                $child->id = (string)$child->ids;
+                $child->ids = $temp_id;
+                $image_link = env('IMAGE_LINK', 'default_value');
+                $imageTest = $image_link . $child->thumbnail_url;
+                if (!file_exists($imageTest)) {
+                    $image_url =  '/public/anime/dummy_thumbnail.png';
+                } else {
+                    $image_url = $child->thumbnail_url;
+                }
                 $child->thumbnail = [
-                    'url' => $child->thumbnail_url,
+                    'url' => $image_url,
                     'text' => $child->thumbnail_text,
                     'link' => $child->thumbnail_link,
                 ]; // decode thumbnail if needed
@@ -497,10 +512,17 @@ class ArticleController extends Controller
                 $cleanedThumbnail = trim($article->thumbnail, '"');
                 $innerJsonThumbnail = stripslashes($cleanedThumbnail);
                 $thumbnailArr = (json_decode($innerJsonThumbnail, true));
+                $image_link = env('IMAGE_LINK', 'default_value');
+                $imageTestUrl = $image_link . $thumbnailArr['url'];
+                if (!file_exists($imageTestUrl)) {
+                    $thumbnail_urls =  '/public/anime/dummy_thumbnail.png';
+                } else {
+                    $thumbnail_urls =  $thumbnailArr['url'];
+                }
                 $article->thumbnail = [
                     'link' => $thumbnailArr['link'][0],
                     'text' => $thumbnailArr['text'],
-                    'url' => $thumbnailArr['url'],
+                    'url' => $thumbnail_urls,
                 ];
 
                 $article->music = []; // #temporary

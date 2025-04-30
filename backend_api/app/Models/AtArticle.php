@@ -12,17 +12,55 @@ class AtArticle extends Model
     protected $table = 'at_article'; // keep the table name as is
 
     protected $fillable = [
-        'id', 'genre_type_id', 'tag_type_id', 'path_name', 'parent_id',
-        'title', 'title_meta', 'description_meta', 'network_id', 'season_id',
-        'thumbnail_url', 'thumbnail_text', 'thumbnail_link', 'category_id',
-        'summary_title', 'summary_text', 'summary_reference', 'summary_link',
-        'author_organization', 'staff', 'other_production', 'sns',
-        'duration_time', 'series_number', 'publisher', 'other_publisher',
-        'website', 'original_work_organization', 'label', 'duration_period',
-        'volume', 'content_genre', 'content_subgenre', 'distributor',
-        'distributor_overseas', 'copyright', 'production_year', 'video_text',
-        'video_url', 'vod', 'sort', 'content', 'summary', 'tag',
-        'program_title', 'thumbnail', 'path', 'created_at', 'updated_at'
+        'id',
+        'genre_type_id',
+        'tag_type_id',
+        'path_name',
+        'parent_id',
+        'title',
+        'title_meta',
+        'description_meta',
+        'network_id',
+        'season_id',
+        'thumbnail_url',
+        'thumbnail_text',
+        'thumbnail_link',
+        'category_id',
+        'summary_title',
+        'summary_text',
+        'summary_reference',
+        'summary_link',
+        'author_organization',
+        'staff',
+        'other_production',
+        'sns',
+        'duration_time',
+        'series_number',
+        'publisher',
+        'other_publisher',
+        'website',
+        'original_work_organization',
+        'label',
+        'duration_period',
+        'volume',
+        'content_genre',
+        'content_subgenre',
+        'distributor',
+        'distributor_overseas',
+        'copyright',
+        'production_year',
+        'video_text',
+        'video_url',
+        'vod',
+        'sort',
+        'content',
+        'summary',
+        'tag',
+        'program_title',
+        'thumbnail',
+        'path',
+        'created_at',
+        'updated_at'
     ];
 
     protected $casts = [
@@ -42,6 +80,11 @@ class AtArticle extends Model
     public function childs()
     {
         return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function getIdAttribute($value)
+    {
+        return (string) $value;
     }
 
     // ✅ Your existing index or scopes will stay exactly as they are
