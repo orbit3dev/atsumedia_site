@@ -48,7 +48,6 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
             $idArticle = $wpdb->get_results("SELECT id FROM at_article ORDER BY id ASC", ARRAY_A); // ARRAY_A returns associative array
             $idArticleArr = array_column($idArticle, 'id');
         }
-        // return ["num_row_processed" => 0];
 
         file_put_contents($progress_file, json_encode([
             "status" => "processing",

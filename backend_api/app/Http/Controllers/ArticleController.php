@@ -137,6 +137,7 @@ class ArticleController extends Controller
                 'at_network.name AS network_name',
                 'at_article_genre_type.name AS genre_name',
                 'at_article.id AS article_id_data',
+                'at_article.thumbnail_url AS path_thumbnail',
             )
             ->orderBy('click_count', 'desc')
             ->get();
@@ -146,8 +147,8 @@ class ArticleController extends Controller
             $thumbnailUrl = $thumbnail['url'] ?? null;
 
             // fallback to generate URL if not present
-            if (!$thumbnailUrl && $article->path_name && $article->id) {
-                $thumbnailUrl = 'public/' . $genreType . '/' . $article->path_name . '/program_thumbnail_' . $article->article_id_data . '.png';
+            if (!$thumbnailUrl && $article->path_thumbnail) {
+                $thumbnailUrl = $article->path_thumbnail;
             }
 
 
