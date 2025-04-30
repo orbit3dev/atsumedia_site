@@ -152,6 +152,12 @@ function custom_content_page()
             </div>
         </div>
     </form>
+    <style>
+        input.flatpickr-input[readonly] {
+            background-color: white !important;
+            color: black;
+        }
+    </style>
 <?php
 }
 

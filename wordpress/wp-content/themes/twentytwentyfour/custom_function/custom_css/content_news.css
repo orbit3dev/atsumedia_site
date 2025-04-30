@@ -204,4 +204,11 @@ input[type="checkbox"] {
 .custom-group:hover .custom-line {
     background-color: #f53a50;
 }
+#customDate {
+    background-color: white;
+}
+input.flatpickr-input[readonly] {
+    background-color: white !important;
+    color: black; /* Optional: Ensure text is readable */
+}
 
