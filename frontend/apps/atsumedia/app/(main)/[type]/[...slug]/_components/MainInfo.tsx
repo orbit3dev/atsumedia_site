@@ -40,7 +40,8 @@ const MainInfo: React.FC<MovieMainInfoProps> = ({ data }) => {
 						{/*<GrayTag text={data.distributor} />*/}
 						<span>製作国</span>
 						<GrayTag text={'日本'} /> {/*todo*/}
-						{data.season && <GrayTag text={data.season.name} />}
+						{data.season?.name ? <GrayTag text={data.season.name} /> : null}
+						{/* {data.season && <GrayTag text={data.season.name} />} */}
 						{/*{data.networks.map((item) => (*/}
 						{/*	<GrayTag key={item.id} text={item.dateTime} />*/}
 						{/*))}{' '}*/}
