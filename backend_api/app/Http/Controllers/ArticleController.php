@@ -331,6 +331,9 @@ class ArticleController extends Controller
                     $image_person = !empty($person->image) ? '/public/cast/' . $person->image : '';
 
                     $image_link = env('ABSOLUTE_PATH');
+                    if(empty($image_link)){
+                        $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                    }
                     $imageTest = $image_link . 'public/cast' . $image_person;
                     if (!file_exists($imageTest)) {
                         $image_person =  '/public/cast/dummy_cast_image.png';
@@ -390,6 +393,9 @@ class ArticleController extends Controller
                 $child->id = (string)$child->ids;
                 $child->ids = $temp_id;
                 $image_link = env('ABSOLUTE_PATH');
+                if(empty($image_link)){
+                    $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                }
                 $imageTest = $image_link . $child->thumbnail_url;
                 if (!file_exists($imageTest)) {
                     $image_url =  '/public/anime/dummy_thumbnail.png';
@@ -512,8 +518,10 @@ class ArticleController extends Controller
                 $innerJsonThumbnail = stripslashes($cleanedThumbnail);
                 $thumbnailArr = (json_decode($innerJsonThumbnail, true));
                 $image_link = env('ABSOLUTE_PATH');
+                if(empty($image_link)){
+                    $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                }
                 $imageTestUrl = $image_link . $thumbnailArr['url'];
-                Log::info($imageTestUrl);
                 if (!file_exists($imageTestUrl)) {
                     $thumbnail_urls =  '/public/anime/dummy_thumbnail.png';
                 } else {
