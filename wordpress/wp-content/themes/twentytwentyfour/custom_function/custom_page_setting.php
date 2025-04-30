@@ -21,11 +21,11 @@ function page_settings_config()
     <body>
 
         <div class="tabs">
-            <div class="tab active" data-category="anime">アニメ</div>
+            <div class="tab active" data-category="public">TOP</div>
+            <div class="tab" data-category="anime">アニメ</div>
             <div class="tab" data-category="movie">映画</div>
             <div class="tab" data-category="jdrama">国内ドラマ</div>
             <div class="tab" data-category="fdrama">海外ドラマ</div>
-            <div class="tab" data-category="public">TOP</div>
         </div>
 
         <!-- Table structure, shared across all tabs -->

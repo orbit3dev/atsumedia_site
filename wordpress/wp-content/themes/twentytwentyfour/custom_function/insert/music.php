@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
     require_once('../../../../../wp-load.php'); // Adjust path as needed
 }
 
-function insertMusic($wpdb, $articleId, $course, $edArtist, $opArtist, $opSong, $otherArtist, $otherSong, $type)
+function insertMusic($wpdb, $articleId, $course, $opArtist, $opSong,  $edArtist,  $edSong, $otherArtist, $otherSong, $type)
 {
     $table = $wpdb->prefix . 'article_music';
 
@@ -14,6 +14,7 @@ function insertMusic($wpdb, $articleId, $course, $edArtist, $opArtist, $opSong, 
         'ed_artist'      => $edArtist,
         'op_artist'      => $opArtist,
         'op_song'        => $opSong,
+        'ed_song'        => $edSong,
         'other_artist'   => $otherArtist,
         'other_song'     => $otherSong,
         'sort'           => $articleId,       // Optional: same as article_id

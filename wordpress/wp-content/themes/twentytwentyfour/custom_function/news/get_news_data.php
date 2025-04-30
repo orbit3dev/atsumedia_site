@@ -89,18 +89,25 @@ function get_news_by_id()
         if (isset($result['author_image'])) {
             $result['author_image'] = $base_url . $result['author_image'];
         }
-        if ($result['related_titles']) {
-            $data_related_titles = $wpdb->get_row($wpdb->prepare(
-                "SELECT 
-                id, path_name AS text, thumbnail_url as image,vod
-                FROM at_article WHERE id = %d",
-                $result['related_titles']
-            ), ARRAY_A);
-            $data_related_titles['image'] = get_template_directory_uri() . '/assets/assets/'. $data_related_titles['image'] ."v=" .time();
-            $result['related_articles'] = !empty($data_related_titles) ? json_encode($data_related_titles) : null;
-            // $result['related_articles'][]
+        if (!empty($result['related_titles'])) {
+            $ids = array_map('intval', explode(',', $result['related_titles']));
+            $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+            $query = "
+                SELECT id, path_name AS text, thumbnail_url AS image, vod
+                FROM at_article
+                WHERE id IN ($placeholders)
+            ";
+
+            $prepared_query = $wpdb->prepare($query, ...$ids);
+            $related_rows = $wpdb->get_results($prepared_query, ARRAY_A);
+
+            foreach ($related_rows as &$row) {
+                $row['image'] = get_template_directory_uri() . '/assets/assets/' . $row['image'] . '?v=' . time();
+            }
+
+            $result['related_articles'] = !empty($related_rows) ? json_encode($related_rows) : null;
         } else {
-            $result['related_articles'] = 1;
+            // $result['related_articles'] = 1;
         }
         error_log("Data news fetched successfully: " . print_r($result, true));
         echo json_encode(["success" => true, "data" => $result]);

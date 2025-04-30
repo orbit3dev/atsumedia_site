@@ -122,7 +122,7 @@ function custom_content_page()
                             </tr>
                             <tr>
                                 <th><label for="article-select">関連作品</label></th>
-                                <td><select id="article-select" style="width: 400px;"></select></td>
+                                <td><select id="article-select" multiple style="width: 400px;"></select></td>
                                 <!-- <td><textarea name="related_titles" rows="2" class="large-text"></textarea></td> -->
                             </tr>
                             <tr>
@@ -211,7 +211,10 @@ function custom_content_scripts()
             let originalImageUrl = '';
             let originalImageFilename = '';
             $select.on('select2:select', function(e) {
-                var selectedData = e.params.data;
+                let selectedData = $select.select2('data');
+            });
+            $select.on('select2:unselect', function(e) {
+                let deselectedItem = e.params.data;
             });
 
             class ButtonTool {
@@ -609,9 +612,12 @@ function custom_content_scripts()
                                 $('#author_preview').html('<img src="' + data.author_image + '" width="150">');
                             }
                             var savedRelatedTitles = typeof data.related_articles != 'undefined' ? JSON.parse(data.related_articles) : null;
-                            if (savedRelatedTitles != null) {
-                                var option = new Option(savedRelatedTitles.text, savedRelatedTitles.id, true, true); // true sets the option as selected
-                                $select.append(option).trigger('change');
+                            if (Array.isArray(savedRelatedTitles)) {
+                                savedRelatedTitles.forEach(function(item) {
+                                    var option = new Option(item.text, item.id, true, true); // true, true = selected and default
+                                    $select.append(option);
+                                });
+                                $select.trigger('change');
                             }
                             if (data.related_titles && data.related_titles !== '') {
 
@@ -789,7 +795,19 @@ function custom_content_scripts()
                 editor.save().then((outputData) => {
                     const formData = $("#custom-content-form").serializeArray();
 
-                    articleId = selectedData
+                    idList = []
+                    selectedData = $select.select2('data')
+                    selectedData.forEach(item => {
+                        if (item.id) {
+                            idList.push(item.id);
+                        }
+                        for (let key in item) {
+                            if (Array.isArray(item[key])) {
+                                extractIdsRecursive(item[key], ids);
+                            }
+                        }
+                    });
+                    articleId = idList.join(',')
                     formData.push({
                         name: "article_content",
                         value: JSON.stringify(outputData),
@@ -888,8 +906,8 @@ function insert_at_news()
     $meta_title = sanitize_text_field($form_data['meta_title']);
     $meta_description = sanitize_textarea_field($form_data['meta_description']);
     $first_view_image = !empty($form_data['first_view_image']) ? esc_url_raw($form_data['first_view_image']) : null;
-    if(isset($first_view_image)){
-        $first_view_image = str_replace($base_url,'',$first_view_image);
+    if (isset($first_view_image)) {
+        $first_view_image = str_replace($base_url, '', $first_view_image);
     }
     $article_content = !empty($form_data['article_content']) ? ($form_data['article_content']) : null;
     $banner = sanitize_textarea_field($form_data['banner']);
@@ -897,8 +915,8 @@ function insert_at_news()
     $author_name = sanitize_text_field($form_data['author_name']);
     $author_description = sanitize_textarea_field($form_data['author_description']);
     $author_image = !empty($form_data['author_image']) ? esc_url_raw(trim($form_data['author_image'])) : null;
-    if(isset($author_image)){
-        $author_image = str_replace($base_url,'',$author_image);
+    if (isset($author_image)) {
+        $author_image = str_replace($base_url, '', $author_image);
     }
 
     // Simulate author ID & username (Replace with actual logged-in user data)
