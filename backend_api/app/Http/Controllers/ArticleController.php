@@ -513,6 +513,7 @@ class ArticleController extends Controller
                 $thumbnailArr = (json_decode($innerJsonThumbnail, true));
                 $image_link = env('ABSOLUTE_PATH', 'default_value');
                 $imageTestUrl = $image_link . $thumbnailArr['url'];
+                Log::info($imageTestUrl);
                 if (!file_exists($imageTestUrl)) {
                     $thumbnail_urls =  '/public/anime/dummy_thumbnail.png';
                 } else {
