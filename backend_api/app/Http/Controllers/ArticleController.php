@@ -486,8 +486,7 @@ class ArticleController extends Controller
 
                 $cleanedArticle = trim($article->summary, '"');
                 $cleanedArticle = str_replace('\n', ' ', $cleanedArticle);
-                $innerJsonArticle = stripslashes($cleanedArticle);
-                $summaryArr = json_decode($innerJsonArticle, true);
+                $summaryArr = json_decode($cleanedArticle, true);
                 $article->summary = [
                     'link' => $summaryArr['link'][0],
                     'reference' => $summaryArr['reference'],
