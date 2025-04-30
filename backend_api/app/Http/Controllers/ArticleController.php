@@ -330,8 +330,7 @@ class ArticleController extends Controller
                         ->first();
                     $image_person = !empty($person->image) ? '/public/cast/' . $person->image : '';
 
-                    $image_link = env('IMAGE_LINK', 'default_value');
-
+                    $image_link = env('ABSOLUTE_PATH', 'default_value');
                     $imageTest = $image_link . 'public/cast' . $image_person;
                     if (!file_exists($imageTest)) {
                         $image_person =  '/public/cast/dummy_cast_image.png';
@@ -390,7 +389,7 @@ class ArticleController extends Controller
                 $temp_id = $child->id;
                 $child->id = (string)$child->ids;
                 $child->ids = $temp_id;
-                $image_link = env('IMAGE_LINK', 'default_value');
+                $image_link = env('ABSOLUTE_PATH', 'default_value');
                 $imageTest = $image_link . $child->thumbnail_url;
                 if (!file_exists($imageTest)) {
                     $image_url =  '/public/anime/dummy_thumbnail.png';
@@ -512,7 +511,7 @@ class ArticleController extends Controller
                 $cleanedThumbnail = trim($article->thumbnail, '"');
                 $innerJsonThumbnail = stripslashes($cleanedThumbnail);
                 $thumbnailArr = (json_decode($innerJsonThumbnail, true));
-                $image_link = env('IMAGE_LINK', 'default_value');
+                $image_link = env('ABSOLUTE_PATH', 'default_value');
                 $imageTestUrl = $image_link . $thumbnailArr['url'];
                 if (!file_exists($imageTestUrl)) {
                     $thumbnail_urls =  '/public/anime/dummy_thumbnail.png';
