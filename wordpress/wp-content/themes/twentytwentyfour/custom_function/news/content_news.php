@@ -166,7 +166,9 @@ function custom_content_scripts()
             selectedData = ''
             if (typeof flatpickr !== "undefined") {
                 flatpickr("#customDate", {
-                    dateFormat: "Y/m/d" // Force format to yyyy/mm/dd
+                    enableTime: true, // Enable time picker
+                    dateFormat: "Y/m/d H:i", // Format: yyyy/mm/dd HH:MM
+                    time_24hr: true // Use 24-hour format (optional)
                 });
             }
 

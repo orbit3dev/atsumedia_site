@@ -66,6 +66,7 @@ function insertOrUpdateArticle($wpdb, $data)
         'video_text' =>  $data['video_text'] ?? '',
         'title' =>  $data['title'] ?? '',
         'sns' =>  $data['sns'] ?? '',
+        'label' =>  $data['label'] ?? '',
     ];
 
     $formats = array_fill(0, count($insert_data), '%s');
