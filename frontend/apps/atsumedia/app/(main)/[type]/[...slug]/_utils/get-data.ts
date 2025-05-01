@@ -18,7 +18,7 @@ export const getResultData = unstable_cache(
 
 		// 获取pathname
 		const pathName = params.slug.join('/');
-		const article = await getArticle(pathName);
+		const article = await getArticle(pathName , params.type);
 		if (!article) {
 			return { data: null };
 		}
@@ -35,13 +35,14 @@ export const getResultData = unstable_cache(
 	{ revalidate: 300 }
 );
 
-export const getArticle = async(pathName:string) =>{
+export const getArticle = async(pathName:string ,type:string) =>{
 	const response = await fetch(
 		process.env.NEXT_PUBLIC_API_URL + "/detail-article",
 		{
 			method: "POST",
 			body: JSON.stringify({
 				path: pathName,
+				type: type,
 			}),
 			headers: {
 				"Content-Type": "application/json",

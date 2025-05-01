@@ -245,6 +245,7 @@ class ArticleController extends Controller
                     'at_article.tag_type_id as tag_types',
                     'at_article.id as articles_id',
                 )
+                ->where('at_article_genre_type.name',$request->type)
                 ->get();
 
             if ($articles[0]['id'] == 0 && !empty($articles[0]['articles_id']) && $articles[0]['articles_id'] != 0) {
