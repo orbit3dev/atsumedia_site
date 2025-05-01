@@ -114,18 +114,17 @@ const dataSort = (article: Article): Article => {
 };
 
 const getPhotographyOrPopularityDataList = async (data: Article, limit: number) => {
-	const articleList: Article[] = [];
-	if (data.tagType == TagType.root || data.tagType == TagType.series) {
-		const list = (await getArticleListByParentIdOrderByClickCount(data.id, limit)).map((item) => {
+	let articleList: Article[] = [];
+	if (data.tagType == TagType.root || data.tagType == TagType.series || data.tagType == TagType.episode) {
+		articleList = (await getArticleListByParentIdOrderByClickCount(data.id, limit, data.tagType)).map((item) => {
 			return {
 				...item.article,
 				yearWeek: item.yearWeek,
 				clickCount: item.clickCount,
 			};
 		});
-		articleList.push(...list);
 	}
-		
+
 	return articleList;
 };
 

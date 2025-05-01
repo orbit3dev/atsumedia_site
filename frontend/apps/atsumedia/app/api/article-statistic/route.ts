@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 			method: "POST",
 			body: JSON.stringify({
 				articleId: req.articleId,
-				parentArticleId: req.parentArticleId,
+				parentArticleId: (req.parentArticleId == null ? req.tagType : req.parentArticleId),
 				genreType: req.genreType,
 				tagType: req.tagType,
 			}),

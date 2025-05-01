@@ -11,11 +11,11 @@ export const getPersonList = async () => {
 
 
 
-export const getBannerList = async (data:string) => {
+export const getBannerList = async (data: string) => {
 	const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/get-banner",
 		{
 			method: "POST",
-			body: JSON.stringify({ type: 'banner' ,category:data}),
+			body: JSON.stringify({ type: 'banner', category: data }),
 			headers: {
 				"Content-Type": "application/json", // Ensure JSON is sent
 				"Accept": "application/json",
@@ -27,11 +27,11 @@ export const getBannerList = async (data:string) => {
 
 
 
-export const getTopicData = async (data:string) => {
+export const getTopicData = async (data: string) => {
 	const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/get-banner",
 		{
 			method: "POST",
-			body: JSON.stringify({ type: 'topic' , category:data}),
+			body: JSON.stringify({ type: 'topic', category: data }),
 			headers: {
 				"Content-Type": "application/json", // Ensure JSON is sent
 				"Accept": "application/json",
@@ -123,7 +123,8 @@ export const getRootArticleListByGenreTypeOrderByClickCount = async (
 
 export const getArticleListByParentIdOrderByClickCount = async (
 	parentId: string,
-	limit: number
+	limit: number,
+	tag_type: string,
 ) => {
 	const now = new Date();
 	const weekNumber = getWeekNumber(now);
@@ -137,6 +138,7 @@ export const getArticleListByParentIdOrderByClickCount = async (
 				YearWeek: `${parentId}-${now.getFullYear()}${weekNumber}`,
 				limit: limit,
 				sortDirection: 'DESC',
+				tagType:tag_type
 			}),
 			headers: {
 				"Content-Type": "application/json",
@@ -146,7 +148,7 @@ export const getArticleListByParentIdOrderByClickCount = async (
 	);
 
 	const dataResult2 = await response.json();
-	let list = (dataResult2.data ?? []) as ArticleStatistic[];
+	let list = (dataResult2 ?? []) as ArticleStatistic[];
 	return list;
 };
 
@@ -179,7 +181,7 @@ export const getNewsListByGenreType = async (
 
 
 
-export const getIsTopNewsList = async (category:string, data:number) => {
+export const getIsTopNewsList = async (category: string, data: number) => {
 	const response = await fetch(
 		process.env.NEXT_PUBLIC_API_URL + "/news-list-by-genre",
 		{
@@ -188,8 +190,8 @@ export const getIsTopNewsList = async (category:string, data:number) => {
 				season_id: '21',
 				genre_type_id: 1,
 				tag_type_id: 2,
-				is_top:1,
-				category:category,
+				is_top: 1,
+				category: category,
 			}),
 			headers: {
 				"Content-Type": "application/json",

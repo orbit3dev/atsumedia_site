@@ -19,6 +19,7 @@ function insertMusic($wpdb, $articleId, $course, $opArtist, $opSong,  $edArtist,
         'other_song'     => $otherSong,
         'sort'           => $articleId,       // Optional: same as article_id
         'type'           => $type,
+        'article_id_course' => $articleId. '-' .$course,
         'updated_at'     => current_time('mysql'),
         'created_at'     => current_time('mysql'),
     ];

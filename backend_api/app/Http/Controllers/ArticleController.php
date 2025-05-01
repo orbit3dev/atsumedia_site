@@ -12,6 +12,7 @@ use App\Models\AtArticleScreenwriter;
 use App\Models\AtArticleCast;
 use App\Models\AtArticleOriginalWork;
 use App\Models\AtArticleFreeText;
+use App\Models\AtArticleMusic;
 use App\Models\Season;
 use App\Models\Network;
 use App\Models\Person;
@@ -92,7 +93,7 @@ class ArticleController extends Controller
                 $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
             }
             $thumbnailUrl = $article->thumbnail_url;
-            $imageTestUrl = $image_link .$article->thumbnail_url;
+            $imageTestUrl = $image_link . $article->thumbnail_url;
             if (!file_exists($imageTestUrl)) {
                 $thumbnailUrl =  '/public/anime/dummy_thumbnail.png';
             }
@@ -245,7 +246,7 @@ class ArticleController extends Controller
                     'at_article.tag_type_id as tag_types',
                     'at_article.id as articles_id',
                 )
-                ->where('at_article_genre_type.name',$request->type)
+                ->where('at_article_genre_type.name', $request->type)
                 ->get();
 
             if ($articles[0]['id'] == 0 && !empty($articles[0]['articles_id']) && $articles[0]['articles_id'] != 0) {
@@ -365,6 +366,8 @@ class ArticleController extends Controller
                 ->get();
             $articleChilds11 = Season::where('id', $articles[0]['season'])
                 ->get();
+            $articleChilds12 = AtArticleMusic::where('article_id', $articlesId)
+                ->get();
             // 3. For each child, get productions and group
             $articleChilds = $articleChilds->map(function ($child) {
                 // Get productions for each child
@@ -436,10 +439,26 @@ class ArticleController extends Controller
                 $articleChilds9,
                 $articleChilds10,
                 $articleChilds11,
+                $articleChilds12,
                 $articlesId,
             ) {
                 $article->childs = $articleChilds;
                 $article->network = $articleChilds2;
+                $article->musics = collect($articleChilds12)->map(function ($musicItem) {
+                    return [
+                        'id' => $musicItem['id'],
+                        'type' => $musicItem['type'],
+                        'articleId' => $musicItem['article_id'],
+                        'course' => $musicItem['course'],
+                        'opArtist' => $musicItem['op_artist'],
+                        'edArtist' => $musicItem['ed_artist'],
+                        'opSong' => $musicItem['op_song'],
+                        'edSong' => $musicItem['ed_song'],
+                        'otherArtist' => $musicItem['other_artist'],
+                        'otherSong' => $musicItem['other_song'],
+                        'sort' => $musicItem['sort'],
+                    ];
+                });
                 $article->vods = collect($articleChilds3)->map(function ($vodItem) {
                     return [
                         'vod' => [

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\AtArticleStatistic;
+use App\Models\AtArticle;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
@@ -55,11 +56,15 @@ class ArticleStatisticController extends Controller
         $parentArticleIdYearWeek = $request->input('parentArticleIdYearWeek');
         $YearWeek = $request->input('YearWeek');
         $parentIds = $request->input('parent_id');
+        $tagTypes = $request->input('tagType');
         $limit = $request->input('limit', 10); // Default limit to 10 if not provided
 
         if (!$parentArticleIdYearWeek) {
             return response()->json(['error' => 'Missing parentArticleIdYearWeek'], 400);
         }
+
+        $articleYearId = explode("-", $parentArticleIdYearWeek);
+        $yearId = !empty($articleYearId[1]) ? $articleYearId[1] : '';
 
         $query = AtArticleStatistic::select([
             'at_article_statistic.article_id AS id',
@@ -71,6 +76,7 @@ class ArticleStatisticController extends Controller
             'at_article.title_meta AS titleMeta',
             'at_article.description_meta AS descriptionMeta',
             'at_article.network_id',
+            'at_article.thumbnail_url',
             'at_article_statistic.year_week AS yearWeek',
             'at_article_statistic.click_count AS clickCount',
             'at_network.name AS networkName',
@@ -79,12 +85,27 @@ class ArticleStatisticController extends Controller
             ->leftJoin('at_article_genre_type', 'at_article.genre_type_id', '=', 'at_article_genre_type.id')
             ->leftJoin('at_article_tag_type', 'at_article.tag_type_id', '=', 'at_article_tag_type.id')
             ->leftJoin('at_network', 'at_article.network_id', '=', 'at_network.id')
-            ->where('at_article_statistic.article_id', '=', $parentIds)
-            ->where('at_article_statistic.year_week', '=', $YearWeek)
             ->orderBy('at_article_statistic.click_count', 'DESC')
-            ->limit($limit)->get();
+            ->limit($limit);
+        if ($tagTypes == 'root') {
+            $query = $query->where('at_article_statistic.year_week_tag_type', '=', $yearId . '-root')->get();
+        } else if ($tagTypes == 'series' || $tagTypes == 'episode') {
+            $dataParent = AtArticle::select(['x.id'])
+                ->leftJoin('at_article as x', 'x.parent_id', '=', 'at_article.parent_id')
+                ->where('at_article.id', '=', $parentIds)
+                ->where('x.id', '!=', $parentIds)
+                ->get();
+            $ids = collect($dataParent)->pluck('id')->toArray();
+            $query = $query->whereIn('at_article_statistic.article_id', $ids)->where('at_article_statistic.year_week', '=', $yearId)->get();
+        }
+
         $response = $query->map(function ($item) {
-            $thumbnail = json_decode($item->thumbnail, true);
+            if (json_decode($item->thumbnail, true) != '') {
+                $thumbnail = json_decode($item->thumbnail, true);
+            } else {
+                $thumbnail = trim($item->thumbnail, '"');
+                $thumbnail = json_decode($thumbnail, true);
+            }
             $image_link = env('ABSOLUTE_PATH');
             if (empty($image_link)) {
                 $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
@@ -104,9 +125,9 @@ class ArticleStatisticController extends Controller
                     'tagType' => $item->tagType,
                     'title' => $item->title,
                     'thumbnail' => [
-                        'link' => $thumbnail['link'],  // Get the 'link' from the decoded JSON
-                        'url' => $thumbnail_urls,    // Optionally, you can also return the 'url' if needed
-                        'text' => $thumbnail['text']   // Return the 'text' if needed
+                        'link' => $thumbnail['link'],
+                        'url' => $thumbnail_urls,
+                        'text' => $thumbnail['text']
                     ], // Assuming thumbnail is stored as JSON string
                     'titleMeta' => $item->titleMeta,
                     'descriptionMeta' => $item->descriptionMeta,
@@ -124,7 +145,7 @@ class ArticleStatisticController extends Controller
     {
         // Validate the incoming data
         $validated = $request->validate([
-            'articleId' => 'required|integer',
+            'articleId' => 'required|string',
             'parentArticleId' => 'required|string',
             'genreType' => 'required|string',
             'tagType' => 'required|string',
@@ -141,9 +162,7 @@ class ArticleStatisticController extends Controller
 
         // Check if the article statistic already exists
         $articleStatistic = AtArticleStatistic::find($customId);
-
         if ($articleStatistic) {
-            // Update the existing article statistic
             $articleStatistic->update([
                 'click_count' => $articleStatistic->click_count + 1,
                 'updated_at' => now(),

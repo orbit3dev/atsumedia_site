@@ -120,21 +120,20 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $parentId = null;
             }
             $categoryName = 'anime';
-            if($data['genre'] == 'アニメ'){
+            if ($data['genre'] == 'アニメ') {
                 $genre_type_id = Constants::CATEGORY['anime'];
                 $categoryName = 'anime';
-            } elseif($data['genre'] == '映画'){
+            } elseif ($data['genre'] == '映画') {
                 $genre_type_id = Constants::CATEGORY['movie'];
                 $categoryName = 'movie';
-
-            } elseif($data['genre'] == '国内ドラマ'){
+            } elseif ($data['genre'] == '国内ドラマ') {
                 $genre_type_id = Constants::CATEGORY['drama_japan'];
                 $categoryName = 'drama_japan';
             };
 
             // Thumbnail
             $thumbnailUrl = !empty($data['thumbnail']) && !empty($titlePath) ? $data['thumbnail'] : ('public/' . $categoryName . '/' . $titlePath);
-            $thumbnailUrl = ('public/'. $categoryName . '/' . $titlePath);
+            $thumbnailUrl = ('public/' . $categoryName . '/' . $titlePath);
             if (empty($data['series_path']) && empty($data['episode_path'])) {
                 $thumbnailUrl .= '/program_thumbnail_' . $id . '.png';
             } elseif (!empty($data['series_path']) && empty($data['episode_path'])) {
@@ -290,7 +289,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $castName = trim($data[$castKey] ?? "");
                 $castRole = trim($data[$roleKey] ?? "");
 
-                if ($castName === "") break;
+                if ($castName === "") continue;
                 insertCast($wpdb, $id, $castName, $castRole);
             }
 
@@ -343,7 +342,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 foreach ($arrayProduction as $company) {
                     $company = trim($company);
                     if ($company !== "") {
-                        // insertArticleProduction($wpdb, $id, $company);
+                        insertArticleProduction($wpdb, $id, $company);
                     }
                 }
             }
