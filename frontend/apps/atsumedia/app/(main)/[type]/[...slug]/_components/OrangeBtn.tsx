@@ -17,7 +17,8 @@ const OrangeBtn: React.FC<Props> = ({ text, url, microcopy,title }) => {
 					<div className="flex items-center justify-center text-center font-bold md:text-base">
 						<span className="mx-3 inline-block h-[15px] w-[1px] -rotate-[30deg] bg-[#FF6534] align-top font-normal group-hover:bg-[#f53a50]" />
 						{/* {(title ? title + ' ' : '') + microcopy + 'で視聴'} */}
-						{(title ? title + ' ' : '') + microcopy }
+						{/* {(title ? title + ' ' : '') + microcopy } */}
+						{microcopy}
 						<span className="mx-3 inline-block h-[15px] w-[1px] rotate-[30deg] bg-[#FF6534] group-hover:bg-[#f53a50]" />
 					</div>
 				)}
