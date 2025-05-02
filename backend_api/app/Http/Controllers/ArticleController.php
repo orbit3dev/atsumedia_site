@@ -187,7 +187,10 @@ class ArticleController extends Controller
             ];
         });
 
-        return response()->json($shapedData);
+        return response()->json($shapedData)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     public function detailArticle(Request $request)
@@ -367,11 +370,11 @@ class ArticleController extends Controller
             $articleChilds11 = Season::where('id', $articles[0]['season'])
                 ->get();
             $idMusic = -1;
-                if($articles[0]['tag_types'] == 2){
-                    $idMusic = $articlesId;
-                } else if($articles[0]['tag_types'] == 3){
-                    $idMusic = $articles[0]['parentId'];
-                }
+            if ($articles[0]['tag_types'] == 2) {
+                $idMusic = $articlesId;
+            } else if ($articles[0]['tag_types'] == 3) {
+                $idMusic = $articles[0]['parentId'];
+            }
             $articleChilds12 = AtArticleMusic::where('article_id', $idMusic)
                 ->get();
             // 3. For each child, get productions and group
@@ -589,7 +592,11 @@ class ArticleController extends Controller
                 $article->id = $articlesId;
                 return $article;
             });
-            return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
+            return response()
+                ->json($response, 200, [], JSON_UNESCAPED_UNICODE)
+                ->header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
         } catch (\Exception $e) {
             echo $e->getMessage();
         }

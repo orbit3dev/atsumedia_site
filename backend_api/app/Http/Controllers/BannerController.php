@@ -124,6 +124,9 @@ class BannerController extends Controller
             });
         }
 
-        return response()->json($formattedData);
+        return response()->json($formattedData)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 }

@@ -110,7 +110,7 @@ class ArticleStatisticController extends Controller
             if (empty($image_link)) {
                 $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
             }
-            $thumbnail_urls =  !empty($thumbnail['url']) ? $thumbnail['url'] :'';
+            $thumbnail_urls =  !empty($thumbnail['url']) ? $thumbnail['url'] : '';
             $imageTestUrl = $image_link . $thumbnail_urls;
             if (!file_exists($imageTestUrl) || empty($thumbnail_urls)) {
                 $thumbnail_urls =  '/public/anime/dummy_thumbnail.png';
@@ -138,7 +138,11 @@ class ArticleStatisticController extends Controller
                 ]
             ];
         });
-        return response()->json($response, 200, [], JSON_UNESCAPED_UNICODE);
+        return response()
+            ->json($response, 200, [], JSON_UNESCAPED_UNICODE)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     public function store(Request $request): JsonResponse
@@ -193,6 +197,9 @@ class ArticleStatisticController extends Controller
                 'createdAt' => $articleStatistic->created_at->toIso8601String(),
                 'updatedAt' => $articleStatistic->updated_at->toIso8601String(),
             ]
-        ], 200);
+        ], 200)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 }
