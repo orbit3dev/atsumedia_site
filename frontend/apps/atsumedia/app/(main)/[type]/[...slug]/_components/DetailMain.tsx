@@ -21,9 +21,8 @@ interface MovieDetailMainProps {
 	tagType: TagType;
 	photographyList: Article[];
 	popularityList: Article[];
-    parentData: Article | null | undefined;
+	parentData: Article | null | undefined;
 }
-
 const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photographyList, popularityList, parentData }) => {
 	const [ready, setReady] = useState(false);
 	const [isVideoValid, setIsVideoValid] = useState<boolean | 'private' | null>(null);
@@ -43,13 +42,13 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 			return url;
 		}
 	};
-    let childs = data.childs;
-    let isUsingParent = false;
+	let childs = data.childs;
+	let isUsingParent = false;
 
-    if (childs && childs.length === 0 && parentData) {
-        childs = parentData.childs;
-        isUsingParent = true;
-    }
+	if (childs && childs.length === 0 && parentData) {
+		childs = parentData.childs;
+		isUsingParent = true;
+	}
 	childs = childs?.filter(item => item.id != data.id);
 
 	const vods = data.vods.filter((item) => !!item.vod);
@@ -162,77 +161,79 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 			{childs &&
 				childs.length > 0 &&
 				(tagType !== TagType.series ? (<MainTitle title={isUsingParent && parentData ? (parentData.tagType == 'root' ? `${parentData.titleMeta}の詳細` : `${parentData.titleMeta}のエピソード`) : (data.tagType == 'root' ? (data.genreType == 'movie' ? `${data.titleMeta}のシリーズ一覧` : `${data.titleMeta}のシリーズ一覧`) : `${data.titleMeta}の作品`)}>
-						{childs.map((item) => (
-							<Link href={`/${pathname}/${item.pathName}`} title={item.titleMeta} key={item.id}>
-								<div className="mb-2 flex items-center rounded-md bg-[#F0F0F0] p-3 md:p-4">
-									<div className={'w-[113px] shrink-0 grow-0 basis-[113px] md:w-40 md:basis-40'}>
-										<MyImage
-											path={
-												item.thumbnail?.url
-													? item.thumbnail.url
-													: 'public/anime/dummy_thumbnail.png'
-											}
-											alt={item.titleMeta}
-										/>
+					{childs.map((item) => (
+						<Link href={`/${pathname}/${item.pathName}`} title={item.titleMeta} key={item.id}>
+							<div className="mb-2 flex items-center rounded-md bg-[#F0F0F0] p-3 md:p-4">
+								<div className={'w-[113px] shrink-0 grow-0 basis-[113px] md:w-40 md:basis-40'}>
+									<MyImage
+										path={
+											item.thumbnail?.url
+												? item.thumbnail.url
+												: 'public/anime/dummy_thumbnail.png'
+										}
+										alt={item.titleMeta}
+									/>
+								</div>
+								<div className="ml-2 flex-1 overflow-hidden">
+									{/*<H3Arrow text={'$タイトル名$'} />*/}
+									<div className="line-clamp-2 text-base font-[500] md:max-w-[750px]">
+										{item.titleMeta}
 									</div>
-									<div className="ml-2 flex-1 overflow-hidden">
-										{/*<H3Arrow text={'$タイトル名$'} />*/}
-										<div className="line-clamp-2 text-base font-[500] md:max-w-[750px]">
-											{item.titleMeta}
-										</div>
-										<div className="mb-1 hidden text-justify text-[15px] font-[300] md:block">
-											制作：
-											{item.productions.length > 0 &&
+									<div className="mb-1 hidden text-justify text-[15px] font-[300] md:block">
+										{data.genreType == 'movie' ? '配給:' : '制作:'}
+										{/* 制作： */}
+										{item.productions.length > 0 &&
 											item.productions[0].production &&
 											item.productions[0].production.name
-												? item.productions[0].production.name
-												: item.otherProduction}
-										</div>
-										{/*<div className="text-justify text-[15px] font-[300]">*/}
-										{/*	劇場公開日：{item.broadcastDay}*/}
-										{/*</div>*/}
+											? item.productions[0].production.name
+											: item.otherProduction}
 									</div>
+									{/*<div className="text-justify text-[15px] font-[300]">*/}
+									{/*	劇場公開日：{item.broadcastDay}*/}
+									{/*</div>*/}
 								</div>
-							</Link>
-						))}
-					</MainTitle>
+							</div>
+						</Link>
+					))}
+				</MainTitle>
 				) : (<MainTitle title={isUsingParent && parentData ? (data.genreType == 'movie' ? `${parentData.titleMeta}のその他のシリーズ` : `${data.titleMeta}のエピソード`) : `${data.titleMeta}のエピソード`}>
-						{childs.map((item) => (
-							<Link key={item.pathName} href={`/${pathname}/${item.pathName}`} title={item.titleMeta}>
-								<div
-									key={item.id}
-									className="mb-2 flex items-center rounded-md bg-[#F0F0F0] p-3 md:p-4">
-									<div className={'w-[113px] shrink-0 grow-0 basis-[113px] md:w-40 md:basis-40'}>
-										<MyImage
-											path={
-												item.thumbnail?.url
-													? item.thumbnail.url
-													: 'public/anime/dummy_thumbnail.png'
-											}
-											alt={item.titleMeta}
-										/>
-									</div>
-									<div className="ml-2 flex-1 overflow-hidden">
-										{/*<H3Arrow text={'$タイトル名$'} />*/}
-										<h3 className="line-clamp-2 text-base font-[500] md:max-w-[750px]">
-											{item.titleMeta}
-										</h3>
-										<div className="mb-1 hidden text-justify text-[15px] font-[300] md:block">
-											制作：
-											{item.productions.length > 0 &&
+					{childs.map((item) => (
+						<Link key={item.pathName} href={`/${pathname}/${item.pathName}`} title={item.titleMeta}>
+							<div
+								key={item.id}
+								className="mb-2 flex items-center rounded-md bg-[#F0F0F0] p-3 md:p-4">
+								<div className={'w-[113px] shrink-0 grow-0 basis-[113px] md:w-40 md:basis-40'}>
+									<MyImage
+										path={
+											item.thumbnail?.url
+												? item.thumbnail.url
+												: 'public/anime/dummy_thumbnail.png'
+										}
+										alt={item.titleMeta}
+									/>
+								</div>
+								<div className="ml-2 flex-1 overflow-hidden">
+									{/*<H3Arrow text={'$タイトル名$'} />*/}
+									<h3 className="line-clamp-2 text-base font-[500] md:max-w-[750px]">
+										{item.titleMeta}
+									</h3>
+									<div className="mb-1 hidden text-justify text-[15px] font-[300] md:block">
+										{data.genreType == 'movie' ? '配給:' : '制作:'}
+										{/* 制作： */}
+										{item.productions.length > 0 &&
 											item.productions[0].production &&
 											item.productions[0].production.name
-												? item.productions[0].production.name
-												: item.otherProduction}
-										</div>
-										{/*<div className="text-justify text-[15px] font-[300]">*/}
-										{/*	劇場公開日：{item.broadcastDay}*/}
-										{/*</div>*/}
+											? item.productions[0].production.name
+											: item.otherProduction}
 									</div>
+									{/*<div className="text-justify text-[15px] font-[300]">*/}
+									{/*	劇場公開日：{item.broadcastDay}*/}
+									{/*</div>*/}
 								</div>
-							</Link>
-						))}
-					</MainTitle>
+							</div>
+						</Link>
+					))}
+				</MainTitle>
 				))}
 
 			{/* TODO 暂时隐藏处理，以后再开 */}
@@ -271,26 +272,26 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 			{/*	</Link>*/}
 			{/*</div>*/}
 
-			{isVideoValid !== false  && (
-				<div  style={{ display: videoReady ? 'block' : 'none' }}>
-				<MainTitle className={'px-1'} title={`${data.titleMeta}の予告・告知動画`}>
-					<div className="mb-10 px-2">
-						<div className="relative">
-							<YoutubeEmbed
-							embedId={data.video?.url?.split('/').at(-1) ?? ''}
-								className="mb-10 aspect-video h-auto w-full"
-								onStatusChange={(status) => {
-									if (status) {
-										setVideoReady(true);
-									}
-								}}
-							/>
+			{isVideoValid !== false && (
+				<div style={{ display: videoReady ? 'block' : 'none' }}>
+					<MainTitle className={'px-1'} title={`${data.titleMeta}の予告・告知動画`}>
+						<div className="mb-10 px-2">
+							<div className="relative">
+								<YoutubeEmbed
+									embedId={data.video?.url?.split('/').at(-1) ?? ''}
+									className="mb-10 aspect-video h-auto w-full"
+									onStatusChange={(status) => {
+										if (status) {
+											setVideoReady(true);
+										}
+									}}
+								/>
+							</div>
+							{vod && (
+								<OrangeBtn text={vod.name + 'で視聴する'} url={vod.url ?? ''} microcopy={vod.microcopy ?? ''} title={data.title ?? ''} />
+							)}
 						</div>
-						{vod && (
-							<OrangeBtn text={vod.name + 'で視聴する'} url={vod.url ?? ''} microcopy={vod.microcopy ?? ''} title={data.title ?? ''} />
-						)}
-					</div>
-				</MainTitle>
+					</MainTitle>
 				</div>
 			)}
 
@@ -330,7 +331,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 				</div>
 				<H3Line text={`${data.titleMeta}のキャスト`} />
 				<div className="my-6 mb-8 grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-				{/* <div className="my-6 mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4 lg:grid-cols-4"> */}
+					{/* <div className="my-6 mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4 lg:grid-cols-4"> */}
 					{(castsLimitFlag ? data.casts.slice(0, 5) : data.casts).map((item, index) => (
 						<div key={index} className="mb-3 flex items-center bbb">
 							<div className=" h-[62px] w-[62px] shrink-0 grow-0 basis-[62px] overflow-hidden rounded-full lg:h-[70px] lg:w-[70px] lg:basis-[70px]">
