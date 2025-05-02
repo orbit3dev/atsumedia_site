@@ -19,7 +19,7 @@ function custom_csv_upload_page()
                     <option value="vod">VOD</option>
                     <option value="song">曲</option>
                     <option value="page_settings">ページ設定</option>
-                    <option value="production">制作会社</option>
+                    <option value="distributor">配給会社</option>
                     <!-- <option value="news">ニュース</option> -->
                 </select>
                 </br>
@@ -393,6 +393,12 @@ function custom_process_csv_function($file_path, $file_type)
         if ($file_type === "category") {
             require_once get_template_directory() . "/custom_function/process_csv/category_csv.php";
             $result = process_category_csv($file_path);
+            $columns = Constants::CATEGORY_COLUMNS; // Ensure proper column mapping
+            $columns_jp = Constants::CATEGORY_COLUMNS_JP; // Ensure proper column mapping
+        }
+        if ($file_type === "distributor") {
+            require_once get_template_directory() . "/custom_function/process_csv/distributor_csv.php";
+            $result = process_distributor_csv($file_path);
             $columns = Constants::CATEGORY_COLUMNS; // Ensure proper column mapping
             $columns_jp = Constants::CATEGORY_COLUMNS_JP; // Ensure proper column mapping
         }

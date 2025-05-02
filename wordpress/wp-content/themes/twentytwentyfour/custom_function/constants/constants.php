@@ -20,6 +20,8 @@ class Constants
     public const CATEGORY_COLUMNS_JP = ['カテゴリID', '名前', 'タイプ', '並び順'];
     public const MUSIC_COLUMNS = ['id','course','op_artist','op_song','ed_artist','ed_song','other_artist','other_song'];
     public const MUSIC_COLUMNS_JP = ['ID','クール','オープニング_制作','オープニング_曲','エンディング_制作','エンディング_曲','その他音楽_制作','その他音楽_曲'];
+    public const DISTRIBUTOR_COLUMNS = ['id', 'name'];
+    public const DISTRIBUTOR_COLUMNS_JP = ['ID', '配給会社名'];
 
     public const BROADCAST_COLUMNS_JP = ['ID', 'カテゴリ名'];
     public const ARTICLE_COLUMNS = [

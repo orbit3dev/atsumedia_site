@@ -7,6 +7,7 @@ require_once __DIR__ . "/../insert/page_setting.php";
 require_once __DIR__ . "/../insert/production.php";
 require_once __DIR__ . "/../insert/category.php";
 require_once __DIR__ . "/../insert/music.php";
+require_once __DIR__ . "/../insert/distributor.php";
 require_once __DIR__ . "/../process_csv/main_csv.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -154,6 +155,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "sort" => $sort,
                     "type" => $type,
                 ];
+            }
+            if ($file_type === 'distributor') {
+                $id = $data['id'] ?? "";
+                $name = $data['name'] ?? "";
+                $type = $data['type'] ?? "";
+                $sort = (int)$data['sort'] ?? 0;
+
+                insertDistributor($id, $name,$type,$sort);
+
+                $processed_data[] = ["id" => $id, "name" => $name];
             }
 
             $rowCount++;
