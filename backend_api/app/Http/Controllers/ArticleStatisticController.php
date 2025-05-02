@@ -110,9 +110,9 @@ class ArticleStatisticController extends Controller
             if (empty($image_link)) {
                 $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
             }
-            $thumbnail_urls =  $thumbnail['url'];
+            $thumbnail_urls =  !empty($thumbnail['url']) ? $thumbnail['url'] :'';
             $imageTestUrl = $image_link . $thumbnail_urls;
-            if (!file_exists($imageTestUrl)) {
+            if (!file_exists($imageTestUrl) || empty($thumbnail_urls)) {
                 $thumbnail_urls =  '/public/anime/dummy_thumbnail.png';
             }
             return [
@@ -125,9 +125,9 @@ class ArticleStatisticController extends Controller
                     'tagType' => $item->tagType,
                     'title' => $item->title,
                     'thumbnail' => [
-                        'link' => $thumbnail['link'],
+                        'link' => !empty($thumbnail['link']) ? $thumbnail['link'] : '',
                         'url' => $thumbnail_urls,
-                        'text' => $thumbnail['text']
+                        'text' => !empty($thumbnail['text']) ? $thumbnail['text'] : '',
                     ], // Assuming thumbnail is stored as JSON string
                     'titleMeta' => $item->titleMeta,
                     'descriptionMeta' => $item->descriptionMeta,
