@@ -246,6 +246,8 @@ class ArticleController extends Controller
                     'at_article.created_at as createdAt',
                     'at_article.updated_at as updatedAt',
                     'at_article.thumbnail',
+                    'at_article.dubcast',
+                    'at_article.dubcast_role',
                     'at_article.tag_type_id as tag_types',
                     'at_article.id as articles_id',
                 )
@@ -377,6 +379,61 @@ class ArticleController extends Controller
             }
             $articleChilds12 = AtArticleMusic::where('article_id', $idMusic)
                 ->get();
+            $dubcast = json_decode(($articles[0]['dubcast']), true);
+            $dubcast_role = json_decode(($articles[0]['dubcast_role']), true);
+            $item_dubcast = [];
+            $item_dubcast_role = [];
+            if (!empty($dubcast) && !empty($dubcast['dubcast_1'])) {
+                for ($i = 1; $i <= 15; $i++) {
+                    $castKey = "dubcast_$i";
+                    $roleKey = "dubcast_role_$i";
+                    if (!isset($castKey)) continue;
+
+                    $castId = trim($dubcast[$castKey] ?? "");
+                    $castRole = trim($dubcast_role[$roleKey] ?? "");
+                    if ($castId === "") continue;
+                    $item_dubcast[] = $castId;
+                    $item_dubcast_role[] = $castRole;
+                }
+            }
+            $articleChilds13 = [];
+
+            if (!empty($item_dubcast)) {
+                // Step 1: Fetch unique persons by ID
+                $persons = Person::whereIn('id', $item_dubcast)->get()->keyBy('id');
+
+                // Step 2: Prepare final result preserving order and duplicates
+                $articleChilds13 = [];
+                foreach ($item_dubcast as $index => $personId) {
+                    $dubcast = $persons[$personId] ?? null;
+
+                    if (!$dubcast) continue; // Skip if not found (shouldn't happen)
+
+                    // Check image file
+                    $image_person = !empty($dubcast->image) ? '/public/cast/' . $dubcast->image : '';
+                    $image_link = env('ABSOLUTE_PATH') ?: '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                    $imageTest = $image_link . 'public/cast' . $image_person;
+
+                    if (!file_exists($imageTest)) {
+                        $image_person = '/public/cast/dummy_cast_image.png';
+                    }
+
+                    // Use the matching role from same index
+                    $roleName = $item_dubcast_role[$index] ?? '';
+
+                    // Push to result array
+                    $articleChilds13[] = [
+                        'roleName' => $roleName,
+                        'person' => [
+                            'id' => $dubcast->id,
+                            'name' => $dubcast->name,
+                            'image' => $image_person,
+                            'sort' => $dubcast->sort,
+                        ],
+                    ];
+                }
+            }
+
             // 3. For each child, get productions and group
             $articleChilds = $articleChilds->map(function ($child) {
                 // Get productions for each child
@@ -449,6 +506,7 @@ class ArticleController extends Controller
                 $articleChilds10,
                 $articleChilds11,
                 $articleChilds12,
+                $articleChilds13,
                 $articlesId,
             ) {
                 $article->childs = $articleChilds;
@@ -578,6 +636,7 @@ class ArticleController extends Controller
                 unset($article->categoryId);
                 unset($article->category_name);
                 $article->casts = $articleChilds8;
+                $article->dubcasts = $articleChilds13;
                 $article->sns = !empty($article->sns) ? $article->sns : [];
                 $article->freeTexts = $articleChilds10->map(function ($item) {
                     return [

@@ -159,6 +159,7 @@ export type Article = {
     freeTexts?: ArticleFreeText[];
 	createdAt: string;
 	updatedAt: string;
+	dubcasts: ArticleCast[];
 };
 
 export type FreeText = {

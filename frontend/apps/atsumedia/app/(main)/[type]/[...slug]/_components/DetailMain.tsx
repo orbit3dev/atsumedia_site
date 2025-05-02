@@ -28,6 +28,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 	const [isVideoValid, setIsVideoValid] = useState<boolean | 'private' | null>(null);
 	const [videoReady, setVideoReady] = useState(false);
 	const [castsLimitFlag, setCastsLimitFlag] = useState(true);
+	const [castsDubLimit, setDubCastsLimit] = useState(true);
 	const pathname = usePathname().split('/')[1];
 	const getPlatformByUrl = (url: string) => {
 		if (url.includes('twitter') || url.includes('x.com')) {
@@ -369,6 +370,50 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 						</Button>
 					)}
 				</div>
+				{data.genreType === 'movie' && data.dubcasts?.length > 0 && (
+					<>
+						<H3Line text={`${data.titleMeta} 吹替キャスト`} />
+						<div className="my-6 mb-8 grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+							{(castsDubLimit ? data.dubcasts.slice(0, 5) : data.dubcasts).map((item, index) => (
+								<div key={index} className="mb-3 flex items-center bbb">
+									<div className=" h-[62px] w-[62px] shrink-0 grow-0 basis-[62px] overflow-hidden rounded-full lg:h-[70px] lg:w-[70px] lg:basis-[70px]">
+										<MyImage
+											className="h-[62px] w-[62px] lg:h-[70px] lg:w-[70px]"
+											path={
+												item.person && item.person.image
+													? item.person.image
+													: 'public/cast/dummy_cast_image.png'
+											}
+											alt={item.person ? item.person.name : ''}
+										/>
+									</div>
+									<div className={'max-w-full flex-1 truncate pl-2'}>
+										<div className="mb-2 truncate text-[13px]">{item.roleName ?? '役名なし'}</div>
+										<GrayTag
+											text={item.person ? item.person.name : ''}
+											className={'max-w-full truncate text-[13px] font-[300]'}
+										/>
+									</div>
+								</div>
+							))}
+						</div>
+						<div className="mb-14 flex justify-center md:justify-end">
+							{castsDubLimit ? (
+								<Button variant={'gray'} className="h-14 rounded-full" onClick={() => setDubCastsLimit(false)}>
+									スタッフ・キャストをもっと見る吹替キャストをもっと見る +
+								</Button>
+							) : (
+								<Button
+									variant={'gray'}
+									className="rounded-full md:text-[15px]"
+									onClick={() => setDubCastsLimit(true)}>
+									閉じる -{/*todo*/}
+								</Button>
+							)}
+						</div>
+					</>
+				)}
+
 				<div className="mb-10 flex w-full flex-col rounded-md border border-black p-4 lg:flex-row lg:pl-10">
 					<div className="flex-1 lg:pr-12">
 						<h2 className="break-all border-b-2 border-black py-6 text-[21px] font-bold">
