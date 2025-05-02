@@ -366,7 +366,13 @@ class ArticleController extends Controller
                 ->get();
             $articleChilds11 = Season::where('id', $articles[0]['season'])
                 ->get();
-            $articleChilds12 = AtArticleMusic::where('article_id', $articlesId)
+            $idMusic = -1;
+                if($articles[0]['tag_types'] == 2){
+                    $idMusic = $articlesId;
+                } else if($articles[0]['tag_types'] == 3){
+                    $idMusic = $articles[0]['parentId'];
+                }
+            $articleChilds12 = AtArticleMusic::where('article_id', $idMusic)
                 ->get();
             // 3. For each child, get productions and group
             $articleChilds = $articleChilds->map(function ($child) {
