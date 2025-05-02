@@ -19,6 +19,7 @@ function custom_csv_upload_page()
                     <option value="vod">VOD</option>
                     <option value="song">曲</option>
                     <option value="page_settings">ページ設定</option>
+                    <option value="production">制作会社</option>
                     <option value="distributor">配給会社</option>
                     <!-- <option value="news">ニュース</option> -->
                 </select>
