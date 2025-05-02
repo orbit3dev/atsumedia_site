@@ -689,6 +689,7 @@ class ArticleController extends Controller
             ];
         }
 
+        $currentPath = implode('/', $parts);
         $currentId = $depth; 
         $currentTitle = end($parts); 
         $tagType = match ($depth) {
