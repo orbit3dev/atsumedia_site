@@ -613,6 +613,8 @@ class ArticleController extends Controller
                     'title' => $summaryArr['title'],
                 ];
 
+                $article->parent = $this->buildArticleHierarchy($article->pathName, $article->id);
+                
                 $cleanedThumbnail = trim($article->thumbnail, '"');
                 $innerJsonThumbnail = stripslashes($cleanedThumbnail);
                 $thumbnailArr = (json_decode($innerJsonThumbnail, true));
@@ -659,5 +661,46 @@ class ArticleController extends Controller
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
+    }
+
+    public function buildArticleHierarchy($pathName,$id)
+    {
+        $parts = explode('/', $pathName);
+        $depth = count($parts);
+
+        $data = AtArticle::where('id','=',$id)->select('parent_id')->first();
+        $ids = !empty($data['parent_id']) ? $data['parent_id'] : '';
+        $dataX = AtArticle::where('id','=',$ids)->select('title_meta','path')->first();
+        $title_meta = !empty($dataX['title_meta']) ? $dataX['title_meta'] : '';
+        $path = !empty($dataX['path']) ? $dataX['path'] : '';
+
+        if ($depth === 1) {
+            return [
+                'id' => 1,
+                'titleMeta' => ucfirst($parts[0]),
+                'pathName' => !empty($data['title_meta']) ? $data['title_meta'] :'',
+                'tagType' => 'root',
+            ];
+        }
+
+        $currentPath = implode('/', $parts);
+        $currentId = $depth; 
+        $currentTitle = end($parts); 
+        $tagType = match ($depth) {
+            2 => 'series',
+            3 => 'episode',
+            default => 'root',
+        };
+
+        $parentPath = implode('/', array_slice($parts, 0, -1)); 
+        $parent = $this->buildArticleHierarchy($parentPath, $ids); 
+
+        return [
+            'id' => $currentId,
+            'titleMeta' => $title_meta,
+            'pathName' => $path,
+            'tagType' => $tagType,
+            'parent' => $parent,
+        ];
     }
 }
