@@ -20,6 +20,7 @@ use App\Models\Vod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ArticleController extends Controller
 {
@@ -248,6 +249,7 @@ class ArticleController extends Controller
                     'at_article.thumbnail',
                     'at_article.dubcast',
                     'at_article.dubcast_role',
+                    'at_article.roadshow_day',
                     'at_article.tag_type_id as tag_types',
                     'at_article.id as articles_id',
                 )
@@ -650,6 +652,10 @@ class ArticleController extends Controller
                 } else {
                     $article->season = ['name' => ''];
                 }
+                if($article->genre_type_ids == 2){
+                    $year = Carbon::parse($article->roadshow_day)->year;
+                    $article->season = ['name' => $year];
+                }
                 $article->id = $articlesId;
                 return $article;
             });
@@ -683,7 +689,6 @@ class ArticleController extends Controller
             ];
         }
 
-        $currentPath = implode('/', $parts);
         $currentId = $depth; 
         $currentTitle = end($parts); 
         $tagType = match ($depth) {

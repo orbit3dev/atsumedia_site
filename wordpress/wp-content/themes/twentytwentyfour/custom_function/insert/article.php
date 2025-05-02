@@ -67,6 +67,7 @@ function insertOrUpdateArticle($wpdb, $data)
         'title' =>  $data['title'] ?? '',
         'sns' =>  $data['sns'] ?? '',
         'label' =>  $data['label'] ?? '',
+        'roadshow_day' =>  $data['roadshow_day'] ?? '',
     ];
 
     $formats = array_fill(0, count($insert_data), '%s');

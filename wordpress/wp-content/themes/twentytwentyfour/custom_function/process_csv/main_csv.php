@@ -226,6 +226,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 'flag_series' =>  $data['flag_series'] ?? '',
                 'canonical' =>  $data['canonical'] ?? '',
                 'broadcast_day' =>  $data['broadcast_day'] ?? '',
+                'roadshow_day' =>  $data['roadshow_day'] ?? '',
                 'weekday' =>  $data['weekday'] ?? '',
                 'stream_day' =>  $data['stream_day'] ?? '',
                 'kana' =>  $data['kana'] ?? '',
