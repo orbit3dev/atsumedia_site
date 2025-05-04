@@ -212,3 +212,82 @@ input.flatpickr-input[readonly] {
     color: black; /* Optional: Ensure text is readable */
 }
 
+  
+.ce-header p,
+.ce-header div {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/**
+ * Styles for Plugin icon in Toolbar
+ */
+.ce-header__icon {
+}
+
+.ce-header[contentEditable="true"][data-placeholder]::before {
+  position: absolute;
+  content: attr(data-placeholder);
+  color: #707684;
+  font-weight: normal;
+  display: none;
+  cursor: text;
+}
+
+.ce-header[contentEditable="true"][data-placeholder]:empty::before {
+  display: block;
+}
+
+.ce-header[contentEditable="true"][data-placeholder]:empty:focus::before {
+  display: none;
+}
+
+/* Alignment*/
+.ce-header--right {
+  text-align: right;
+}
+.ce-header--center {
+  text-align: center;
+}
+.ce-header--left {
+  text-align: left;
+}
+.ce-header--justify {
+  text-align: justify;
+}
+
+h2.ce-header {
+    font-size: 21px;
+    color: #fff;
+    font-weight: bold;
+    padding: 16px 12px;
+    margin: 24px 0;
+    background: #000;
+    box-sizing: border-box;
+    border-radius: 12px;
+  }
+  
+  h3.ce-header {
+    position: relative;
+    font-size: 17px;
+    font-weight: bold;
+    padding: 0 0 0 12px;
+    margin: 0 16px 20px;
+  
+    &::after {
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 4px;
+      height: 16px;
+      content: "";
+      background: linear-gradient(to bottom, #226dff, #d458ff);;
+    }
+  }
+  
+  h4.ce-header {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 0;
+    margin: 0 16px 20px;
+  }

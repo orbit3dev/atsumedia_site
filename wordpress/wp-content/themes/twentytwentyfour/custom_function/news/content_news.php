@@ -11,7 +11,6 @@ function custom_content_page()
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/custom_function/custom_css/content_news.css">
-
     <div class="wrap" id="table_panel">
         <div class="header-container">
             <h1><b>コンテンツ一覧</b></h1>
@@ -168,6 +167,11 @@ function custom_content_scripts()
     <script>
         let editor;
         jQuery(document).ready(function($) {
+            for (let key in window) {
+                if (key.toLowerCase().includes('header')) {
+                    console.log(key, window[key]);
+                }
+            }
             const $select = $('#article-select');
             selectedData = ''
             if (typeof flatpickr !== "undefined") {
@@ -339,68 +343,30 @@ function custom_content_scripts()
                 }
             }
 
-            class HeadlineTool {
-                static get toolbox() {
-                    return {
-                        title: 'Headline Block',
-                        icon: '<svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="3" ry="3" style="fill:black"></rect></svg>'
-                    };
-                }
-
+            class CustomParagraph extends Paragraph {
                 constructor({
-                    data
+                    data,
+                    config,
+                    api
                 }) {
-                    this.data = data || {};
-                    this.text = this.data.text || this.data.headlineText || '';
-                    this.level = this.data.level || 2;
-                    this.alignment = this.data.alignment || 'left';
-                }
-
-                render() {
-                    this.$wrapper = $('<div>');
-
-                    this.$headline = $('<h2>', {
-                        text: this.text,
-                        contenteditable: true,
-                        placeholder: 'Type your headline here...',
-                        class: 'cdx-input',
-                        style: `
-                background-color: black;
-                color: white;
-                font-weight: bold;
-                padding: 10px;
-                border-radius: 5px;
-                margin: 0;
-                width: 100%;
-                text-align: ${this.alignment};
-            `
+                    super({
+                        data,
+                        config,
+                        api
                     });
-
-                    // Optional: support text alignment UI (buttons)
-                    // const $alignmentControls = $('<div>', {
-                    //     style: 'margin-top: 5px;'
-                    // });
-                    // ['left', 'center', 'right'].forEach(alignment => {
-                    //     const $btn = $('<button>', {
-                    //         text: alignment,
-                    //         style: 'margin-right: 5px;',
-                    //         click: () => {
-                    //             this.alignment = alignment;
-                    //             this.$headline.css('text-align', alignment);
-                    //         }
-                    //     });
-                    //     $alignmentControls.append($btn);
-                    // });
-
-                    this.$wrapper.append(this.$headline);
-                    return this.$wrapper[0];
+                    console.log(data)
+                    this.tunes = data?.tunes || {};
                 }
 
-                save() {
+                save(blockContent) {
+                    const baseData = super.save(blockContent);
+
+                    const alignment =
+                        this.tunes?.alignmentTune?.alignment || 'left';
+
                     return {
-                        text: this.$headline.text().trim(),
-                        level: this.level,
-                        alignment: this.alignment
+                        ...baseData,
+                        alignment
                     };
                 }
             }
@@ -410,7 +376,7 @@ function custom_content_scripts()
                     holder: 'editorjs_news',
                     tools: {
                         paragraph: {
-                            class: Paragraph,
+                            class: CustomParagraph,
                             tunes: ['alignmentTune'],
                         },
                         header: {
@@ -420,14 +386,9 @@ function custom_content_scripts()
                                 levels: [2, 3, 4],
                                 defaultLevel: 2
                             },
-                            tunes: ['alignmentTune'],
                         },
-                        AnyButton: { // ✅ change from "button"
+                        AnyButton: {
                             class: ButtonTool
-                        },
-                        header: { // ✅ change from "headline"
-                            class: HeadlineTool, // your custom tool
-                            tunes: ['alignmentTune'],
                         },
                         image: {
                             class: ImageTool,
@@ -682,7 +643,7 @@ function custom_content_scripts()
                     success: function(response) {
                         if (response.success) {
                             alert("ステータスが「" + newStatus + "」に変更されました。");
-                            window.location.reload();
+                            // window.location.reload();
                         } else {
                             alert("ステータス変更に失敗しました。");
                         }
@@ -801,6 +762,23 @@ function custom_content_scripts()
 
             function submitArticleForm() {
                 editor.save().then((outputData) => {
+                    outputData.blocks = outputData.blocks.map((block) => {
+                        if (
+                            block.tunes &&
+                            block.tunes.alignmentTune &&
+                            block.tunes.alignmentTune.alignment
+                        ) {
+                            return {
+                                ...block,
+                                data: {
+                                    ...block.data,
+                                    alignment: block.tunes.alignmentTune.alignment,
+                                },
+                            };
+                        }
+
+                        return block;
+                    });
                     const formData = $("#custom-content-form").serializeArray();
 
                     idList = []
@@ -837,7 +815,7 @@ function custom_content_scripts()
                                 $("#custom-content-form")[0].reset();
                                 $("#first_view_preview").html("");
                                 $("#author_preview").html("");
-                                window.location.reload();
+                                // window.location.reload();
                             } else {
                                 alert("エラー: " + response.data.message);
                             }

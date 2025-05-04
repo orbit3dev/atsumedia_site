@@ -530,6 +530,13 @@ function enqueue_editorjs_assets() {
         'editorjs-text-alignment-blocktune', get_template_directory_uri() . '/lib/bundle.js',array('editorjs'), null, true
     );
     wp_enqueue_script('editorjs-text-alignment-blocktune', 'https://cdn.jsdelivr.net/npm/@editorjs/text-alignment-blocktune@latest/dist/bundle.js', array('editorjs'), null, true);
+	wp_enqueue_script(
+        'editorjs-header-with-alignment',
+        'https://cdn.jsdelivr.net/npm/editorjs-header-with-alignment@1.0.1/dist/bundle.js',
+        array('editorjs'),
+        null,
+        true
+    );
 }
 add_action('admin_enqueue_scripts', 'enqueue_editorjs_assets');
 

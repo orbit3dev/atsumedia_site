@@ -12,7 +12,7 @@ function custom_csv_upload_page()
                 <select name="file_type" id="file_type" required>
                     <option value="" disabled selected>選択してください</option>
                     <option value="article">作品</option>
-                    <option value="category">カテゴリー</option>
+                    <option value="category">ジャンル</option>
                     <option value="season_master">シーズン</option>
                     <option value="broadcast_master">放送局</option>
                     <option value="cast_master">キャスト</option>
