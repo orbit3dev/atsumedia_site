@@ -57,7 +57,6 @@ function generate_datatable($data, $columns) {
                     editedData.push(rowData);
                 });
 
-                console.log(editedData); // Send this to backend for saving if needed
             });
         });
     </script>

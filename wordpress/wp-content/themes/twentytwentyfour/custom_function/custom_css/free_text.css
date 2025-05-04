@@ -71,22 +71,6 @@ body {
     background-color: #1a6d9f;
 }
 
-.select2-container--default .select2-selection--single {
-    height: 40px;
-    border-radius: 6px;
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-}
-
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 40px;
-}
-
-.select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 38px;
-    right: 6px;
-}
-
 /* Fix Select2 dropdown overlapping issues */
 .select2-container {
     z-index: 9999 !important;
@@ -96,4 +80,116 @@ body {
 .select2-dropdown {
     z-index: 99999 !important;
 }
+
+.custom-button {
+    background-color: #FF6534;
+    color: white;
+    padding: 12px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.custom-button:hover {
+    background-color: #f53a50;
+}
+
+.custom-group:hover {
+    color: #f53a50;
+}
+
+.custom-group:hover .custom-line {
+    background-color: #f53a50;
+}
+#customDate {
+    background-color: white;
+}
+input.flatpickr-input[readonly] {
+    background-color: white !important;
+    color: black; /* Optional: Ensure text is readable */
+}
+
+  
+.ce-header p,
+.ce-header div {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/**
+ * Styles for Plugin icon in Toolbar
+ */
+.ce-header__icon {
+}
+
+.ce-header[contentEditable="true"][data-placeholder]::before {
+  position: absolute;
+  content: attr(data-placeholder);
+  color: #707684;
+  font-weight: normal;
+  display: none;
+  cursor: text;
+}
+
+.ce-header[contentEditable="true"][data-placeholder]:empty::before {
+  display: block;
+}
+
+.ce-header[contentEditable="true"][data-placeholder]:empty:focus::before {
+  display: none;
+}
+
+/* Alignment*/
+.ce-header--right {
+  text-align: right;
+}
+.ce-header--center {
+  text-align: center;
+}
+.ce-header--left {
+  text-align: left;
+}
+.ce-header--justify {
+  text-align: justify;
+}
+
+h2.ce-header {
+    font-size: 21px;
+    color: #fff;
+    font-weight: bold;
+    padding: 16px 12px;
+    margin: 24px 0;
+    background: #000;
+    box-sizing: border-box;
+    border-radius: 12px;
+  }
+  
+  h3.ce-header {
+    position: relative;
+    font-size: 17px;
+    font-weight: bold;
+    padding: 0 0 0 12px;
+    margin: 0 16px 20px;
+  
+    &::after {
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 4px;
+      height: 16px;
+      content: "";
+      background: linear-gradient(to bottom, #226dff, #d458ff);;
+    }
+  }
+  
+  h4.ce-header {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 0;
+    margin: 0 16px 20px;
+  }
+
 

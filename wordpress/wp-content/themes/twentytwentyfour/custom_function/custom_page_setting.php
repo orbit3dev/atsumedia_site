@@ -352,7 +352,6 @@ function page_settings_config()
                         articles: postData
                     },
                     success: function(response) {
-                        console.log(response);
                         alert("データが保存されました！");
                     },
                     error: function(xhr, status, error) {

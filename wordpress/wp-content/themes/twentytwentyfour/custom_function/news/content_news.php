@@ -167,11 +167,6 @@ function custom_content_scripts()
     <script>
         let editor;
         jQuery(document).ready(function($) {
-            for (let key in window) {
-                if (key.toLowerCase().includes('header')) {
-                    console.log(key, window[key]);
-                }
-            }
             const $select = $('#article-select');
             selectedData = ''
             if (typeof flatpickr !== "undefined") {
@@ -354,7 +349,6 @@ function custom_content_scripts()
                         config,
                         api
                     });
-                    console.log(data)
                     this.tunes = data?.tunes || {};
                 }
 
