@@ -153,7 +153,7 @@ function free_text_menu()
                     });
 
                     const $bar = $('<div>', {
-                        text: `\\ ${this.barText} /`,
+                        text: ` ${this.barText} `,
                         style: 'font-weight: bold; color: #FF6534; margin-bottom: 10px;'
                     });
 
@@ -170,7 +170,7 @@ function free_text_menu()
                     return {
                         link: this.link,
                         text: this.buttonText,
-                        title: `\\ ${this.barText} /`
+                        title: ` ${this.barText} `
                     };
                 }
             }
@@ -261,6 +261,7 @@ function free_text_menu()
                             if ($('#editorjs_article').length) {
                                 editor = new EditorJS({
                                     holder: 'editorjs_article',
+                                    data:articleData,
                                     tools: {
                                         paragraph: {
                                             class: CustomParagraph,

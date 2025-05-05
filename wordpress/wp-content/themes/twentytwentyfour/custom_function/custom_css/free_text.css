@@ -187,4 +187,36 @@ h2.ce-header {
     margin: 0 16px 20px;
   }
 
+  .custom-button {
+    background-color: #FF6534;
+    color: white;
+    padding: 12px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.custom-button:hover {
+    background-color: #f53a50;
+}
+
+.custom-group {
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: #FF6534;
+}
+
+.custom-group:hover {
+    color: #f53a50;
+}
+
+.custom-group:hover .custom-line {
+    background-color: #f53a50;
+}
+
 
