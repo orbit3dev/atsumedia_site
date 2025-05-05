@@ -87,9 +87,16 @@ class ArticleStatisticController extends Controller
             ->leftJoin('at_network', 'at_article.network_id', '=', 'at_network.id')
             ->orderBy('at_article_statistic.click_count', 'DESC')
             ->limit($limit);
-        if ($tagTypes == 'root') {
-            $query = $query->where('at_article_statistic.year_week_tag_type', '=', $yearId . '-root')->get();
-        } else if ($tagTypes == 'series' || $tagTypes == 'episode') {
+        if ($tagTypes == 'root' || $tagTypes == 'series') {
+            if($tagTypes == 'root'){
+                $tagChild = '-series';
+            } else {
+                $tagChild ='-episode';
+            }
+            $query = $query->where('at_article_statistic.year_week_tag_type', '=', $yearId . $tagChild)
+            ->where('at_article.parent_id','=',$parentIds)
+            ->get();
+        } else if ($tagTypes == 'episode') {
             $dataParent = AtArticle::select(['x.id'])
                 ->leftJoin('at_article as x', 'x.parent_id', '=', 'at_article.parent_id')
                 ->where('at_article.id', '=', $parentIds)

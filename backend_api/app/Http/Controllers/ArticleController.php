@@ -616,7 +616,7 @@ class ArticleController extends Controller
                 ];
 
                 $article->parent = $this->buildArticleHierarchy($article->pathName, $article->id);
-                
+
                 $cleanedThumbnail = trim($article->thumbnail, '"');
                 $innerJsonThumbnail = stripslashes($cleanedThumbnail);
                 $thumbnailArr = (json_decode($innerJsonThumbnail, true));
@@ -652,9 +652,13 @@ class ArticleController extends Controller
                 } else {
                     $article->season = ['name' => ''];
                 }
-                if($article->genre_type_ids == 2){
+                if ($article->genre_type_ids == 2) {
                     $year = Carbon::parse($article->roadshow_day)->year;
-                    $article->season = ['name' => $year];
+                    if ($article->tag_types != 1) {
+                        $article->season = ['name' => $year];
+                    } else {
+                        $article->season = ['name' => ''];
+                    }
                 }
                 $article->id = $articlesId;
                 return $article;
@@ -669,14 +673,14 @@ class ArticleController extends Controller
         }
     }
 
-    public function buildArticleHierarchy($pathName,$id)
+    public function buildArticleHierarchy($pathName, $id)
     {
         $parts = explode('/', $pathName);
         $depth = count($parts);
 
-        $data = AtArticle::where('id','=',$id)->select('parent_id')->first();
+        $data = AtArticle::where('id', '=', $id)->select('parent_id')->first();
         $ids = !empty($data['parent_id']) ? $data['parent_id'] : '';
-        $dataX = AtArticle::where('id','=',$ids)->select('title_meta','path')->first();
+        $dataX = AtArticle::where('id', '=', $ids)->select('title_meta', 'path')->first();
         $title_meta = !empty($dataX['title_meta']) ? $dataX['title_meta'] : '';
         $path = !empty($dataX['path']) ? $dataX['path'] : '';
 
@@ -684,22 +688,22 @@ class ArticleController extends Controller
             return [
                 'id' => 1,
                 'titleMeta' => ucfirst($parts[0]),
-                'pathName' => !empty($data['title_meta']) ? $data['title_meta'] :'',
+                'pathName' => !empty($data['title_meta']) ? $data['title_meta'] : '',
                 'tagType' => 'root',
             ];
         }
 
         $currentPath = implode('/', $parts);
-        $currentId = $depth; 
-        $currentTitle = end($parts); 
+        $currentId = $depth;
+        $currentTitle = end($parts);
         $tagType = match ($depth) {
             2 => 'series',
             3 => 'episode',
             default => 'root',
         };
 
-        $parentPath = implode('/', array_slice($parts, 0, -1)); 
-        $parent = $this->buildArticleHierarchy($parentPath, $ids); 
+        $parentPath = implode('/', array_slice($parts, 0, -1));
+        $parent = $this->buildArticleHierarchy($parentPath, $ids);
 
         return [
             'id' => $currentId,
