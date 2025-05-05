@@ -809,7 +809,7 @@ function custom_content_scripts()
                                 $("#custom-content-form")[0].reset();
                                 $("#first_view_preview").html("");
                                 $("#author_preview").html("");
-                                // window.location.reload();
+                                window.location.reload();
                             } else {
                                 alert("エラー: " + response.data.message);
                             }
