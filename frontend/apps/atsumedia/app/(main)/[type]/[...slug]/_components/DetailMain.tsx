@@ -406,7 +406,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 						<div className="mb-14 flex justify-center md:justify-end">
 							{castsDubLimit ? (
 								<Button variant={'gray'} className="h-14 rounded-full" onClick={() => setDubCastsLimit(false)}>
-									スタッフ・キャストをもっと見る吹替キャストをもっと見る +
+									 吹替キャストをもっと見る +
 								</Button>
 							) : (
 								<Button
