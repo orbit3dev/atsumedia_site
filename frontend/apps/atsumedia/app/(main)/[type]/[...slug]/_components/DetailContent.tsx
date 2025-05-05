@@ -4,8 +4,8 @@ import DetailMain from './DetailMain';
 import DetailPopular from './DetailPopular';
 import { Article, KeyValue, TagType } from '@atsumedia/data';
 import LayoutWithRight from '../../../_components/LayoutWithRight';
-import AdFooter from '../../../_components/AdFooter';
-import AdTop from '../../../_components/AdTop';
+// import AdFooter from '../../../_components/AdFooter';
+// import AdTop from '../../../_components/AdTop';
 import { getPhotographyOrPopularityDataListBy3, getPhotographyOrPopularityDataListBy8 } from '../_utils/get-data';
 
 type Props = {
@@ -13,9 +13,11 @@ type Props = {
 	data: Article;
 	category: KeyValue;
     parentData: Article | null | undefined;
+    showElement: boolean;
+
 };
 
-const DetailContent: React.FC<Props> = async ({ tagType, data, category, parentData }) => {
+const DetailContent: React.FC<Props> = async ({ tagType, data, category, parentData, showElement }) => {
 	const [photographyList, popularityList] = await Promise.all([
 		getPhotographyOrPopularityDataListBy8(data),
 		getPhotographyOrPopularityDataListBy3(data),
@@ -35,6 +37,7 @@ const DetailContent: React.FC<Props> = async ({ tagType, data, category, parentD
 					photographyList={photographyList}
 					popularityList={popularityList}
                     parentData={parentData}
+                    showElement={showElement}
 				/>
 			</LayoutWithRight>
 			<Suspense fallback={<div>Loading...</div>}>

@@ -16,26 +16,34 @@ export const getResultData = unstable_cache(
 			return {};
 		}
 
-		// 获取pathname
 		const pathName = params.slug.join('/');
-		const article = await getArticle(pathName , params.type);
+		const pathNameParent = params.slug.slice(0, -1).join('/');
+
+		// Declare once, assign conditionally
+		let parentArticle = null;
+		if (pathNameParent) {
+			parentArticle = await getArticle(pathNameParent, params.type);
+		}
+
+		const article = await getArticle(pathName, params.type);
 		if (!article) {
 			return { data: null };
 		}
-		if (article.genreType != params.type) {
-			// 作品のカテゴリとURLのカテゴリが一致しない場合は不正なURLとする
+
+		if (article.genreType !== params.type) {
 			return { data: null };
 		}
 
 		const targetCategory = { key: params.type, value: value.name };
 		const { paths: paths1 } = getData1(article, targetCategory);
-		return { data: article, paths: paths1, targetCategory };
+		return { data: article, paths: paths1, targetCategory, parentData: parentArticle };
 	},
 	['listByPathName'],
 	{ revalidate: 300 }
 );
 
-export const getArticle = async(pathName:string ,type:string) =>{
+
+export const getArticle = async (pathName: string, type: string) => {
 	const response = await fetch(
 		process.env.NEXT_PUBLIC_API_URL + "/detail-article",
 		{

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CategoryType } from '@atsumedia/data';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import DetailContent from './_components/DetailContent';
 import MainPath from '../../_components/MainPath';
 import { Metadata } from 'next';
@@ -10,6 +10,7 @@ import { checkParams, getResultData } from './_utils/get-data';
 type PageProps = {
 	params: { type: CategoryType; slug: string[] };
 };
+
 export const revalidate = 300;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -32,15 +33,39 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 	};
 }
 
-
 const Page = async ({ params }: PageProps) => {
 	const check = checkParams(params.type);
 	if (!check) {
 		return notFound();
 	}
-	const { paths, targetCategory, data } = await getResultData(params);
+	const { paths, targetCategory, data, parentData } = await getResultData(params);
 	if (!data) {
 		return notFound();
+	}
+
+	const showElement = () => {
+		if (data.genreType === 'movie') {
+			if (data.tagType === 'root') {
+				if (data.childs && data.childs.length > 0) {
+					return false;
+				} else {
+					return true;
+				}
+			} else {
+				return true;
+			}
+		} else {
+			return true;
+		}
+	}
+
+	if (data.genreType === 'movie' && data.tagType === 'root') {
+		if (data.childs && data.childs.length === 1) {
+			const firstChildPath = data.childs[0]?.pathName;
+			if (firstChildPath) {
+				return permanentRedirect(firstChildPath);
+			}
+		}
 	}
 
 	const jsonLd = {
@@ -58,14 +83,14 @@ const Page = async ({ params }: PageProps) => {
 			};
 		}),
 	};
-
 	return (
 		<>
 			<section>
-				<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+				<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }
+				} />
 			</section>
-			<MainPath paths={paths} />
-			<DetailContent category={targetCategory} tagType={data.tagType} data={data} parentData={data} />
+			< MainPath paths={paths} />
+			<DetailContent category={targetCategory} tagType={data.tagType} data={data} parentData={parentData} showElement={showElement()} />
 			<StatisticClickCount data={data} />
 		</>
 	);

@@ -8,10 +8,19 @@ export type MainPathProps = {
 
 const MainPath: React.FC<MainPathProps> = ({ paths }) => {
 	const domain = process.env.DOMAIN;
+
+    // From breadcrumbs this will result in TOP -> (Category, e.g. "Movie") -> Parent -> Child
+    // If parent and child is the same filter out the parent
+    const filteredPaths = paths?.filter((item, index) => {
+        if (index === 0) return true; // Always include the first item (Category)
+        if (index > 0 && item.name === paths[index + 1]?.name) return false; // Filter out the parent if the current item has the same name
+        return true; // Include all other items
+    });
+
 	const jsonLd = {
 		'@context': 'https://schema.org',
 		'@type': 'BreadcrumbList',
-		itemListElement: [{ name: 'TOP', path: '/' }, ...(paths ?? [])]?.map((item, index) => {
+		itemListElement: [{ name: 'TOP', path: '/' }, ...(filteredPaths ?? [])]?.map((item, index) => {
 			return {
 				'@type': 'ListItem',
 				position: index + 1,
@@ -32,11 +41,11 @@ const MainPath: React.FC<MainPathProps> = ({ paths }) => {
 						<span className="mx-1">
 							<ChevronRight size={16} />
 						</span>
-						{paths?.map((item, index) => (
+							{filteredPaths?.map((item, index) => (
 							<span className={'inline-flex items-center whitespace-nowrap'} key={item.name}>
 								{item.path && <Link href={item.path}>{item.name}</Link>}
 								{!item.path && item.name}
-								{index != paths.length - 1 && (
+								{index != filteredPaths.length - 1 && (
 									<span className="mx-1 block">
 										<ChevronRight size={16} />
 									</span>

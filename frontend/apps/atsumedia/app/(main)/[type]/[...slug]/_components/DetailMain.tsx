@@ -22,8 +22,9 @@ interface MovieDetailMainProps {
 	photographyList: Article[];
 	popularityList: Article[];
 	parentData: Article | null | undefined;
+    showElement: boolean;
 }
-const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photographyList, popularityList, parentData }) => {
+const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photographyList, popularityList, parentData, showElement }) => {
 	const [ready, setReady] = useState(false);
 	const [isVideoValid, setIsVideoValid] = useState<boolean | 'private' | null>(null);
 	const [videoReady, setVideoReady] = useState(false);
@@ -65,6 +66,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 	return (
 		<>
 			<MainInfo data={data} />
+			{showElement && (
 			<MainTitle title={data.tagType == 'root' ? `${data.titleMeta}の概要` : `${data.titleMeta}のあらすじ`}>
 				<MainText text={data.summary?.text ?? ''} truncateText={truncateTextFlag} />
 				<p className={`mb-6 px-1 text-end text-[13px] font-[100]`}>
@@ -90,7 +92,9 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 					)}
 				</div>
 			</MainTitle>
+			)}
 
+			{showElement && (
 			<MainTitle className={'px-1'} title={`${data.titleMeta}の配信情報`}>
 				{/*<MainText text={data.vodInfo} />*/}
 				{vod && (
@@ -158,6 +162,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 					</div>
 				)}
 			</MainTitle>
+			)}
 
 			{childs &&
 				childs.length > 0 &&
@@ -273,8 +278,8 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 			{/*	</Link>*/}
 			{/*</div>*/}
 
-			{isVideoValid !== false && (
-				<div style={{ display: videoReady ? 'block' : 'none' }}>
+			{isVideoValid !== false && showElement && (
+				<div  style={{ display: videoReady ? 'block' : 'none' }}>
 					<MainTitle className={'px-1'} title={`${data.titleMeta}の予告・告知動画`}>
 						<div className="mb-10 px-2">
 							<div className="relative">
@@ -296,6 +301,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 				</div>
 			)}
 
+			{showElement && (
 			<MainTitle title={`${data.titleMeta}のスタッフ・キャスト`}>
 				<H3Line text={`${data.titleMeta}のスタッフ`} />
 				<div className="my-6 flex flex-wrap">
@@ -334,7 +340,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 				<div className="my-6 mb-8 grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
 					{/* <div className="my-6 mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4 lg:grid-cols-4"> */}
 					{(castsLimitFlag ? data.casts.slice(0, 5) : data.casts).map((item, index) => (
-						<div key={index} className="mb-3 flex items-center bbb">
+						<div key={index} className="mb-3 flex items-center">
 							<div className=" h-[62px] w-[62px] shrink-0 grow-0 basis-[62px] overflow-hidden rounded-full lg:h-[70px] lg:w-[70px] lg:basis-[70px]">
 								<MyImage
 									className="h-[62px] w-[62px] lg:h-[70px] lg:w-[70px]"
@@ -473,6 +479,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 					</div>
 				</div>
 			</MainTitle>
+			)}
 			{/*TODO： 暂时关闭，以后再开*/}
 			{/*<MainTitle title={ `${ data.programTitle }のインタビュー・コラム` } className="px-0 md:px-4">*/}
 			{/*  <div className="max-h-[152px] overflow-hidden md:max-h-max md:!overflow-visible">*/}
@@ -538,7 +545,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 					))}
 				</MainTitle>
 			)}
-			{popularityList.length > 0 && (
+			{popularityList.length > 0 && showElement && (
 				<MainTitle
 					title={
 						data.tagType == 'root'
