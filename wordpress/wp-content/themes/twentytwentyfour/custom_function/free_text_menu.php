@@ -73,7 +73,7 @@ function free_text_menu()
                     data
                 }) {
                     this.data = data || {};
-                    this.link = this.data.link || 'http://';
+                    this.link = this.data.link || 'https://';
                     this.buttonText = this.data.text || ''; // map saved `text` to buttonText
 
                     // Extract barText from title (strip slashes: "\ a /" → "a")

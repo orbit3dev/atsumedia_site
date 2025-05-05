@@ -236,7 +236,7 @@ function custom_content_scripts()
                     data
                 }) {
                     this.data = data || {};
-                    this.link = this.data.link || '';
+                    this.link = this.data.link || 'https://';
                     this.buttonText = this.data.text || ''; // map saved `text` to buttonText
 
                     // Extract barText from title (strip slashes: "\ a /" → "a")
