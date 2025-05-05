@@ -95,6 +95,12 @@ Route::get('/', function () {
 
     return response()->json($routes);
 });
+Route::get('/ping', function () {
+    return response()->json([
+        'status' => 'success',
+        'message' => 'API is working!'
+    ]);
+});
 // Route::get('/page-settings/{type}', [PageSettingController::class, 'getSettingsByType']);
 
 // Route::get('/person', [PersonController::class, 'index']);
