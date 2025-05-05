@@ -546,7 +546,7 @@ function custom_content_scripts()
                             clearForm()
                             $('input[name="title"]').val(data.title);
                             $('input[name="slug"]').val(data.slug);
-                            $('input[name="date"]').val(data.date_news.split(' ')[0]);
+                            $('input[name="date"]').val(data.date_news);
                             $('textarea[name="synopsis"]').val(data.outline);
                             $('input[name="meta_title"]').val(data.title_meta);
                             $('textarea[name="meta_description"]').val(data.description_meta);
