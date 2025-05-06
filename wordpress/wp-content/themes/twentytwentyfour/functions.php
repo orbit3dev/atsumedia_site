@@ -650,6 +650,36 @@ function custom_free_text_menu()
 add_action('admin_menu', 'custom_free_text_menu');
 require_once get_template_directory() . '/custom_function/free_text_menu.php';
 
+function master_view_data_menu()
+{
+	add_menu_page(
+		'Free Texts Menu', // Page title
+		'マスターデータを表示', // Menu title
+		'manage_options', // Capability
+		'master-data-view', // Menu slug
+		'master_data_view', // Callback function
+		'dashicons-welcome-write-blog', // Icon
+		29 // Position
+	);
+}
+add_action('admin_menu', 'master_view_data_menu');
+require_once get_template_directory() . '/custom_function/master_data_view.php';
+
+function article_data_menu()
+{
+	add_menu_page(
+		'Free Texts Menu', // Page title
+		'マスターデータを表示', // Menu title
+		'manage_options', // Capability
+		'master-data-view', // Menu slug
+		'article_data_view', // Callback function
+		'dashicons-welcome-write-blog', // Icon
+		30 // Position
+	);
+}
+add_action('admin_menu', 'article_data_menu');
+require_once get_template_directory() . '/custom_function/article_data_view.php';
+
 function hide_admin_menus_for_all_users()
 {
 	remove_menu_page('edit.php');                     // Posts

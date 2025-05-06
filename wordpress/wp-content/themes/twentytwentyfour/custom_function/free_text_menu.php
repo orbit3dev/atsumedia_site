@@ -261,11 +261,14 @@ function free_text_menu()
                             if ($('#editorjs_article').length) {
                                 editor = new EditorJS({
                                     holder: 'editorjs_article',
-                                    data:articleData,
+                                    data: articleData,
                                     tools: {
                                         paragraph: {
                                             class: CustomParagraph,
                                             tunes: ['alignmentTune'],
+                                            config: {
+                                                preserveBlank: true,
+                                            },
                                         },
                                         header: {
                                             class: Header,
