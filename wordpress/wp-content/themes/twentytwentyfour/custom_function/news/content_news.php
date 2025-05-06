@@ -372,6 +372,9 @@ function custom_content_scripts()
                         paragraph: {
                             class: CustomParagraph,
                             tunes: ['alignmentTune'],
+                            config: {
+                                preserveBlank: true,
+                            },
                         },
                         header: {
                             class: Header,
