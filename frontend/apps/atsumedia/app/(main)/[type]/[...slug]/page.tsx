@@ -64,7 +64,6 @@ const Page = async ({ params }: PageProps) => {
 		if (data.childs && data.childs.length === 1) {
 			let firstChildPath = data.childs[0]?.pathName;
 			const pathTrimmer = data.pathName + '/';
-			console.log(firstChildPath)
 			if (firstChildPath.startsWith(pathTrimmer)) {
 				firstChildPath = firstChildPath.slice(pathTrimmer.length)
 			  }
