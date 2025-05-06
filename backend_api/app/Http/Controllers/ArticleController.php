@@ -125,7 +125,9 @@ class ArticleController extends Controller
         // ]);
         $genreTypeYearWeek = $request->genre_type_year_week;
         $genreType = isset($request->genre_type) ?  $request->genre_type : 'anime';
-        $genreTypeYearWeek = '202449';
+        $weekNumber = date('W');
+        $year = date('Y');
+        $genreTypeYearWeek = $year . $weekNumber;
 
         $combinations = [
             $genreType . '-' . $genreTypeYearWeek . '-series',

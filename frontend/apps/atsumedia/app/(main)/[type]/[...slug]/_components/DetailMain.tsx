@@ -166,7 +166,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 
 			{childs &&
 				childs.length > 0 &&
-				(tagType !== TagType.series ? (<MainTitle title={isUsingParent && parentData ? (parentData.tagType == 'root' ? `${parentData.titleMeta}の詳細` : `${parentData.titleMeta}のエピソード`) : (data.tagType == 'root' ? (data.genreType == 'movie' ? `${data.titleMeta}のシリーズ一覧` : `${data.titleMeta}のシリーズ一覧`) : `${data.titleMeta}の作品`)}>
+				(tagType !== TagType.series ? (<MainTitle title={isUsingParent && parentData ? (parentData.tagType == 'root' ? `${parentData.titleMeta}の詳細` : (parentData.tagType == 'series' ? `${parentData.titleMeta}のエピソード` : `${data.parent?.titleMeta}のエピソード`)) : (data.tagType == 'root' ? (data.genreType == 'movie' ? `${data.titleMeta}のシリーズ一覧` : `${data.titleMeta}のシリーズ一覧`) : (parentData?.tagType == 'series' ? `${parentData.titleMeta}のエピソード` : `${data.parent?.titleMeta}のエピソード`))}>
 					{childs.map((item) => (
 						<Link href={`/${pathname}/${item.pathName}`} title={item.titleMeta} key={item.id}>
 							<div className="mb-2 flex items-center rounded-md bg-[#F0F0F0] p-3 md:p-4">
@@ -552,7 +552,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 							? `${data.titleMeta}の人気シリーズ`
 							: data.tagType == 'series'
 								? `${data.titleMeta}の人気エピソード`
-								: `${data.titleMeta}の人気作品`
+								: `${data.parent?.titleMeta}の人気作品`
 					}
 					className="px-0 md:px-4">
 					<div className="max-h-[152px] overflow-hidden md:max-h-max md:!overflow-visible">
