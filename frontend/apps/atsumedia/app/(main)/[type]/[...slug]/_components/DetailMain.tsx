@@ -202,7 +202,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 						</Link>
 					))}
 				</MainTitle>
-				) : (<MainTitle title={isUsingParent && parentData ? (data.genreType == 'movie' ? `${parentData.titleMeta}のその他のシリーズ` : `${data.titleMeta}のエピソード`) : `${data.titleMeta}のエピソード`}>
+				) : (<MainTitle title={isUsingParent && parentData ? (data.genreType == 'movie' ? `${parentData.titleMeta}のその他のシリーズ` : `${data.titleMeta}のエピソードX`) : ( (data.genreType == 'movie') ? `${data.titleMeta}のシリーズ` :`${data.titleMeta}のエピソード`) }>
 					{childs.map((item) => (
 						<Link key={item.pathName} href={`/${pathname}/${item.pathName}`} title={item.titleMeta}>
 							<div
