@@ -1,6 +1,7 @@
 import React from 'react';
 import { CategoryType } from '@atsumedia/data';
 import { notFound, permanentRedirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import DetailContent from './_components/DetailContent';
 import MainPath from '../../_components/MainPath';
 import { Metadata } from 'next';
@@ -61,7 +62,12 @@ const Page = async ({ params }: PageProps) => {
 
 	if (data.genreType === 'movie' && data.tagType === 'root') {
 		if (data.childs && data.childs.length === 1) {
-			const firstChildPath = data.childs[0]?.pathName;
+			let firstChildPath = data.childs[0]?.pathName;
+			const pathTrimmer = data.pathName + '/';
+			console.log(firstChildPath)
+			if (firstChildPath.startsWith(pathTrimmer)) {
+				firstChildPath = firstChildPath.slice(pathTrimmer.length)
+			  }
 			if (firstChildPath) {
 				return permanentRedirect(firstChildPath);
 			}
