@@ -552,7 +552,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 							? `${data.titleMeta}の人気シリーズ`
 							: data.tagType == 'series'
 								? `${data.titleMeta}の人気エピソード`
-								: `${data.parent?.titleMeta}の人気作品`
+								: `${data.parent?.titleMeta}の人気エピソード`
 					}
 					className="px-0 md:px-4">
 					<div className="max-h-[152px] overflow-hidden md:max-h-max md:!overflow-visible">
