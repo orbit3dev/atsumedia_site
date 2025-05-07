@@ -207,7 +207,7 @@ function custom_csv_upload_page()
                                         if (response.match_file == false) {
                                             alert('「間違ったファイルをアップロードしています。もう一度ファイルを確認してください。」');
                                             setTimeout(function() {
-                                                // window.location.reload();
+                                                window.location.reload();
                                             }, 6000);
                                         } else {
                                             alert('記事データのアップロードが完了しました');
@@ -217,7 +217,7 @@ function custom_csv_upload_page()
                                                 $('#file_type').val('');
                                             });
                                             setTimeout(function() {
-                                                // window.location.reload();
+                                                window.location.reload();
                                             }, 3000);
                                         }
                                     }
