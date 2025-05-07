@@ -187,34 +187,36 @@ function custom_content_scripts()
                 return `<img src="${option.image}" style="height: 20px; width: auto; vertical-align: middle; margin-right: 5px;" /> ${option.text}`;
             }
 
-            $select.select2({
-                placeholder: '記事を選択',
-                ajax: {
-                    url: "<?php echo get_template_directory_uri(); ?>/custom_function/page_settings/article_list.php",
-                    dataType: 'json',
-                    delay: 250,
-                    cache: false,
-                    data: function(params) {
-                        return {
-                            term: params.term || '',
-                            page: params.page || 1
-                        };
+            if (typeof $.fn.select2 !== 'undefined') {
+                $select.select2({
+                    placeholder: '記事を選択',
+                    ajax: {
+                        url: "<?php echo get_template_directory_uri(); ?>/custom_function/page_settings/article_list.php",
+                        dataType: 'json',
+                        delay: 250,
+                        cache: false,
+                        data: function(params) {
+                            return {
+                                term: params.term || '',
+                                page: params.page || 1
+                            };
+                        },
+                        processResults: function(data, params) {
+                            params.page = params.page || 1;
+                            return {
+                                results: data.results,
+                                pagination: {
+                                    more: data.more
+                                }
+                            };
+                        },
+                        cache: true
                     },
-                    processResults: function(data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.results,
-                            pagination: {
-                                more: data.more
-                            }
-                        };
-                    },
-                    cache: true
-                },
-                templateResult: formatOptionWithImage,
-                templateSelection: formatSelectedOption,
-                escapeMarkup: markup => markup
-            });
+                    templateResult: formatOptionWithImage,
+                    templateSelection: formatSelectedOption,
+                    escapeMarkup: markup => markup
+                });
+            }
             let originalImageUrl = '';
             let originalImageFilename = '';
             $select.on('select2:select', function(e) {
