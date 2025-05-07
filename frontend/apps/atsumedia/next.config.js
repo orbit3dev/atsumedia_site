@@ -8,7 +8,7 @@ const {
  **/
 const nextConfig = {
   reactStrictMode: false,
-  basePath: '/test/frontend',
+  basePath: '/main/frontend',
   trailingSlash: true,
   // basePath: '/media',
   experimental: {

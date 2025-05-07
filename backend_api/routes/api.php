@@ -16,6 +16,17 @@ Route::middleware([Log404Request::class])->group(function () {
     // Add your routes here
 });
 
+
+Route::get('/clear-log', function () {
+    file_put_contents(storage_path('logs/laravel.log'), '');
+    return 'Log cleared';
+});
+
+Route::get('/get-path', function () {
+    file_put_contents(storage_path('logs/laravel.log'), '');
+    $image_link = env('ABSOLUTE_PATH');
+    return $image_link;
+});
 // Route::middleware('strip-env')->group(function () {
 //     // your routes here
 //     Route::get('/get-person', [PersonController::class, 'getPerson']);
@@ -51,7 +62,7 @@ Route::get('/health', function () {
 });
 
 Route::get('/get-personsss', function () {
-    return ['status' => 'ok'];
+    return ['status' => 'ok-main'];
 });
 Route::get('/api/get-persona', function () {
     return ['status' => 'ok1'];

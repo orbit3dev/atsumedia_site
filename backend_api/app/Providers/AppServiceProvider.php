@@ -23,8 +23,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         URL::forceRootUrl(config('app.url'));
-    	if (Request::is('test/*')) {
-        $path = preg_replace('#^test/#', '', Request::path());
+    	if (Request::is('main/*')) {
+        $path = preg_replace('#^main/#', '', Request::path());
 Log::info($path);
         app()->instance('request', Request::create("/{$path}", Request::method(), Request::all()));
     	}

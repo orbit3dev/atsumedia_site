@@ -10,8 +10,8 @@ class StripEnvPrefix
 {
     public function handle(Request $request, Closure $next)
     {
-        if (str_starts_with($request->path(), 'test/')) {
-            $newPath = preg_replace('#^test/#', '', $request->path());
+        if (str_starts_with($request->path(), 'main/')) {
+            $newPath = preg_replace('#^main/#', '', $request->path());
             Log::info('new path');
             Log::info($newPath);
             // Clone request with new path

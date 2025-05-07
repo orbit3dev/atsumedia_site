@@ -5,6 +5,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\PersonController; // ✅ Explicitly import the controller
 
+Route::get('/clear-log', function () {
+    file_put_contents(storage_path('logs/laravel.log'), '');
+    return 'Log cleared';
+});
+
 // Route::get('/{any}', function (Request $request, $any) { // it should be /{any}
 //     $debugInfo = [
 // 	'x' => 123,
