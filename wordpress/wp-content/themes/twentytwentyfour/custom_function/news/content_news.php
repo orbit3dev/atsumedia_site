@@ -57,7 +57,7 @@ function custom_content_page()
                             </tr>
                             <tr>
                                 <th><label for="slug">slug(URL文字列)</label></th>
-                                <td><input type="text" name="slug" class="regular-text"></td>
+                                <td><input type="text" name="slug" class="regular-text" id="slug-input"></td>
                             </tr>
                             <tr>
                                 <th><label for="date">日付</label></th>
@@ -176,6 +176,10 @@ function custom_content_scripts()
                     time_24hr: true // Use 24-hour format (optional)
                 });
             }
+
+            $('#slug-input').on('input', function() {
+                $(this).val($(this).val().replace(/[^a-zA-Z0-9_-]/g, ''));
+            });
 
             function formatSelectedOption(option) {
                 if (!option.id) return option.text;
@@ -488,8 +492,9 @@ function custom_content_scripts()
                             let actionButtonClass = (row.is_public === '公開') ? 'deactivate-btn' : 'activate-btn';
 
                             let actionButton = '<button class="' + actionButtonClass + ' button" data-id="' + data + '">' + actionButtonText + '</button>';
+                            let deleteButton = '<button class="del-btn button" data-id="' + data + '">ニュースを削除</button>';
 
-                            return editButton + " " + actionButton;
+                            return editButton + " " + actionButton + " " + deleteButton;
                         }
                     }
                 ],
@@ -511,27 +516,36 @@ function custom_content_scripts()
                 clearForm()
             })
             // Delete event
-            $('#contentTable').on('click', '.delete-btn', function() {
+            $('#contentTable tbody').on('click', '.del-btn', function() {
                 var id = $(this).data('id');
-                if (confirm('このコンテンツを削除しますか？')) {
-                    $.ajax({
-                        url: ajaxurl,
-                        type: 'POST',
-                        data: {
-                            action: 'delete_content',
-                            content_id: id
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                alert('削除成功');
-                                table.ajax.reload();
-                            } else {
-                                alert('削除失敗');
-                            }
-                        }
-                    });
+
+                if (!confirm("このニュースを削除しますか？")) {
+                    return;
                 }
+
+                $.ajax({
+                    url: "<?php echo get_template_directory_uri(); ?>/custom_function/news/get_news_data.php",
+                    type: "POST",
+                    data: {
+                        action: "delete_news_by_id",
+                        id: id
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.success) {
+                            alert("削除が成功しました");
+                            $('#contentTable').DataTable().ajax.reload(null, false); // Refresh without resetting pagination
+                        } else {
+                            alert("削除に失敗しました: " + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", xhr.responseText);
+                        alert("通信エラー: " + error);
+                    }
+                });
             });
+
             $('#contentTable tbody').on('click', '.edit-btn', function() {
                 var id = $(this).data('id');
 

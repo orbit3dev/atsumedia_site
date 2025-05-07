@@ -21,6 +21,7 @@ class NewsController extends Controller
 
         $query = News::where('datetime', '<', Carbon::now())
             ->where('is_public', 1)
+            // ->where('is_deleted', 0)
             ->select(
                 'id',
                 'title',
@@ -76,6 +77,7 @@ class NewsController extends Controller
         $slug = $request->slug;
         $query = News::where('path_name', $slug)
             ->where('datetime', '<', Carbon::now())
+            // ->where('is_deleted', 0)
             ->select(
                 'id',
                 'title',
