@@ -62,7 +62,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 	const [vodsShowFlag, setVodsShowFlag] = useState(false);
 
 	const [truncateTextFlag, setTruncateTextFlag] = useState(true);
-
+	console.log(data.summary)
 	return (
 		<>
 			<MainInfo data={data} />
@@ -511,7 +511,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 				<MainTitle title={`${data.titleMeta}の音楽`}>
 					{data.musics.map((item, index) => (
 						<div key={index}>
-							<H3Line text={`第 ${index + 1} クール`} />
+							 {data.musics!.length >= 2 && <H3Line text={`第 ${index + 1} クール`} />}
 							<table className="my-5 w-full border-collapse border border-[#dbdbdb] text-[15px]">
 								<tbody>
 									<tr>
