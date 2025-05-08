@@ -291,3 +291,14 @@ h2.ce-header {
     padding: 0;
     margin: 0 16px 20px;
   }
+
+  table#contentTable.wp-list-table td,
+  table#contentTable.wp-list-table th {
+    vertical-align: middle !important;
+  }
+
+  select[name="contentTable_length"] {
+    width: 60px;            /* increase width */
+    padding-right: 24px;     /* create space for dropdown arrow */
+    box-sizing: border-box;  /* ensures padding doesn’t overflow width */
+  }

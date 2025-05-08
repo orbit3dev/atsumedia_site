@@ -57,7 +57,7 @@ function custom_content_page()
                             </tr>
                             <tr>
                                 <th><label for="slug">slug(URL文字列)</label></th>
-                                <td><input type="text" name="slug" class="regular-text"></td>
+                                <td><input type="text" name="slug" class="regular-text" id="slug-input"></td>
                             </tr>
                             <tr>
                                 <th><label for="date">日付</label></th>
@@ -176,6 +176,10 @@ function custom_content_scripts()
                     time_24hr: true // Use 24-hour format (optional)
                 });
             }
+
+            $('#slug-input').on('input', function() {
+                $(this).val($(this).val().replace(/[^a-zA-Z0-9_-]/g, ''));
+            });
 
             function formatSelectedOption(option) {
                 if (!option.id) return option.text;
@@ -367,6 +371,107 @@ function custom_content_scripts()
                 }
             }
 
+            class ImageWithLink extends ImageTool {
+                constructor({
+                    data,
+                    config,
+                    api
+                }) {
+                    super({
+                        data,
+                        config,
+                        api
+                    });
+                    this.link = data.link || '';
+                }
+
+                render() {
+                    const wrapper = super.render();
+
+                    const linkInput = document.createElement('input');
+                    linkInput.type = 'text';
+                    linkInput.placeholder = 'https://example.com';
+                    linkInput.value = this.link.startsWith('https://') ? this.link : 'https://' + this.link.replace(/^https?:\/\//, '');
+                    linkInput.classList.add('cdx-input');
+                    linkInput.style.marginTop = '10px';
+
+                    // Prevent deleting the "https://"
+                    linkInput.addEventListener('input', () => {
+                        if (!linkInput.value.startsWith('https://')) {
+                            linkInput.value = 'https://' + linkInput.value.replace(/^https?:\/\//, '');
+                        }
+                        this.link = linkInput.value;
+                    });
+
+                    // Also prevent user from moving caret before "https://"
+                    linkInput.addEventListener('keydown', (e) => {
+                        const cursorPosition = linkInput.selectionStart;
+                        if (
+                            cursorPosition <= 8 && // Length of "https://"
+                            ['Backspace', 'ArrowLeft'].includes(e.key)
+                        ) {
+                            e.preventDefault();
+                            linkInput.setSelectionRange(8, 8);
+                        }
+                    });
+
+                    // Ensure cursor doesn't start before "https://"
+                    linkInput.addEventListener('focus', () => {
+                        setTimeout(() => {
+                            if (linkInput.selectionStart < 8) {
+                                linkInput.setSelectionRange(8, 8);
+                            }
+                        }, 0);
+                    });
+
+                    wrapper.appendChild(linkInput);
+                    return wrapper;
+                }
+                save(blockContent) {
+                    const baseData = super.save(blockContent);
+                    return {
+                        ...baseData,
+                        link: this.link
+                    };
+                }
+            }
+            class CustomLinkTool extends LinkTool {
+                render() {
+                    const wrapper = super.render();
+
+                    setTimeout(() => {
+                        const input = wrapper.querySelector('.cdx-input.link-tool__input');
+
+                        if (input) {
+                            // Set the placeholder
+                            input.setAttribute('data-placeholder', 'https://');
+
+                            // Optional: if user hasn't typed anything, pre-fill the content
+                            if (input.innerText.trim() === '') {
+                                input.innerText = 'https://';
+                                input.setAttribute('data-empty', 'false');
+                            }
+
+                            // Ensure https:// stays at the beginning while editing
+                            input.addEventListener('input', () => {
+                                if (!input.innerText.startsWith('https://') && !input.innerText.startsWith('http://')) {
+                                    input.innerText = 'https://' + input.innerText.replace(/^https?:\/\//, '');
+                                    // Move caret to end
+                                    const range = document.createRange();
+                                    const sel = window.getSelection();
+                                    range.selectNodeContents(input);
+                                    range.collapse(false);
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                }
+                            });
+                        }
+                    }, 0);
+
+                    return wrapper;
+                }
+            }
+
             if ($('#editorjs_news').length) {
                 editor = new EditorJS({
                     holder: 'editorjs_news',
@@ -390,7 +495,7 @@ function custom_content_scripts()
                             class: ButtonTool
                         },
                         image: {
-                            class: ImageTool,
+                            class: ImageWithLink,
                             config: {
                                 endpoints: {
                                     byFile: "<?php echo get_template_directory_uri(); ?>/custom_function/news/save_images_news.php",
@@ -407,7 +512,7 @@ function custom_content_scripts()
                             class: Embed
                         },
                         linkTool: {
-                            class: LinkTool,
+                            class: CustomLinkTool,
                             config: {
                                 endpoint: '<?php echo get_template_directory_uri(); ?>/custom_function/free_text/save_link_free_text.php',
                                 fetchData: (url) => {
@@ -488,8 +593,9 @@ function custom_content_scripts()
                             let actionButtonClass = (row.is_public === '公開') ? 'deactivate-btn' : 'activate-btn';
 
                             let actionButton = '<button class="' + actionButtonClass + ' button" data-id="' + data + '">' + actionButtonText + '</button>';
+                            let deleteButton = '<button class="del-btn button" data-id="' + data + '">ニュースを削除</button>';
 
-                            return editButton + " " + actionButton;
+                            return editButton + " " + actionButton + " " + deleteButton;
                         }
                     }
                 ],
@@ -511,27 +617,36 @@ function custom_content_scripts()
                 clearForm()
             })
             // Delete event
-            $('#contentTable').on('click', '.delete-btn', function() {
+            $('#contentTable tbody').on('click', '.del-btn', function() {
                 var id = $(this).data('id');
-                if (confirm('このコンテンツを削除しますか？')) {
-                    $.ajax({
-                        url: ajaxurl,
-                        type: 'POST',
-                        data: {
-                            action: 'delete_content',
-                            content_id: id
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                alert('削除成功');
-                                table.ajax.reload();
-                            } else {
-                                alert('削除失敗');
-                            }
-                        }
-                    });
+
+                if (!confirm("このニュースを削除しますか？")) {
+                    return;
                 }
+
+                $.ajax({
+                    url: "<?php echo get_template_directory_uri(); ?>/custom_function/news/get_news_data.php",
+                    type: "POST",
+                    data: {
+                        action: "delete_news_by_id",
+                        id: id
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.success) {
+                            alert("削除が成功しました");
+                            $('#contentTable').DataTable().ajax.reload(null, false); // Refresh without resetting pagination
+                        } else {
+                            alert("削除に失敗しました: " + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", xhr.responseText);
+                        alert("通信エラー: " + error);
+                    }
+                });
             });
+
             $('#contentTable tbody').on('click', '.edit-btn', function() {
                 var id = $(this).data('id');
 
@@ -886,7 +1001,7 @@ function insert_at_news()
     $date = sanitize_text_field($form_data['date']);
     $genre = sanitize_text_field($form_data['genre']);
     $is_top = isset($form_data['top_screen']) ? 1 : 0;
-    $synopsis = sanitize_textarea_field($form_data['synopsis']);
+    $synopsis = ($form_data['synopsis']);
     $is_public = ($form_data['visibility'] === 'public') ? 1 : 0;
     $meta_title = sanitize_text_field($form_data['meta_title']);
     $meta_description = sanitize_textarea_field($form_data['meta_description']);

@@ -21,6 +21,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Exception;
+use DateTime;
 
 class ArticleController extends Controller
 {
@@ -252,16 +254,19 @@ class ArticleController extends Controller
                     'at_article.dubcast',
                     'at_article.dubcast_role',
                     'at_article.roadshow_day',
+                    'at_article.stream_day',
                     'at_article.tag_type_id as tag_types',
                     'at_article.id as articles_id',
                 )
                 ->where('at_article_genre_type.name', $request->type)
                 ->get();
-
+                if(empty($articles)){
+                    throw new Exception('No Data Found');
+                }
             if ($articles[0]['id'] == 0 && !empty($articles[0]['articles_id']) && $articles[0]['articles_id'] != 0) {
-                $articlesId = $articles[0]['articles_id'];
+                $articlesId = !empty($articles[0]['articles_id']) ? $articles[0]['articles_id'] : '';
             } else {
-                $articlesId = $articles[0]['id'];
+                $articlesId = !empty($articles[0]['id']) ? $articles[0]['id'] : '';
             }
             //Episodes needs all its peers to show
             if ($articles[0]['tag_types'] != 3) {
@@ -611,7 +616,7 @@ class ArticleController extends Controller
                 $cleanedArticle = str_replace('\n', ' ', $cleanedArticle);
                 $summaryArr = json_decode($cleanedArticle, true);
                 $article->summary = [
-                    'link' => $summaryArr['link'][0],
+                    'link' => $summaryArr['link'],
                     'reference' => $summaryArr['reference'],
                     'text' => $summaryArr['text'],
                     'title' => $summaryArr['title'],
@@ -656,6 +661,9 @@ class ArticleController extends Controller
                 }
                 if ($article->genre_type_ids == 2) {
                     $year = Carbon::parse($article->roadshow_day)->year;
+                    if(($year  == -1)){
+                        $year = (new DateTime($article->stream_day))->format('Y');
+                    }
                     if ($article->tag_types != 1) {
                         $article->season = ['name' => $year];
                     } else {
@@ -671,6 +679,7 @@ class ArticleController extends Controller
                 ->header('Pragma', 'no-cache')
                 ->header('Expires', '0');
         } catch (\Exception $e) {
+            Log::info($e);
             echo $e->getMessage();
         }
     }

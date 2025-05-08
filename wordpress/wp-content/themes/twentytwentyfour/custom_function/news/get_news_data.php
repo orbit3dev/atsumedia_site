@@ -24,6 +24,8 @@ function fetch_content_data()
         path_name AS slug, 
         description_meta AS synopsis
         FROM at_news where id_author_create = " .  $current_user->ID . "
+        and is_deleted = 0
+        ORDER BY created_at DESC         
         LIMIT $start, $length",
         ARRAY_A
     );
@@ -147,6 +149,43 @@ function change_status_activation()
     exit;
 }
 
+function delete_news_by_id() {
+    global $wpdb;
+
+    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+
+    if ($id <= 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => '不正なIDです'
+        ]);
+        exit;
+    }
+
+    $table_name = $wpdb->prefix . 'news'; // ✅ Replace with your actual news table name
+
+    $updated = $wpdb->update(
+        $table_name,
+        ['is_deleted' => 1],            // Soft delete
+        ['id' => $id],
+        ['%d'],
+        ['%d']
+    );
+
+    if ($updated !== false) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => '削除処理に失敗しました'
+        ]);
+    }
+
+    exit;
+}
+
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'fetch_content_data') {
@@ -155,5 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         get_news_by_id();
     } elseif ($_POST['action'] === 'change_status') {
         change_status_activation();
+    } elseif ($_POST['action'] === 'delete_news_by_id') {
+        delete_news_by_id(); // ← Add this line
     }
 }

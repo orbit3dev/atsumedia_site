@@ -62,7 +62,6 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 	const [vodsShowFlag, setVodsShowFlag] = useState(false);
 
 	const [truncateTextFlag, setTruncateTextFlag] = useState(true);
-
 	return (
 		<>
 			<MainInfo data={data} />
@@ -70,7 +69,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 			<MainTitle title={data.tagType == 'root' ? `${data.titleMeta}の概要` : `${data.titleMeta}のあらすじ`}>
 				<MainText text={data.summary?.text ?? ''} truncateText={truncateTextFlag} />
 				<p className={`mb-6 px-1 text-end text-[13px] font-[100]`}>
-					{`${data.summary?.reference}${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`}
+					{`${data.genreType != 'movie' ? data.summary?.reference : ''}${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`}
 				</p>
 				{/*<H3Line text={data.summary?.title ?? ''} />*/}
 				{/*<MainText text={data.summary?.text ?? ''} />*/}
@@ -511,7 +510,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 				<MainTitle title={`${data.titleMeta}の音楽`}>
 					{data.musics.map((item, index) => (
 						<div key={index}>
-							<H3Line text={`第 ${index + 1} クール`} />
+							 {data.musics!.length >= 2 && <H3Line text={`第 ${index + 1} クール`} />}
 							<table className="my-5 w-full border-collapse border border-[#dbdbdb] text-[15px]">
 								<tbody>
 									<tr>
