@@ -661,7 +661,7 @@ class ArticleController extends Controller
                 }
                 if ($article->genre_type_ids == 2) {
                     $year = Carbon::parse($article->roadshow_day)->year;
-                    if(empty($article->roadshow_day)){
+                    if(empty($year)){
                         $year = $article->stream_day;
                         $year = (new DateTime($article->stream_day))->format('Y');
                     }
