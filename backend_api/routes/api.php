@@ -16,7 +16,12 @@ Route::middleware([Log404Request::class])->group(function () {
     // Add your routes here
 });
 
-// Route::middleware('strip-env')->group(function () {
+
+Route::get('/clear-log', function () {
+    file_put_contents(storage_path('logs/laravel.log'), '');
+    return 'Log cleared';
+});
+
 //     // your routes here
 //     Route::get('/get-person', [PersonController::class, 'getPerson']);
 // });
