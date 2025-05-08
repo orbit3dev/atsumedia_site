@@ -92,18 +92,55 @@ class Ui {
 	 * @returns {Element}
 	 */
 	render(toolData) {
-		if (!toolData.file || Object.keys(toolData.file).length === 0) {
-			this.toggleStatus(UiState.Empty);
-		} else {
-			this.toggleStatus(UiState.Uploading);
-		}
-        if (!this.readOnly) {
-            // 読み取り専用（プレビューのみ）の場合はリンク先URLの入力欄を表示しない
-            this.nodes.linkInput.value = toolData.linkUrl ?? '';
-		    this.nodes.wrapper.appendChild(this.nodes.linkInput);
-        }
-		return this.nodes.wrapper;
-	}
+    // Handle UI state based on whether image is uploaded
+    if (!toolData.file || Object.keys(toolData.file).length === 0) {
+        this.toggleStatus(UiState.Empty);
+    } else {
+        this.toggleStatus(UiState.Uploading);
+    }
+
+    // Build new image wrapper
+    const img = document.createElement('img');
+    img.classList.add('image-tool__image-picture');
+    img.src = toolData.file?.url || '';
+
+    const newImageWrapper = document.createElement('div');
+    newImageWrapper.classList.add('image-tool__image');
+
+    if (toolData.links_click) {
+        const a = document.createElement('a');
+        a.href = toolData.links_click;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.appendChild(img);
+        newImageWrapper.appendChild(a);
+    } else {
+        newImageWrapper.appendChild(img);
+    }
+
+    // Replace the old image container
+    const oldWrapper = this.nodes.wrapper.querySelector('.image-tool__image');
+    if (oldWrapper) {
+        this.nodes.wrapper.replaceChild(newImageWrapper, oldWrapper);
+    } else {
+        this.nodes.wrapper.appendChild(newImageWrapper);
+    }
+
+    // Append link input field (if not read-only)
+    if (!this.readOnly) {
+        this.nodes.linkInput.value = toolData.links_click || '';
+        this.nodes.linkInput.placeholder = 'Enter URL to link this image';
+        this.nodes.linkInput.classList.add('cdx-input'); // Optional styling
+        this.nodes.linkInput.addEventListener('input', () => {
+            this._data.links_click = this.nodes.linkInput.value;
+        });
+
+        this.nodes.wrapper.appendChild(this.nodes.linkInput);
+    }
+
+    return this.nodes.wrapper;
+}
+
 
 	/**
 	 * Creates upload-file button
@@ -464,6 +501,7 @@ export default class ImageTool {
 		this.api = api;
 		this.readOnly = readOnly;
 		this.block = block;
+		this.links_click = data.link || '';
 
 		/**
 		 * Tool's initial config
@@ -515,6 +553,7 @@ export default class ImageTool {
 				url: '',
 			},
             linkUrl: '',
+			links_click: this.links_click,
 		};
 		this.data = data;
 	}
