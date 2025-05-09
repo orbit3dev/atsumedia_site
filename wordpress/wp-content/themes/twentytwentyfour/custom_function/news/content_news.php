@@ -382,7 +382,8 @@ function custom_content_scripts()
                         config,
                         api
                     });
-                    this.link = data.link || '';
+                    // Ensure that the link starts with 'https://', if not add it
+                    this.link = data.link ? (data.link.startsWith('https://') ? data.link : 'https://' + data.link) : '';
                 }
 
                 render() {
@@ -390,36 +391,37 @@ function custom_content_scripts()
 
                     const linkInput = document.createElement('input');
                     linkInput.type = 'text';
-                    linkInput.placeholder = 'https://example.com';
-                    linkInput.value = this.link.startsWith('https://') ? this.link : 'https://' + this.link.replace(/^https?:\/\//, '');
+                    linkInput.placeholder = 'example.com'; // You can set a custom placeholder
+                    linkInput.value = this.link.replace(/^https?:\/\//, ''); // Remove the "https://" for display in the input field
                     linkInput.classList.add('cdx-input');
                     linkInput.style.marginTop = '10px';
 
-                    // Prevent deleting the "https://"
+                    // Update link with "https://" when the user enters a URL
                     linkInput.addEventListener('input', () => {
-                        if (!linkInput.value.startsWith('https://')) {
-                            linkInput.value = 'https://' + linkInput.value.replace(/^https?:\/\//, '');
+                        let value = linkInput.value.trim();
+                        if (value && !value.startsWith('https://')) {
+                            value = 'https://' + value;
                         }
-                        this.link = linkInput.value;
+                        this.link = value;
                     });
 
                     // Also prevent user from moving caret before "https://"
                     linkInput.addEventListener('keydown', (e) => {
                         const cursorPosition = linkInput.selectionStart;
                         if (
-                            cursorPosition <= 8 && // Length of "https://"
+                            cursorPosition <= 0 && // Length of the input string before the user starts typing
                             ['Backspace', 'ArrowLeft'].includes(e.key)
                         ) {
                             e.preventDefault();
-                            linkInput.setSelectionRange(8, 8);
+                            linkInput.setSelectionRange(0, 0);
                         }
                     });
 
                     // Ensure cursor doesn't start before "https://"
                     linkInput.addEventListener('focus', () => {
                         setTimeout(() => {
-                            if (linkInput.selectionStart < 8) {
-                                linkInput.setSelectionRange(8, 8);
+                            if (linkInput.selectionStart < 0) {
+                                linkInput.setSelectionRange(0, 0);
                             }
                         }, 0);
                     });
@@ -427,6 +429,7 @@ function custom_content_scripts()
                     wrapper.appendChild(linkInput);
                     return wrapper;
                 }
+
                 save(blockContent) {
                     const baseData = super.save(blockContent);
                     return {
@@ -435,7 +438,22 @@ function custom_content_scripts()
                     };
                 }
             }
+
             class CustomLinkTool extends LinkTool {
+                constructor({
+                    data,
+                    config,
+                    api
+                }) {
+                    super({
+                        data,
+                        config,
+                        api
+                    });
+                    // Ensure the link starts with 'https://', if not, add it
+                    this.link = data.link ? (data.link.startsWith('https://') ? data.link : 'https://' + data.link) : '';
+                }
+
                 render() {
                     const wrapper = super.render();
 
@@ -443,32 +461,33 @@ function custom_content_scripts()
                         const input = wrapper.querySelector('.cdx-input.link-tool__input');
 
                         if (input) {
-                            // Set the placeholder
-                            input.setAttribute('data-placeholder', 'https://');
+                            input.setAttribute('data-placeholder', 'example.com');
+                            input.innerText = this.link.replace(/^https?:\/\//, '');
+                            input.addEventListener('input', () => {
+                                let value = input.innerText.trim();
+                                if (value && !value.startsWith('https://')) {
+                                    value = 'https://' + value;
+                                }
+                                this.link = value; // Save the link with the 'https://'
+                            });
 
-                            // Optional: if user hasn't typed anything, pre-fill the content
+                            // Optional: If user hasn't typed anything, pre-fill with 'https://'
                             if (input.innerText.trim() === '') {
-                                input.innerText = 'https://';
+                                input.innerText = '';
                                 input.setAttribute('data-empty', 'false');
                             }
-
-                            // Ensure https:// stays at the beginning while editing
-                            input.addEventListener('input', () => {
-                                if (!input.innerText.startsWith('https://') && !input.innerText.startsWith('http://')) {
-                                    input.innerText = 'https://' + input.innerText.replace(/^https?:\/\//, '');
-                                    // Move caret to end
-                                    const range = document.createRange();
-                                    const sel = window.getSelection();
-                                    range.selectNodeContents(input);
-                                    range.collapse(false);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
-                                }
-                            });
                         }
                     }, 0);
 
                     return wrapper;
+                }
+
+                save(blockContent) {
+                    const baseData = super.save(blockContent);
+                    return {
+                        ...baseData,
+                        link: this.link // Save the full link with 'https://'
+                    };
                 }
             }
 

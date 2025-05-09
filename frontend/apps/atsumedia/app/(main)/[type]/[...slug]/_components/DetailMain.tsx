@@ -69,7 +69,8 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 			<MainTitle title={data.tagType == 'root' ? `${data.titleMeta}の概要` : `${data.titleMeta}のあらすじ`}>
 				<MainText text={data.summary?.text ?? ''} truncateText={truncateTextFlag} />
 				<p className={`mb-6 px-1 text-end text-[13px] font-[100]`}>
-					{`${data.genreType != 'movie' ? data.summary?.reference : ''}${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`}
+					{/* {`${data.genreType != 'movie' ? data.summary?.reference : ''}${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`} */}
+					{`${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`}
 				</p>
 				{/*<H3Line text={data.summary?.title ?? ''} />*/}
 				{/*<MainText text={data.summary?.text ?? ''} />*/}
@@ -526,7 +527,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 											エンディング
 										</td>
 										<td className="border border-[#dbdbdb] p-3">
-											<span className="text-[#2F8FEA]">{item.edArtist}</span> 「{item.edSong}」
+											<span className="text-[#2F8FEA]">{item.edArtist}</span> {item.edSong ? `「${item.edSong}」` : ''}
 										</td>
 									</tr>
 									<tr>

@@ -260,9 +260,9 @@ class ArticleController extends Controller
                 )
                 ->where('at_article_genre_type.name', $request->type)
                 ->get();
-                if(empty($articles)){
-                    throw new Exception('No Data Found');
-                }
+            if (empty($articles)) {
+                throw new Exception('No Data Found');
+            }
             if ($articles[0]['id'] == 0 && !empty($articles[0]['articles_id']) && $articles[0]['articles_id'] != 0) {
                 $articlesId = !empty($articles[0]['articles_id']) ? $articles[0]['articles_id'] : '';
             } else {
@@ -289,7 +289,12 @@ class ArticleController extends Controller
                     'at_article.thumbnail_url',
                     'at_article.thumbnail_text',
                     'at_article.thumbnail_link',
+                    'at_article.distribution',
+                    'at_article.distribution_name',
+                    'at_article.genre_type_id',
                     'at_article.id AS id',
+                    'at_article.created_at',
+                    'at_article.updated_at',
                 )
                 ->get();
 
@@ -445,39 +450,69 @@ class ArticleController extends Controller
 
             // 3. For each child, get productions and group
             $articleChilds = $articleChilds->map(function ($child) {
-                // Get productions for each child
-                $productions = DB::table('at_article_production')
-                    ->join('at_production', 'at_article_production.production_id', '=', 'at_production.id')
-                    ->select(
-                        DB::raw('CAST(at_article_production.article_id AS CHAR) AS articleId'),
-                        DB::raw('CAST(at_article_production.production_id AS CHAR) AS productionId'),
-                        'at_article_production.created_at AS createdAt',
-                        'at_article_production.updated_at AS updatedAt',
-                        DB::raw('CAST(at_production.id AS CHAR) AS id'),
-                        'at_production.name',
-                        'at_production.type',
-                        'at_production.sort',
-                        'at_production.created_at AS productionCreatedAt',
-                        'at_production.updated_at AS productionUpdatedAt'
-                    )
-                    ->where('at_article_production.article_id', $child->ids)
+                if ($child->genre_type_id != 2) {
+                    $productions = DB::table('at_article_production')
+                        ->join('at_production', 'at_article_production.production_id', '=', 'at_production.id')
+                        ->select(
+                            DB::raw('CAST(at_article_production.article_id AS CHAR) AS articleId'),
+                            DB::raw('CAST(at_article_production.production_id AS CHAR) AS productionId'),
+                            'at_article_production.created_at AS createdAt',
+                            'at_article_production.updated_at AS updatedAt',
+                            DB::raw('CAST(at_production.id AS CHAR) AS id'),
+                            'at_production.name',
+                            'at_production.type',
+                            'at_production.sort',
+                            'at_production.created_at AS productionCreatedAt',
+                            'at_production.updated_at AS productionUpdatedAt'
+                        )
+                        ->where('at_article_production.article_id', $child->ids)->get()
+                        ->map(function ($prod) {
+                            return [
+                                'articleId' => $prod->articleId,
+                                'productionId' => $prod->productionId,
+                                'createdAt' => $prod->createdAt,
+                                'updatedAt' => $prod->updatedAt,
+                                'production' => [
+                                    'id' => $prod->id,
+                                    'name' => $prod->name,
+                                    'type' => $prod->type,
+                                    'sort' => $prod->sort,
+                                    'createdAt' => $prod->productionCreatedAt,
+                                    'updatedAt' => $prod->productionUpdatedAt,
+                                ],
+                            ];
+                        });
+                } else {
+                    $distributorList = $child->distribution;
+                    $distributorId = array_map('intval', array_map('trim', explode(',', $distributorList)));
+                    $productions = DB::table('at_distributor')
+                    ->selectRaw("
+                        GROUP_CONCAT(name ORDER BY id SEPARATOR ', ') as name_distributor,
+                        MIN(id) as dist_id,
+                        MIN(created_at) as created_at_dist,
+                        MIN(updated_at) as updated_at_dist,
+                        MIN(type) as type_dist,
+                        MIN(sort) as sort_dist
+                    ")
+                    ->whereIn('id', $distributorId)
                     ->get()
-                    ->map(function ($prod) {
-                        return [
-                            'articleId' => $prod->articleId,
-                            'productionId' => $prod->productionId,
-                            'createdAt' => $prod->createdAt,
-                            'updatedAt' => $prod->updatedAt,
-                            'production' => [
-                                'id' => $prod->id,
-                                'name' => $prod->name,
-                                'type' => $prod->type,
-                                'sort' => $prod->sort,
-                                'createdAt' => $prod->productionCreatedAt,
-                                'updatedAt' => $prod->productionUpdatedAt,
-                            ],
-                        ];
-                    });
+                        ->map(function ($dist) use($child){
+                            return [
+                                'articleId' => $child->id,
+                                'productionId' => $child->distribution,
+                                'createdAt' => $child->created_at,
+                                'updatedAt' => $child->updated_at,
+                                'production' => [
+                                    'id' => $dist->dist_id,
+                                    'name' => $dist->name_distributor,
+                                    'type' => $dist->type_dist,
+                                    'sort' => $dist->sort_dist,
+                                    'createdAt' => $dist->created_at_dist,
+                                    'updatedAt' => $dist->updated_at_dist,
+                                ],
+                            ];
+                        });
+                }
 
                 $child->productions = $productions;
                 $temp_id = $child->id;
@@ -661,7 +696,7 @@ class ArticleController extends Controller
                 }
                 if ($article->genre_type_ids == 2) {
                     $year = Carbon::parse($article->roadshow_day)->year;
-                    if(($year  == -1)){
+                    if (($year  == -1)) {
                         $year = (new DateTime($article->stream_day))->format('Y');
                     }
                     if ($article->tag_types != 1) {

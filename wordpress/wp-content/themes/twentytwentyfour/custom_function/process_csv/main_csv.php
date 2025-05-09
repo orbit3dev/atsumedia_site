@@ -44,8 +44,8 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
             return ["num_row_processed" => 0, 'match_file' => false];
         }
         $limitRows = getCsvRowCount($target_input);
-        if ($type_upload == 1) {
-            $idArticle = $wpdb->get_results("SELECT id FROM at_article ORDER BY id ASC", ARRAY_A); // ARRAY_A returns associative array
+        if ($type_upload != 2) {
+            $idArticle = $wpdb->get_results("SELECT id FROM at_article where id like '%m%' ORDER BY id ASC", ARRAY_A); // ARRAY_A returns associative array
             $idArticleArr = array_column($idArticle, 'id');
         }
 
@@ -70,18 +70,20 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 $rowCount++;
                 continue;
             }
-
             $id = isset($data['id']) ? (string)($data['id']) : uniqid();
             if ($type_upload == 1) {
-                if (($key = array_search($id, $idArticle)) !== false) {
+                if ((in_array($id, $idArticleArr)) == true) {
+                    $key = array_search($id, $idArticle);
                     unset($idArticleArr[$key]);
                     continue;
                 }
             }
             if ($type_upload == 3) {
-                if (($key = array_search($id, $idArticle)) == true) {
-                    unset($idArticleArr[$key]);
+                if ((in_array($id, $idArticleArr)) == false) {
                     continue;
+                } else {
+                    $key = array_search($id, $idArticleArr);
+                    unset($idArticleArr[$key]);
                 }
             }
 
@@ -233,6 +235,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
                 'original_title' =>  $data['original_title'] ?? '',
                 'primary_program' =>  $data['primary_program'] ?? '',
                 'distribution' =>  $data['distribution'] ?? '',
+                'distribution_name' =>  $data['distribution_name'] ?? '',
                 'production_country' =>  $data['production_country'] ?? '',
                 'dubcast' => json_encode([
                     "dubcast_1" => $data['dubcast_1'] ?? '',
@@ -366,7 +369,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
     }
 
     //Delete double data
-    $deleted_rows = $wpdb->query(
+    $wpdb->query(
             "DELETE FROM at_article_cast WHERE id IN (SELECT id FROM (
                 SELECT id, ROW_NUMBER() OVER (
                 PARTITION BY article_id, person_id 
@@ -376,7 +379,6 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
         ) AS ranked
         WHERE rn > 1);"
     );
-    error_log($deleted_rows);
     $wpdb->query(
             "DELETE FROM at_article_author WHERE id IN (SELECT id FROM (
                 SELECT id, ROW_NUMBER() OVER (
