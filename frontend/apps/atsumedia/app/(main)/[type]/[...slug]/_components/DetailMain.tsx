@@ -70,7 +70,9 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 				<MainText text={data.summary?.text ?? ''} truncateText={truncateTextFlag} />
 				<p className={`mb-6 px-1 text-end text-[13px] font-[100]`}>
 					{/* {`${data.genreType != 'movie' ? data.summary?.reference : ''}${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`} */}
-					{`${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`}
+					{/* {`${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`} */}
+					{`${data.summary?.reference}${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`}
+
 				</p>
 				{/*<H3Line text={data.summary?.title ?? ''} />*/}
 				{/*<MainText text={data.summary?.text ?? ''} />*/}
