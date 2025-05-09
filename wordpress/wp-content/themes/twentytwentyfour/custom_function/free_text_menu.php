@@ -192,7 +192,6 @@ function free_text_menu()
 
                 render() {
                     const wrapper = super.render();
-
                     const linkInput = document.createElement('input');
                     linkInput.type = 'text';
                     linkInput.placeholder = 'example.com'; // You can set a custom placeholder
@@ -203,10 +202,8 @@ function free_text_menu()
                     // Update link with "https://" when the user enters a URL
                     linkInput.addEventListener('input', () => {
                         let value = linkInput.value.trim();
-                        if (value && !value.startsWith('https://')) {
-                            value = 'https://' + value;
-                        }
-                        this.link = value;
+                        value = value.replace(/^https?:\/\//, '');
+                        this.link = 'https://' + value;
                     });
 
                     // Also prevent user from moving caret before "https://"
@@ -274,15 +271,13 @@ function free_text_menu()
                             // Ensure https:// stays at the beginning when user types in
                             input.addEventListener('input', () => {
                                 let value = input.innerText.trim();
-                                if (value && !value.startsWith('https://')) {
-                                    value = 'https://' + value;
-                                }
-                                this.link = value; // Save the link with the 'https://'
+                                value = value.replace(/^https?:\/\//, '');
+                                this.link = 'https://' + value;
                             });
 
                             // Optional: If user hasn't typed anything, pre-fill with 'https://'
                             if (input.innerText.trim() === '') {
-                                input.innerText = 'https://';
+                                input.innerText = '';
                                 input.setAttribute('data-empty', 'false');
                             }
                         }

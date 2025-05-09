@@ -461,13 +461,8 @@ function custom_content_scripts()
                         const input = wrapper.querySelector('.cdx-input.link-tool__input');
 
                         if (input) {
-                            // Set the placeholder to just 'example.com', not 'https://'
                             input.setAttribute('data-placeholder', 'example.com');
-
-                            // Display the link without 'https://'
                             input.innerText = this.link.replace(/^https?:\/\//, '');
-
-                            // Ensure https:// stays at the beginning when user types in
                             input.addEventListener('input', () => {
                                 let value = input.innerText.trim();
                                 if (value && !value.startsWith('https://')) {
@@ -478,7 +473,7 @@ function custom_content_scripts()
 
                             // Optional: If user hasn't typed anything, pre-fill with 'https://'
                             if (input.innerText.trim() === '') {
-                                input.innerText = 'https://';
+                                input.innerText = '';
                                 input.setAttribute('data-empty', 'false');
                             }
                         }

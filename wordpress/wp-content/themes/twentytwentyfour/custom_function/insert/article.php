@@ -58,6 +58,7 @@ function insertOrUpdateArticle($wpdb, $data)
         'original_title' =>  $data['original_title'] ?? '',
         'primary_program' =>  $data['primary_program'] ?? '',
         'distribution' =>  $data['distribution'] ?? '',
+        'distribution_name' =>  $data['distribution_name'] ?? '',
         'production_country' =>  $data['production_country'] ?? '',
         'production_year' =>  $data['production_year'] ?? '',
         'dubcast' =>  $data['dubcast'] ?? '',
