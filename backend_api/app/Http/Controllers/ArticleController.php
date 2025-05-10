@@ -487,7 +487,7 @@ class ArticleController extends Controller
                     $distributorId = array_map('intval', array_map('trim', explode(',', $distributorList)));
                     $productions = DB::table('at_distributor')
                     ->selectRaw("
-                        GROUP_CONCAT(name ORDER BY id SEPARATOR ', ') as name_distributor,
+                        GROUP_CONCAT(name ORDER BY id SEPARATOR '、') as name_distributor,
                         MIN(id) as dist_id,
                         MIN(created_at) as created_at_dist,
                         MIN(updated_at) as updated_at_dist,
