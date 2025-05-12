@@ -196,6 +196,7 @@ class NewsController extends Controller
                 $outline = str_replace('""""', '"', $outline);
 
                 $description_meta = substr($rowData['descriptionMeta'], 1, -1);
+                $description_meta = preg_replace('/[^\x20-\x7E\xA1-\xDF\xE0-\xEF\xFF]/u', '', $description_meta);
                 $genre_type = substr($rowData['genreType'], 1, -1);
                 $path_name = substr($rowData['pathName'], 1, -1);
                 $title = substr($rowData['title'], 1, -1);
