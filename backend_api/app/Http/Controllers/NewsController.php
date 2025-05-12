@@ -134,7 +134,7 @@ class NewsController extends Controller
         }
 
         // try {
-        $csvPath = resource_path('csv\trial1.csv');
+        $csvPath = resource_path('csv/trial1.csv');
         $baseImagePath = realpath(base_path('../wordpress/wp-content/themes/twentytwentyfour/assets/assets/news/content/image'));
 
         $fileContent = file_get_contents($csvPath);
