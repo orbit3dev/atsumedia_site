@@ -194,6 +194,10 @@ class NewsController extends Controller
                 $cleanedDateString = trim($dateString, '"');
                 $createdAt = (string)Carbon::parse($cleanedDateString);
 
+                $dateString = $rowData['updatedAt']; // The date string with quotes
+                $cleanedDateString = trim($dateString, '"');
+                $updatedAt = (string)Carbon::parse($cleanedDateString);
+
                 $dateTimeString = $rowData['datetime']; // The date string with quotes
                 $cleanedDateString = trim($dateTimeString, '"');
                 $dateTimeNews = (string)Carbon::parse($cleanedDateString);
@@ -220,6 +224,7 @@ class NewsController extends Controller
                     'author_image' => 'news/content/image/' . $authorImagePath,
                     'content' => $this->transformContent($rowData['content'], $baseImagePath, 'content_image', $newsId, $pathEnv),
                     'created_at' => $createdAt,
+                    'updated_at' => $updatedAt,
                     'datetime' => $dateTimeNews,
                     'description_meta' => $description_meta,
                     'genre_type' => $genre_type,
@@ -384,5 +389,134 @@ class NewsController extends Controller
         fclose($tempFile);
 
         return $row;
+    }
+
+    public function getUploadArticle(Request $request)
+    {
+        set_time_limit(3600);
+        ini_set('memory_limit', '2048M');
+        mb_internal_encoding('UTF-8');
+        ini_set('max_execution_time', '7200');
+        $config = DB::table('at_config')->select('path_env')->first();
+        if ($config) {
+            $pathEnv = $config->path_env;
+            // You can now use $pathEnv
+        } else {
+            $pathEnv = '';
+        }
+
+        // try {
+        $csvPath = resource_path('csv/trial1.csv');
+        $baseImagePath = realpath(base_path('../wordpress/wp-content/themes/twentytwentyfour/assets/assets/news/content/image'));
+
+        $fileContent = file_get_contents($csvPath);
+        $fileContent = mb_convert_encoding($fileContent, 'UTF-8', 'auto');
+        $lines = explode("\n", $fileContent);
+
+        if (!file_exists($csvPath)) {
+            Log::error("CSV file not found at: " . $csvPath);
+            return response()->json(['error' => 'CSV file not found'], 404);
+        }
+        // Get headers (first line)
+        $rox = 0;
+        $headers = str_getcsv(array_shift($lines));
+        foreach ($lines as $index => $rawRow) {
+            $rox++;
+            if (trim($rawRow) === '') {
+                Log::info('skip');
+                continue;
+            }
+            try {
+                $latestId = DB::table('at_news')->max('id');
+                $newsId = $latestId ? intval($latestId) + 1 : 1;
+                $row = $this->parseCsvWithJson($rawRow);
+
+                if (count($row) !== count($headers)) {
+                    throw new \Exception("Column count mismatch after JSON parsing");
+                }
+
+                $rowData = array_combine($headers, $row);
+                $imagePath = $this->downloadAsset(
+                    $rowData['image'],
+                    $baseImagePath,
+                    'content_image',
+                    $newsId
+                );
+
+                $rawData = $rowData['author'];
+                $rawDataAuthor = substr($rawData, 1, -1);
+                $rawDataAuthor = str_replace('""', '"', $rawDataAuthor);
+                $decodedDataAuthor = json_decode($rawDataAuthor, true); // true to return an associative array
+                $imageUrl = $decodedDataAuthor['image']['S'];
+                $authorName = $decodedDataAuthor['name']['S'];
+
+                if ($imageUrl === null) {
+                    Log::error("Failed to decode author data: " . json_last_error_msg());
+                    return null; // or handle the error as appropriate
+                }
+                $authorImagePath = $this->downloadAsset(
+                    $imageUrl,
+                    $baseImagePath,
+                    'author_image',
+                    $newsId
+                );
+
+                // Prepare news data
+                $dateString = $rowData['createdAt']; // The date string with quotes
+                $cleanedDateString = trim($dateString, '"');
+                $createdAt = (string)Carbon::parse($cleanedDateString);
+
+                $dateTimeString = $rowData['datetime']; // The date string with quotes
+                $cleanedDateString = trim($dateTimeString, '"');
+                $dateTimeNews = (string)Carbon::parse($cleanedDateString);
+
+                $outline = $rowData['outline'];
+                $outline = substr($outline, 3, -3);
+                $outline = str_replace('""""', '"', $outline);
+
+                $description_meta = substr($rowData['descriptionMeta'], 1, -1);
+                $description_meta = preg_replace('/[^\x20-\x7E\xA1-\xDF\xE0-\xEF\xFF]/u', '', $description_meta);
+                $genre_type = ($rowData['genreType']);
+                $path_name = ($rowData['pathName']);
+                $title = substr($rowData['title'], 1, -1);
+                $type = strtolower(($rowData['type']));
+                $titleMeta = (substr($rowData['titleMeta'], 1, -1));
+                $titleMeta = preg_replace('/[^\x20-\x7E\xA1-\xDF\xE0-\xEF\xFF]/u', '', $titleMeta);
+                $title = preg_replace('/[^\x20-\x7E]/', '', $title);
+
+                $newsData = [
+                    'id_author_create' => 1,
+                    'username_author_create' => 'admin',
+                    'author' => $authorName,
+                    'author_description' => $this->extractAuthorDescription($rowData['author']),
+                    'author_image' => 'news/content/image/' . $authorImagePath,
+                    'content' => $this->transformContent($rowData['content'], $baseImagePath, 'content_image', $newsId, $pathEnv),
+                    'created_at' => $createdAt,
+                    'datetime' => $dateTimeNews,
+                    'description_meta' => $description_meta,
+                    'genre_type' => $genre_type,
+                    'genre_type_copy' => $genre_type,
+                    'genre_type_public' => (bool)$rowData['genreTypePublic'],
+                    'image' => 'news/content/image/' . $imagePath,
+                    'is_public' => (bool)$rowData['isPublic'],
+                    'is_top' => (bool)$rowData['isTop'],
+                    'outline' => $outline,
+                    'path_name' => $path_name,
+                    'title' => $title,
+                    'title_date_time' => $dateTimeNews,
+                    'top_public' => (bool)$rowData['topPublic'],
+                    'type' => $type,
+                    'type_name' => $type,
+                    'title_meta' => $titleMeta,
+                    'meta_title' => $titleMeta,
+                    'banner' => null,
+                ];
+                // Create news entry
+                News::create($newsData);
+            } catch (\Exception $e) {
+                Log::error("Error processing row: " . $e->getMessage());
+            }
+        }
+        return response()->json(['success' => true]);
     }
 }
