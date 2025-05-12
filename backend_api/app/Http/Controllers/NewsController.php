@@ -122,6 +122,9 @@ class NewsController extends Controller
     public function getUploadData(Request $request)
     {
         set_time_limit(3600);
+        ini_set('memory_limit', '2048M');
+        mb_internal_encoding('UTF-8');
+        ini_set('max_execution_time', '7200');
         $config = DB::table('at_config')->select('path_env')->first();
         if ($config) {
             $pathEnv = $config->path_env;
@@ -135,21 +138,25 @@ class NewsController extends Controller
         $baseImagePath = realpath(base_path('../wordpress/wp-content/themes/twentytwentyfour/assets/assets/news/content/image'));
 
         $fileContent = file_get_contents($csvPath);
+        $fileContent = mb_convert_encoding($fileContent, 'UTF-8', 'auto');
         $lines = explode("\n", $fileContent);
-
 
         if (!file_exists($csvPath)) {
             Log::error("CSV file not found at: " . $csvPath);
             return response()->json(['error' => 'CSV file not found'], 404);
         }
         // Get headers (first line)
+        $rox = 0;
         $headers = str_getcsv(array_shift($lines));
         foreach ($lines as $index => $rawRow) {
-            if (trim($rawRow) === '') continue;
-            // try {
+            $rox++;
+            if (trim($rawRow) === '') {
+                Log::info('skip');
+                continue;
+            }
+            try {
                 $latestId = DB::table('at_news')->max('id');
                 $newsId = $latestId ? intval($latestId) + 1 : 1;
-                $rawRow = array_shift($lines);
                 $row = $this->parseCsvWithJson($rawRow);
 
                 if (count($row) !== count($headers)) {
@@ -202,6 +209,8 @@ class NewsController extends Controller
                 $title = substr($rowData['title'], 1, -1);
                 $type = strtolower(substr($rowData['type'], 1, -1));
                 $titleMeta = (substr($rowData['titleMeta'], 1, -1));
+                $titleMeta = preg_replace('/[^\x20-\x7E\xA1-\xDF\xE0-\xEF\xFF]/u', '', $titleMeta);
+                $title = preg_replace('/[^\x20-\x7E]/', '', $title);
 
                 $newsData = [
                     'id_author_create' => 1,
@@ -232,11 +241,9 @@ class NewsController extends Controller
                 ];
                 // Create news entry
                 News::create($newsData);
-                Log::info("Successfully processed row 2");
-            // } catch (\Exception $e) {
-            //     Log::error("Error processing row: " . $e->getMessage());
-            //     break;
-            // }
+            } catch (\Exception $e) {
+                Log::error("Error processing row: " . $e->getMessage());
+            }
         }
         return response()->json(['success' => true]);
     }
