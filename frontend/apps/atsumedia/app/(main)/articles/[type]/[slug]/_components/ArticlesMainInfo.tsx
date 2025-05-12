@@ -93,7 +93,9 @@ const ArticlesMainInfo: React.FC<ArticlesMainInfoProps> = ({ data }) => {
 				<h1 className="mb-2 text-[21px] font-bold md:text-[29px]">{data.title}</h1>
 				<div className="mb-2 flex flex-col justify-between text-[13px] xl:flex-row xl:space-x-5">
 					<div className="flex flex-row">
-						<p>公開日：{dateFormat(data.datetime)}</p>
+						{typeof window === 'undefined' ? null : (
+							<p>公開日：{dateFormat(data.datetime)}</p>
+						)}
 						<p className="ml-4">更新日：{dateFormat(data.updatedAt)}</p>
 					</div>
 					<div>
