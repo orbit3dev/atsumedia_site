@@ -24,7 +24,7 @@ const dateFormat = (dateStr: string) => {
 		month: '2-digit',
 		day: '2-digit',
 		timeZone: 'Asia/Tokyo',
-	});
+	 }).replace(/\//g, '年').replace(/ /g, '月') + '日';
 };
 
 const getCatalogue = (content: string) => {
