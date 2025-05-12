@@ -257,6 +257,7 @@ class ArticleController extends Controller
                     'at_article.stream_day',
                     'at_article.tag_type_id as tag_types',
                     'at_article.id as articles_id',
+                    'at_article.production_country',
                 )
                 ->where('at_article_genre_type.name', $request->type)
                 ->get();
@@ -447,6 +448,12 @@ class ArticleController extends Controller
                     ];
                 }
             }
+            $articleChilds14= '';
+            if(!empty($articles[0]['production_country'])){
+                $queryCountry = DB::table('at_country')
+                ->where('id',$articles[0]['production_country'])->first();
+                $articleChilds14 = !empty($queryCountry->country) ? $queryCountry->country : '';
+            }
 
             // 3. For each child, get productions and group
             $articleChilds = $articleChilds->map(function ($child) {
@@ -551,10 +558,12 @@ class ArticleController extends Controller
                 $articleChilds11,
                 $articleChilds12,
                 $articleChilds13,
+                $articleChilds14,
                 $articlesId,
             ) {
                 $article->childs = $articleChilds;
                 $article->network = $articleChilds2;
+                $article->productionCountry = $articleChilds14;
                 $article->musics = collect($articleChilds12)->map(function ($musicItem) {
                     return [
                         'id' => $musicItem['id'],

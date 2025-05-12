@@ -22,7 +22,7 @@ interface MovieDetailMainProps {
 	photographyList: Article[];
 	popularityList: Article[];
 	parentData: Article | null | undefined;
-    showElement: boolean;
+	showElement: boolean;
 }
 const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photographyList, popularityList, parentData, showElement }) => {
 	const [ready, setReady] = useState(false);
@@ -62,108 +62,109 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 	const [vodsShowFlag, setVodsShowFlag] = useState(false);
 
 	const [truncateTextFlag, setTruncateTextFlag] = useState(true);
+	console.log(data)
 	return (
 		<>
 			<MainInfo data={data} />
 			{showElement && (
-			<MainTitle title={data.tagType == 'root' ? `${data.titleMeta}の概要` : `${data.titleMeta}のあらすじ`}>
-				<MainText text={data.summary?.text ?? ''} truncateText={truncateTextFlag} />
-				<p className={`mb-6 px-1 text-end text-[13px] font-[100]`}>
-					{/* {`${data.genreType != 'movie' ? data.summary?.reference : ''}${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`} */}
-					{/* {`${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`} */}
-					{`${data.summary?.reference}${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`}
+				<MainTitle title={data.tagType == 'root' ? `${data.titleMeta}の概要` : `${data.titleMeta}のあらすじ`}>
+					<MainText text={data.summary?.text ?? ''} truncateText={truncateTextFlag} />
+					<p className={`mb-6 px-1 text-end text-[13px] font-[100]`}>
+						{/* {`${data.genreType != 'movie' ? data.summary?.reference : ''}${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`} */}
+						{/* {`${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`} */}
+						{`${data.summary?.reference}${data.summary && data.summary.link.length > 0 && data.summary.link[0] ? `(${data.summary.link[0]})` : ''}`}
 
-				</p>
-				{/*<H3Line text={data.summary?.title ?? ''} />*/}
-				{/*<MainText text={data.summary?.text ?? ''} />*/}
-				<div className="mb-10 flex justify-center md:justify-end">
-					{truncateTextFlag ? (
-						<Button
-							variant={'gray'}
-							className="rounded-full md:text-[15px]"
-							onClick={() => setTruncateTextFlag(false)}>
-							もっと見る +{/*todo*/}
-						</Button>
-					) : (
-						<Button
-							variant={'gray'}
-							className="rounded-full md:text-[15px]"
-							onClick={() => setTruncateTextFlag(true)}>
-							閉じる -{/*todo*/}
-						</Button>
-					)}
-				</div>
-			</MainTitle>
+					</p>
+					{/*<H3Line text={data.summary?.title ?? ''} />*/}
+					{/*<MainText text={data.summary?.text ?? ''} />*/}
+					<div className="mb-10 flex justify-center md:justify-end">
+						{truncateTextFlag ? (
+							<Button
+								variant={'gray'}
+								className="rounded-full md:text-[15px]"
+								onClick={() => setTruncateTextFlag(false)}>
+								もっと見る +{/*todo*/}
+							</Button>
+						) : (
+							<Button
+								variant={'gray'}
+								className="rounded-full md:text-[15px]"
+								onClick={() => setTruncateTextFlag(true)}>
+								閉じる -{/*todo*/}
+							</Button>
+						)}
+					</div>
+				</MainTitle>
 			)}
 
 			{showElement && (
-			<MainTitle className={'px-1'} title={`${data.titleMeta}の配信情報`}>
-				{/*<MainText text={data.vodInfo} />*/}
-				{vod && (
-					<OrangeBtn text={vod.name + 'で視聴する'} url={vod.url ?? ''} microcopy={vod.microcopy ?? ''} title={data.title ?? ''} />
-				)}
-				{!vodsShowFlag && (
-					<div className="mb-9 flex justify-center md:justify-end">
-						<Button
-							variant={'gray'}
-							className="rounded-full md:text-[15px]"
-							onClick={() => setVodsShowFlag(true)}>
-							他の配信サイトを見る +{/*todo*/}
-						</Button>
-					</div>
-				)}
-				{vodsShowFlag && (
-					<div className="mb-8 grid grid-cols-2 gap-x-3 gap-y-6 px-3 md:grid-cols-3 xl:grid-cols-4">
-						{vods.length > 0 &&
-							vods.slice(1).map((item, index) => (
-								<div key={index} className="flex items-center space-x-2">
-									{/*<div className="h-[62px] w-[62px] overflow-hidden rounded-full md:h-[72px] md:w-[72px]">
+				<MainTitle className={'px-1'} title={`${data.titleMeta}の配信情報`}>
+					{/*<MainText text={data.vodInfo} />*/}
+					{vod && (
+						<OrangeBtn text={vod.name + 'で視聴する'} url={vod.url ?? ''} microcopy={vod.microcopy ?? ''} title={data.title ?? ''} />
+					)}
+					{!vodsShowFlag && (
+						<div className="mb-9 flex justify-center md:justify-end">
+							<Button
+								variant={'gray'}
+								className="rounded-full md:text-[15px]"
+								onClick={() => setVodsShowFlag(true)}>
+								他の配信サイトを見る +{/*todo*/}
+							</Button>
+						</div>
+					)}
+					{vodsShowFlag && (
+						<div className="mb-8 grid grid-cols-2 gap-x-3 gap-y-6 px-3 md:grid-cols-3 xl:grid-cols-4">
+							{vods.length > 0 &&
+								vods.slice(1).map((item, index) => (
+									<div key={index} className="flex items-center space-x-2">
+										{/*<div className="h-[62px] w-[62px] overflow-hidden rounded-full md:h-[72px] md:w-[72px]">
 										<MyImage
 											className="h-[62px] w-[62px] md:h-[72px] md:w-[72px]"
 											path={'public/cast/dummy_cast_image.png'}
 											alt={''}
 										/>
 									</div>*/}
-									<div className={'flex-1 overflow-hidden'}>
-										<div className="mb-2 truncate text-[13px] leading-[15px]">
-											{/*定額見放題*/}
-											{/*<br />*/}
-											{/*初回30日無料*/}
-											{item.vod!.microcopy}
-										</div>
-										{item.vod!.url ? (
-											<Link href={item.vod!.url}>
+										<div className={'flex-1 overflow-hidden'}>
+											<div className="mb-2 truncate text-[13px] leading-[15px]">
+												{/*定額見放題*/}
+												{/*<br />*/}
+												{/*初回30日無料*/}
+												{item.vod!.microcopy}
+											</div>
+											{item.vod!.url ? (
+												<Link href={item.vod!.url}>
+													<GrayTag
+														text={item.vod!.name}
+														className={
+															'my-0 h-[28px] max-w-full truncate px-3 text-[15px] font-[500] !leading-[28px]'
+														}
+													/>
+												</Link>
+											) : (
 												<GrayTag
 													text={item.vod!.name}
 													className={
 														'my-0 h-[28px] max-w-full truncate px-3 text-[15px] font-[500] !leading-[28px]'
 													}
 												/>
-											</Link>
-										) : (
-											<GrayTag
-												text={item.vod!.name}
-												className={
-													'my-0 h-[28px] max-w-full truncate px-3 text-[15px] font-[500] !leading-[28px]'
-												}
-											/>
-										)}
+											)}
+										</div>
 									</div>
-								</div>
-							))}
-					</div>
-				)}
-				{vodsShowFlag && (
-					<div className="mb-9 flex justify-center md:justify-end">
-						<Button
-							variant={'gray'}
-							className="rounded-full md:text-[15px]"
-							onClick={() => setVodsShowFlag(false)}>
-							閉じる -{/*todo*/}
-						</Button>
-					</div>
-				)}
-			</MainTitle>
+								))}
+						</div>
+					)}
+					{vodsShowFlag && (
+						<div className="mb-9 flex justify-center md:justify-end">
+							<Button
+								variant={'gray'}
+								className="rounded-full md:text-[15px]"
+								onClick={() => setVodsShowFlag(false)}>
+								閉じる -{/*todo*/}
+							</Button>
+						</div>
+					)}
+				</MainTitle>
 			)}
 
 			{childs &&
@@ -193,7 +194,10 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 										{item.productions.length > 0 &&
 											item.productions[0].production &&
 											item.productions[0].production.name
-											? item.productions[0].production.name
+											? item.productions
+												.map((prod) => prod.production?.name)
+												.filter(Boolean)
+												.join(' 、')
 											: item.otherProduction}
 									</div>
 									{/*<div className="text-justify text-[15px] font-[300]">*/}
@@ -204,7 +208,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 						</Link>
 					))}
 				</MainTitle>
-				) : (<MainTitle title={isUsingParent && parentData ? (data.genreType == 'movie' ? `${parentData.titleMeta}のその他のシリーズ` : `${data.titleMeta}のエピソードX`) : ( (data.genreType == 'movie') ? `${data.titleMeta}のシリーズ` :`${data.titleMeta}のエピソード`) }>
+				) : (<MainTitle title={isUsingParent && parentData ? (data.genreType == 'movie' ? `${parentData.titleMeta}のその他のシリーズ` : `${data.titleMeta}のエピソードX`) : ((data.genreType == 'movie') ? `${data.titleMeta}のシリーズ` : `${data.titleMeta}のエピソード`)}>
 					{childs.map((item) => (
 						<Link key={item.pathName} href={`/${pathname}/${item.pathName}`} title={item.titleMeta}>
 							<div
@@ -231,7 +235,10 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 										{item.productions.length > 0 &&
 											item.productions[0].production &&
 											item.productions[0].production.name
-											? item.productions[0].production.name
+											? item.productions
+												.map((prod) => prod.production?.name)
+												.filter(Boolean)
+												.join(' 、')
 											: item.otherProduction}
 									</div>
 									{/*<div className="text-justify text-[15px] font-[300]">*/}
@@ -281,7 +288,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 			{/*</div>*/}
 
 			{isVideoValid !== false && showElement && (
-				<div  style={{ display: videoReady ? 'block' : 'none' }}>
+				<div style={{ display: videoReady ? 'block' : 'none' }}>
 					<MainTitle className={'px-1'} title={`${data.titleMeta}の予告・告知動画`}>
 						<div className="mb-10 px-2">
 							<div className="relative">
@@ -304,183 +311,183 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 			)}
 
 			{showElement && (
-			<MainTitle title={`${data.titleMeta}のスタッフ・キャスト`}>
-				<H3Line text={`${data.titleMeta}のスタッフ`} />
-				<div className="my-6 flex flex-wrap">
-					<span className="mb-2 mr-4 flex flex-col space-x-2 md:flex-row md:items-center">
-						<RoundGradientTitle text={'監督'} />
-						{data.directors.map((item, index) => (
-							<GrayTag
-								key={index}
-								text={item.person ? item.person.name : ''}
-								className={'text-[15px] font-[300]'}
-							/>
-						))}
-					</span>
-					<span className="mb-2 mr-4 flex flex-col space-x-2 md:flex-row md:items-center">
-						<RoundGradientTitle text={'原作'} />
-						{data.authors.map((item, index) => (
-							<GrayTag
-								key={index}
-								text={item.person ? item.person.name : ''}
-								className={'text-[15px] font-[300]'}
-							/>
-						))}
-					</span>
-					<span className="mb-2 mr-4 flex flex-col space-x-2 md:flex-row md:items-center">
-						<RoundGradientTitle text={'脚本'} />
-						{data.screenwriters.map((item, index) => (
-							<GrayTag
-								key={index}
-								text={item.person ? item.person.name : ''}
-								className={'text-[15px] font-[300]'}
-							/>
-						))}
-					</span>
-				</div>
-				<H3Line text={`${data.titleMeta}のキャスト`} />
-				<div className="my-6 mb-8 grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-					{/* <div className="my-6 mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4 lg:grid-cols-4"> */}
-					{(castsLimitFlag ? data.casts.slice(0, 5) : data.casts).map((item, index) => (
-						<div key={index} className="mb-3 flex items-center">
-							<div className=" h-[62px] w-[62px] shrink-0 grow-0 basis-[62px] overflow-hidden rounded-full lg:h-[70px] lg:w-[70px] lg:basis-[70px]">
-								<MyImage
-									className="h-[62px] w-[62px] lg:h-[70px] lg:w-[70px]"
-									path={
-										item.person && item.person.image
-											? item.person.image
-											: 'public/cast/dummy_cast_image.png'
-									}
-									alt={item.person ? item.person.name : ''}
-								/>
-							</div>
-							<div className={'max-w-full flex-1 truncate pl-2'}>
-								<div className="mb-2 truncate text-[13px]">{item.roleName ?? '役名なし'}</div>
+				<MainTitle title={`${data.titleMeta}のスタッフ・キャスト`}>
+					<H3Line text={`${data.titleMeta}のスタッフ`} />
+					<div className="my-6 flex flex-wrap">
+						<span className="mb-2 mr-4 flex flex-col space-x-2 md:flex-row md:items-center">
+							<RoundGradientTitle text={'監督'} />
+							{data.directors.map((item, index) => (
 								<GrayTag
+									key={index}
 									text={item.person ? item.person.name : ''}
-									className={'max-w-full truncate text-[13px] font-[300]'}
+									className={'text-[15px] font-[300]'}
 								/>
-							</div>
-						</div>
-					))}
-				</div>
-				<div className="mb-14 flex justify-center md:justify-end">
-					{castsLimitFlag ? (
-						<Button variant={'gray'} className="h-14 rounded-full" onClick={() => setCastsLimitFlag(false)}>
-							スタッフ・キャストをもっと見る +
-						</Button>
-					) : (
-						<Button
-							variant={'gray'}
-							className="rounded-full md:text-[15px]"
-							onClick={() => setCastsLimitFlag(true)}>
-							閉じる -{/*todo*/}
-						</Button>
-					)}
-				</div>
-				{data.genreType === 'movie' && data.dubcasts?.length > 0 && (
-					<>
-						<H3Line text={`${data.titleMeta} 吹替キャスト`} />
-						<div className="my-6 mb-8 grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-							{(castsDubLimit ? data.dubcasts.slice(0, 5) : data.dubcasts).map((item, index) => (
-								<div key={index} className="mb-3 flex items-center bbb">
-									<div className=" h-[62px] w-[62px] shrink-0 grow-0 basis-[62px] overflow-hidden rounded-full lg:h-[70px] lg:w-[70px] lg:basis-[70px]">
-										<MyImage
-											className="h-[62px] w-[62px] lg:h-[70px] lg:w-[70px]"
-											path={
-												item.person && item.person.image
-													? item.person.image
-													: 'public/cast/dummy_cast_image.png'
-											}
-											alt={item.person ? item.person.name : ''}
-										/>
-									</div>
-									<div className={'max-w-full flex-1 truncate pl-2'}>
-										<div className="mb-2 truncate text-[13px]">{item.roleName ?? '役名なし'}</div>
-										<GrayTag
-											text={item.person ? item.person.name : ''}
-											className={'max-w-full truncate text-[13px] font-[300]'}
-										/>
-									</div>
-								</div>
 							))}
-						</div>
-						<div className="mb-14 flex justify-center md:justify-end">
-							{castsDubLimit ? (
-								<Button variant={'gray'} className="h-14 rounded-full" onClick={() => setDubCastsLimit(false)}>
-									 吹替キャストをもっと見る +
-								</Button>
-							) : (
-								<Button
-									variant={'gray'}
-									className="rounded-full md:text-[15px]"
-									onClick={() => setDubCastsLimit(true)}>
-									閉じる -{/*todo*/}
-								</Button>
-							)}
-						</div>
-					</>
-				)}
-
-				<div className="mb-10 flex w-full flex-col rounded-md border border-black p-4 lg:flex-row lg:pl-10">
-					<div className="flex-1 lg:pr-12">
-						<h2 className="break-all border-b-2 border-black py-6 text-[21px] font-bold">
-							{data.titleMeta}の公式情報
-						</h2>
-						<div className="my-6">
-							<RoundGradientTitle text={'公式サイト'} />
-							<Link
-								href={data.website ?? ''}
-								className="ml-4 break-all text-[13px] text-[#2F8FEA]"
-								target={'_blank'}
-								title={'公式サイト'}>
-								{data.website}
-							</Link>
-						</div>
-						<div className="my-6">
-							<RoundGradientTitle text={'公式SNS'} />
-							<div className="ml-4 flex flex-wrap break-all">
-								{data.sns
-									.filter((item) => item)
-									.map((item) => (
-										<Link key={item} target={'_blank'} href={item}>
-											<GrayTag
-												text={getPlatformByUrl(item)}
-												className={'my-1 mr-2 text-[13px]'}
+						</span>
+						<span className="mb-2 mr-4 flex flex-col space-x-2 md:flex-row md:items-center">
+							<RoundGradientTitle text={'原作'} />
+							{data.authors.map((item, index) => (
+								<GrayTag
+									key={index}
+									text={item.person ? item.person.name : ''}
+									className={'text-[15px] font-[300]'}
+								/>
+							))}
+						</span>
+						<span className="mb-2 mr-4 flex flex-col space-x-2 md:flex-row md:items-center">
+							<RoundGradientTitle text={'脚本'} />
+							{data.screenwriters.map((item, index) => (
+								<GrayTag
+									key={index}
+									text={item.person ? item.person.name : ''}
+									className={'text-[15px] font-[300]'}
+								/>
+							))}
+						</span>
+					</div>
+					<H3Line text={`${data.titleMeta}のキャスト`} />
+					<div className="my-6 mb-8 grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+						{/* <div className="my-6 mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4 lg:grid-cols-4"> */}
+						{(castsLimitFlag ? data.casts.slice(0, 5) : data.casts).map((item, index) => (
+							<div key={index} className="mb-3 flex items-center">
+								<div className=" h-[62px] w-[62px] shrink-0 grow-0 basis-[62px] overflow-hidden rounded-full lg:h-[70px] lg:w-[70px] lg:basis-[70px]">
+									<MyImage
+										className="h-[62px] w-[62px] lg:h-[70px] lg:w-[70px]"
+										path={
+											item.person && item.person.image
+												? item.person.image
+												: 'public/cast/dummy_cast_image.png'
+										}
+										alt={item.person ? item.person.name : ''}
+									/>
+								</div>
+								<div className={'max-w-full flex-1 truncate pl-2'}>
+									<div className="mb-2 truncate text-[13px]">{item.roleName ?? '役名なし'}</div>
+									<GrayTag
+										text={item.person ? item.person.name : ''}
+										className={'max-w-full truncate text-[13px] font-[300]'}
+									/>
+								</div>
+							</div>
+						))}
+					</div>
+					<div className="mb-14 flex justify-center md:justify-end">
+						{castsLimitFlag ? (
+							<Button variant={'gray'} className="h-14 rounded-full" onClick={() => setCastsLimitFlag(false)}>
+								スタッフ・キャストをもっと見る +
+							</Button>
+						) : (
+							<Button
+								variant={'gray'}
+								className="rounded-full md:text-[15px]"
+								onClick={() => setCastsLimitFlag(true)}>
+								閉じる -{/*todo*/}
+							</Button>
+						)}
+					</div>
+					{data.genreType === 'movie' && data.dubcasts?.length > 0 && (
+						<>
+							<H3Line text={`${data.titleMeta} 吹替キャスト`} />
+							<div className="my-6 mb-8 grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+								{(castsDubLimit ? data.dubcasts.slice(0, 5) : data.dubcasts).map((item, index) => (
+									<div key={index} className="mb-3 flex items-center bbb">
+										<div className=" h-[62px] w-[62px] shrink-0 grow-0 basis-[62px] overflow-hidden rounded-full lg:h-[70px] lg:w-[70px] lg:basis-[70px]">
+											<MyImage
+												className="h-[62px] w-[62px] lg:h-[70px] lg:w-[70px]"
+												path={
+													item.person && item.person.image
+														? item.person.image
+														: 'public/cast/dummy_cast_image.png'
+												}
+												alt={item.person ? item.person.name : ''}
 											/>
-										</Link>
-									))}
+										</div>
+										<div className={'max-w-full flex-1 truncate pl-2'}>
+											<div className="mb-2 truncate text-[13px]">{item.roleName ?? '役名なし'}</div>
+											<GrayTag
+												text={item.person ? item.person.name : ''}
+												className={'max-w-full truncate text-[13px] font-[300]'}
+											/>
+										</div>
+									</div>
+								))}
+							</div>
+							<div className="mb-14 flex justify-center md:justify-end">
+								{castsDubLimit ? (
+									<Button variant={'gray'} className="h-14 rounded-full" onClick={() => setDubCastsLimit(false)}>
+										吹替キャストをもっと見る +
+									</Button>
+								) : (
+									<Button
+										variant={'gray'}
+										className="rounded-full md:text-[15px]"
+										onClick={() => setDubCastsLimit(true)}>
+										閉じる -{/*todo*/}
+									</Button>
+								)}
+							</div>
+						</>
+					)}
+
+					<div className="mb-10 flex w-full flex-col rounded-md border border-black p-4 lg:flex-row lg:pl-10">
+						<div className="flex-1 lg:pr-12">
+							<h2 className="break-all border-b-2 border-black py-6 text-[21px] font-bold">
+								{data.titleMeta}の公式情報
+							</h2>
+							<div className="my-6">
+								<RoundGradientTitle text={'公式サイト'} />
+								<Link
+									href={data.website ?? ''}
+									className="ml-4 break-all text-[13px] text-[#2F8FEA]"
+									target={'_blank'}
+									title={'公式サイト'}>
+									{data.website}
+								</Link>
+							</div>
+							<div className="my-6">
+								<RoundGradientTitle text={'公式SNS'} />
+								<div className="ml-4 flex flex-wrap break-all">
+									{data.sns
+										.filter((item) => item)
+										.map((item) => (
+											<Link key={item} target={'_blank'} href={item}>
+												<GrayTag
+													text={getPlatformByUrl(item)}
+													className={'my-1 mr-2 text-[13px]'}
+												/>
+											</Link>
+										))}
+								</div>
+							</div>
+							<div className="my-6">
+								<p className="text-[13px]">{`${data.thumbnail?.text}${data.thumbnail && data.thumbnail.link.length > 0 && data.thumbnail.link[0] ? `(${data.thumbnail.link[0]})` : ''}`}</p>
 							</div>
 						</div>
-						<div className="my-6">
-							<p className="text-[13px]">{`${data.thumbnail?.text}${data.thumbnail && data.thumbnail.link.length > 0 && data.thumbnail.link[0] ? `(${data.thumbnail.link[0]})` : ''}`}</p>
+						{/*{data.sns.length > 0 && <a*/}
+						{/*  className="twitter-timeline"*/}
+						{/*  data-width="334"*/}
+						{/*  data-height="393"*/}
+						{/*  href={data.sns[0].url}>*/}
+						{/*  公式SNS*/}
+						{/*</a>}*/}
+						<div className={'w-full lg:w-[240px] lg:shrink-0 lg:grow-0 lg:basis-[300px]'}>
+							{sns && (
+								<TwitterTimelineEmbed
+									onLoad={() => {
+										setReady(true);
+									}}
+									options={{
+										width: '100%',
+										height: 400,
+									}}
+									sourceType="url"
+									url={sns}
+								/>
+							)}
+							{!ready && <span className="absolute">Twitter&apos;s Widget is Loading...</span>}
 						</div>
 					</div>
-					{/*{data.sns.length > 0 && <a*/}
-					{/*  className="twitter-timeline"*/}
-					{/*  data-width="334"*/}
-					{/*  data-height="393"*/}
-					{/*  href={data.sns[0].url}>*/}
-					{/*  公式SNS*/}
-					{/*</a>}*/}
-					<div className={'w-full lg:w-[240px] lg:shrink-0 lg:grow-0 lg:basis-[300px]'}>
-						{sns && (
-							<TwitterTimelineEmbed
-								onLoad={() => {
-									setReady(true);
-								}}
-								options={{
-									width: '100%',
-									height: 400,
-								}}
-								sourceType="url"
-								url={sns}
-							/>
-						)}
-						{!ready && <span className="absolute">Twitter&apos;s Widget is Loading...</span>}
-					</div>
-				</div>
-			</MainTitle>
+				</MainTitle>
 			)}
 			{/*TODO： 暂时关闭，以后再开*/}
 			{/*<MainTitle title={ `${ data.programTitle }のインタビュー・コラム` } className="px-0 md:px-4">*/}
@@ -513,7 +520,7 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 				<MainTitle title={`${data.titleMeta}の音楽`}>
 					{data.musics.map((item, index) => (
 						<div key={index}>
-							 {data.musics!.length >= 2 && <H3Line text={`第 ${index + 1} クール`} />}
+							{data.musics!.length >= 2 && <H3Line text={`第 ${index + 1} クール`} />}
 							<table className="my-5 w-full border-collapse border border-[#dbdbdb] text-[15px]">
 								<tbody>
 									<tr>

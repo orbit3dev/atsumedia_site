@@ -159,6 +159,7 @@ export type Article = {
     freeTexts?: ArticleFreeText[];
 	createdAt: string;
 	updatedAt: string;
+	productionCountry: string;
 	dubcasts: ArticleCast[];
 };
 
