@@ -22,6 +22,7 @@ const MainInfo: React.FC<MovieMainInfoProps> = ({ data }) => {
 	// 	}
 	// }, [data.category]);
 	const vod = data.vods.length > 0 ? data.vods[0].vod : undefined;
+	console.log( data.productionCountry)
 	return (
 		<div className="px-1 pb-1">
 			<div className="px-2">
@@ -39,7 +40,7 @@ const MainInfo: React.FC<MovieMainInfoProps> = ({ data }) => {
 						{/*<span> | &nbsp;制作</span>*/}
 						{/*<GrayTag text={data.distributor} />*/}
 						<span>製作国</span>
-						<GrayTag text={'日本'} /> {/*todo*/}
+						<GrayTag text={data?.productionCountry ? data.productionCountry : '日本'} /> {/*todo*/}
 						{data.season?.name ? (
 							<GrayTag text={`${data.season.name}${data.genreType == 'movie' ? '年' : ''}`} />
 						) : null}
