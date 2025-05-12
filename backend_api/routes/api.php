@@ -22,6 +22,7 @@ Route::get('/clear-log', function () {
     return 'Log cleared';
 });
 
+Route::post('/upload-news', [NewsController::class, 'uploadData']);
 //     // your routes here
 //     Route::get('/get-person', [PersonController::class, 'getPerson']);
 // });
@@ -55,10 +56,7 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
 });
 
-Route::get('/get-personsss', function () {
-    return ['status' => 'ok'];
-});
-Route::get('/api/get-persona', function () {
+Route::get('/api/get-stats1', function () {
     return ['status' => 'ok1'];
 });
 Route::get('/articles', [ArticleController::class, 'index']);
@@ -73,6 +71,7 @@ Route::post('/news-list-by-genre', [NewsController::class, 'newsListByGenre']);
 Route::post('/get-news-by-path-name', [NewsController::class, 'getNewsByPathName']);
 Route::post('/get-article-statistic-by-count-click', [ArticleStatisticController::class, 'getArticleStatisticByCountClick']);
 Route::post('/article-statistic', [ArticleStatisticController::class, 'store']);
+Route::post('/upload-news-data', [NewsController::class, 'getUploadData']);
 
 
 Route::prefix('article-statistics')->group(function () {
