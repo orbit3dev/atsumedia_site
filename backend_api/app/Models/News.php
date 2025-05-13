@@ -33,7 +33,10 @@ class News extends Model
         'type',
         'type_name',
         'meta_title',
+        'title_meta',
         'banner',
+        'username_author_create',
+        'id_author_create',
     ];
 
     protected $casts = [
