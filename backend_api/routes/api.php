@@ -62,14 +62,10 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
 });
 
-<<<<<<< HEAD
 Route::get('/get-personsss', function () {
     return ['status' => 'ok-main'];
 });
-Route::get('/api/get-persona', function () {
-=======
 Route::get('/api/get-stats1', function () {
->>>>>>> test
     return ['status' => 'ok1'];
 });
 Route::get('/articles', [ArticleController::class, 'index']);
