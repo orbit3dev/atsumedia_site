@@ -393,6 +393,12 @@ class ArticleController extends Controller
                 $idMusic = $articles[0]['parentId'];
             }
             $articleChilds12 = AtArticleMusic::where('article_id', $idMusic)
+                ->orWhereIn('article_id', function ($query) use ($parentId) {
+                    $query->select('id')
+                        ->from((new AtArticle)->getTable())
+                        ->where('parent_id', $parentId)
+                        ->orWhere('id',$parentId);
+                })
                 ->get();
             $dubcast = json_decode(($articles[0]['dubcast']), true);
             $dubcast_role = json_decode(($articles[0]['dubcast_role']), true);
@@ -448,10 +454,10 @@ class ArticleController extends Controller
                     ];
                 }
             }
-            $articleChilds14= '';
-            if(!empty($articles[0]['production_country'])){
+            $articleChilds14 = '';
+            if (!empty($articles[0]['production_country'])) {
                 $queryCountry = DB::table('at_country')
-                ->where('id',$articles[0]['production_country'])->first();
+                    ->where('id', $articles[0]['production_country'])->first();
                 $articleChilds14 = !empty($queryCountry->country) ? $queryCountry->country : '';
             }
 
@@ -493,7 +499,7 @@ class ArticleController extends Controller
                     $distributorList = $child->distribution;
                     $distributorId = array_map('intval', array_map('trim', explode(',', $distributorList)));
                     $productions = DB::table('at_distributor')
-                    ->selectRaw("
+                        ->selectRaw("
                         GROUP_CONCAT(name ORDER BY id SEPARATOR '、') as name_distributor,
                         MIN(id) as dist_id,
                         MIN(created_at) as created_at_dist,
@@ -501,9 +507,9 @@ class ArticleController extends Controller
                         MIN(type) as type_dist,
                         MIN(sort) as sort_dist
                     ")
-                    ->whereIn('id', $distributorId)
-                    ->get()
-                        ->map(function ($dist) use($child){
+                        ->whereIn('id', $distributorId)
+                        ->get()
+                        ->map(function ($dist) use ($child) {
                             return [
                                 'articleId' => $child->id,
                                 'productionId' => $child->distribution,
