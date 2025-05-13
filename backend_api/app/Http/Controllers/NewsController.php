@@ -125,16 +125,18 @@ class NewsController extends Controller
         ini_set('memory_limit', '2048M');
         mb_internal_encoding('UTF-8');
         ini_set('max_execution_time', '7200');
-        $config = DB::table('at_config')->select('path_env')->first();
+        $config = DB::table('at_config')->select('path_env', 'data_csv_upload')->first();
+        $pathCsv = 'trial1';
         if ($config) {
             $pathEnv = $config->path_env;
+            $pathCsv = $config->data_csv_upload;
             // You can now use $pathEnv
         } else {
             $pathEnv = '';
         }
 
         // try {
-        $csvPath = resource_path('csv/trial1.csv');
+        $csvPath = resource_path('csv/' .  $pathCsv . '.csv');
         $baseImagePath = realpath(base_path('../wordpress/wp-content/themes/twentytwentyfour/assets/assets/news/content/image'));
 
         $fileContent = file_get_contents($csvPath);
