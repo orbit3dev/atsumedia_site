@@ -72,6 +72,7 @@ Route::post('/get-news-by-path-name', [NewsController::class, 'getNewsByPathName
 Route::post('/get-article-statistic-by-count-click', [ArticleStatisticController::class, 'getArticleStatisticByCountClick']);
 Route::post('/article-statistic', [ArticleStatisticController::class, 'store']);
 Route::post('/upload-news-data', [NewsController::class, 'getUploadData']);
+Route::post('/upload-article-freetext', [NewsController::class, 'getUploadArticle']);
 
 
 Route::prefix('article-statistics')->group(function () {
