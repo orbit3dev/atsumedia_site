@@ -1,4 +1,5 @@
 <?php
+echo $undefined_variable;
 
 /**
  * Twenty Twenty-Four functions and definitions
@@ -708,3 +709,23 @@ add_action('wp_head', 'add_custom_favicon');
 // Register WordPress API Endpoint
 add_action('wp_ajax_fetch_url_metadata', 'fetch_url_metadata');
 add_action('wp_ajax_nopriv_fetch_url_metadata', 'fetch_url_metadata');
+
+add_action('template_redirect', function() {
+    $current_url = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+    error_log("Redirect Check: Current URL: " . $current_url);
+
+    if (is_admin()) {
+        error_log("In admin area");
+    } else {
+        error_log("Not in admin area");
+    }
+
+    if (is_home()) {
+        error_log("On homepage");
+    }
+
+    if (is_404()) {
+        error_log("404 error triggered");
+    }
+});
+

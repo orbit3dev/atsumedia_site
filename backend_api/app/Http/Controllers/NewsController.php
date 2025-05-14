@@ -55,7 +55,7 @@ class NewsController extends Controller
         // Image checking
         $image_link = env('ABSOLUTE_PATH');
         if (empty($image_link)) {
-            $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+            $image_link = '/var/www/html/main/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
         }
 
         $newsList = $newsList->map(function ($item) use ($image_link) {

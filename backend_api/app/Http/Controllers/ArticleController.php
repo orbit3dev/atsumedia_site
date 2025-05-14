@@ -93,7 +93,7 @@ class ArticleController extends Controller
             }
             $image_link = env('ABSOLUTE_PATH');
             if (empty($image_link)) {
-                $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                $image_link = '/var/www/html/main/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
             }
             $thumbnailUrl = $article->thumbnail_url;
             $imageTestUrl = $image_link . $article->thumbnail_url;
@@ -163,7 +163,7 @@ class ArticleController extends Controller
 
             $image_link = env('ABSOLUTE_PATH');
             if (empty($image_link)) {
-                $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                $image_link = '/var/www/html/main/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
             }
             $imageTestUrl = $image_link . $thumbnailUrl;
             if (!file_exists($imageTestUrl)) {
@@ -366,7 +366,7 @@ class ArticleController extends Controller
 
                     $image_link = env('ABSOLUTE_PATH');
                     if (empty($image_link)) {
-                        $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                        $image_link = '/var/www/html/main/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
                     }
                     $imageTest = $image_link . 'public/cast' . $image_person;
                     if (!file_exists($imageTest)) {
@@ -432,7 +432,7 @@ class ArticleController extends Controller
 
                     // Check image file
                     $image_person = !empty($dubcast->image) ? '/public/cast/' . $dubcast->image : '';
-                    $image_link = env('ABSOLUTE_PATH') ?: '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                    $image_link = env('ABSOLUTE_PATH') ?: '/var/www/html/main/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
                     $imageTest = $image_link . 'public/cast' . $image_person;
 
                     if (!file_exists($imageTest)) {
@@ -533,7 +533,7 @@ class ArticleController extends Controller
                 $child->ids = $temp_id;
                 $image_link = env('ABSOLUTE_PATH');
                 if (empty($image_link)) {
-                    $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                    $image_link = '/var/www/html/main/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
                 }
                 $imageTest = $image_link . $child->thumbnail_url;
                 if (!file_exists($imageTest)) {
@@ -679,7 +679,7 @@ class ArticleController extends Controller
                 $thumbnailArr = (json_decode($innerJsonThumbnail, true));
                 $image_link = env('ABSOLUTE_PATH');
                 if (empty($image_link)) {
-                    $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                    $image_link = '/var/www/html/main/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
                 }
                 $imageTestUrl = $image_link . $thumbnailArr['url'];
                 if (!file_exists($imageTestUrl)) {
