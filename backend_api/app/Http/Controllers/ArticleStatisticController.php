@@ -115,7 +115,7 @@ class ArticleStatisticController extends Controller
             }
             $image_link = env('ABSOLUTE_PATH');
             if (empty($image_link)) {
-                $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                $image_link = '/var/www/html/main/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
             }
             $thumbnail_urls =  !empty($thumbnail['url']) ? $thumbnail['url'] : '';
             $imageTestUrl = $image_link . $thumbnail_urls;

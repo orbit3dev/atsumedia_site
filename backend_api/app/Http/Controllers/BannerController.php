@@ -69,7 +69,7 @@ class BannerController extends Controller
                 $thumbnail = !empty($banner->thumbnail) && is_string($banner->thumbnail) ? json_decode($banner->thumbnail, true) : '';
                 $image_link = env('ABSOLUTE_PATH');
                 if (empty($image_link)) {
-                    $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                    $image_link = '/var/www/html/main/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
                 }
                 $thumbnail_urls =  !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : (!empty($banner->thumbnail_url) ? $banner->thumbnail_url : '');
                 $imageTestUrl = $image_link . $thumbnail_urls;
@@ -99,7 +99,7 @@ class BannerController extends Controller
                 }
                 $image_link = env('ABSOLUTE_PATH');
                 if (empty($image_link)) {
-                    $image_link = '/var/www/html/test/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
+                    $image_link = '/var/www/html/main/wordpress/wp-content/themes/twentytwentyfour/assets/assets/';
                 }
                 $thumbnail_urls =  !empty($thumbnail) && (!empty($thumbnail['url'])) ? $thumbnail['url'] : (!empty($item->thumbnail_url) ? $item->thumbnail_url : '');
                 $imageTestUrl = $image_link . $thumbnail_urls;
