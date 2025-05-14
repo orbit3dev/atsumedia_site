@@ -400,10 +400,11 @@ class NewsController extends Controller
         ini_set('memory_limit', '2048M');
         mb_internal_encoding('UTF-8');
         ini_set('max_execution_time', '7200');
-        $config = DB::table('at_config')->select('path_env')->first();
-        $pathCsv = 'free_text';
+        $config = DB::table('at_config')->select('path_env','data_csv_upload')->first();
+        $pathCsv = '';
         if ($config) {
             $pathEnv = $config->path_env;
+            $pathCsv = $config->data_csv_upload;
         } else {
             $pathEnv = '';
         }
