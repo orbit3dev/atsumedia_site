@@ -392,14 +392,17 @@ class ArticleController extends Controller
             } else if ($articles[0]['tag_types'] == 3) {
                 $idMusic = $articles[0]['parentId'];
             }
-            $articleChilds12 = AtArticleMusic::where('article_id', $idMusic)
-                ->orWhereIn('article_id', function ($query) use ($parentId) {
-                    $query->select('id')
-                        ->from((new AtArticle)->getTable())
-                        ->where('parent_id', $parentId)
-                        ->orWhere('id',$parentId);
-                })
-                ->get();
+            $articleChilds12 = [];
+            if ($articles[0]['tag_types'] != 1) {
+                $articleChilds12 = AtArticleMusic::where('article_id', $idMusic)
+                    ->orWhereIn('article_id', function ($query) use ($parentId) {
+                        $query->select('id')
+                            ->from((new AtArticle)->getTable())
+                            ->where('parent_id', $parentId)
+                            ->orWhere('id', $parentId);
+                    })
+                    ->get();
+            }
             $dubcast = json_decode(($articles[0]['dubcast']), true);
             $dubcast_role = json_decode(($articles[0]['dubcast_role']), true);
             $item_dubcast = [];
