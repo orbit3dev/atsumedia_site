@@ -9,6 +9,7 @@ import ArticlesDetailMain from './_components/ArticlesDetailMain';
 import { getNewsData } from './lib';
 import DetailRight from '../../../_components/DetailRight';
 import { checkParams } from '../../../[type]/[...slug]/_utils/get-data';
+import { headers } from 'next/headers';
 
 type PageProps = {
 	params: { type: CategoryType; slug: string };
@@ -18,6 +19,12 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
 	const { newsData } = await getNewsData(params.slug, params.type);
+	const headersList = headers();
+	const host = headersList.get('host') || 'localhost';
+	const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1');
+	const protocol = isLocal ? 'http' : 'https';
+	const baseUrl = `${protocol}://${host}`;
+	const imagePath = newsData?.image;
 	return {
 		title: newsData?.titleMeta,
 		description: newsData?.descriptionMeta,
@@ -25,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 			title: newsData?.titleMeta,
 			type: 'website',
 			description: newsData?.descriptionMeta,
-			images: newsData?.image,
+			images: [`${baseUrl}${imagePath}`],
 			locale: 'ja_JP',
 		},
 	};

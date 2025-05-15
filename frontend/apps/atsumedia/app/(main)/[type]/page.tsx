@@ -12,6 +12,8 @@ import { getNewsListByGenreType, getRootArticleListByGenreTypeOrderByClickCount 
 import LayoutWithRight from '../_components/LayoutWithRight';
 import CategoryRight from '../_components/CategoryRight';
 import AdTop from '../_components/AdTop';
+import { headers } from 'next/headers';
+
 
 type PageProps = {
 	params: { type: CategoryType };
@@ -20,13 +22,13 @@ type PageProps = {
 type Network = {
 	id: string;
 	name: string;
-  };
+};
 
-  type Thumbnail = {
+type Thumbnail = {
 	url: string;
-  };
+};
 
-  type Article = {
+type Article = {
 	id: string;
 	pathName: string;
 	genreType: string;
@@ -36,39 +38,39 @@ type Network = {
 	titleMeta: string;
 	descriptionMeta: string;
 	network: Network;
-  };
+};
 
-  type List10DbResultItem = {
+type List10DbResultItem = {
 	yearWeek: number;
 	clickCount: number;
 	article: Article;
-  };
-  
-  type ArticleWithStats = Article & {
+};
+
+type ArticleWithStats = Article & {
 	yearWeek: number;
 	clickCount: number;
-  };
+};
 
-  type HomeListItemType = {
+type HomeListItemType = {
 	id: string;
 	pathName: string;
 	title: string;
 	titleMeta: string;
 	descriptionMeta: string;
 	thumbnail: {
-	  url: string;
+		url: string;
 	};
 	network: {
-	  id: string;
-	  name: string;
+		id: string;
+		name: string;
 	};
 	tagType: string;
 	genreType: string; // ← this is the fix (was: CategoryType | undefined)
 	yearWeek: number;
 	clickCount: number;
-  };
+};
 
-  type NewsItem = {
+type NewsItem = {
 	id: number;
 	title: string;
 	type: string;
@@ -78,15 +80,21 @@ type Network = {
 	image: string;
 	pathName: string;
 	author: string;
-  };
-  
-  
+};
+
+
 
 
 export const revalidate = 300;
 
 export function generateMetadata({ params }: PageProps): Metadata {
 	const value = getCategoryByType(params.type);
+	const headersList = headers();
+	const host = headersList.get('host') || 'localhost';
+	const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1');
+	const protocol = isLocal ? 'http' : 'https';
+	const baseUrl = `${protocol}://${host}`;
+	const imagePath = '/public/anime/dummy_thumbnail.png';
 	return {
 		title: value?.title,
 		description: value?.description,
@@ -94,7 +102,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
 			title: value?.title,
 			type: 'website',
 			description: value?.description,
-			images: 'assets/public/anime/dummy_thumbnail.png',
+			images: [`${baseUrl}${imagePath}`],
 			locale: 'ja_JP',
 		},
 	};
@@ -120,7 +128,7 @@ const Page = async ({ params }: PageProps) => {
 		yearWeek: item.yearWeek,
 		clickCount: item.clickCount,
 		genreType: item.article.genreType as CategoryType,
-	  }));
+	}));
 	return (
 		<>
 			<MainPath paths={[{ name: categoryName }]} />
@@ -148,7 +156,7 @@ const Page = async ({ params }: PageProps) => {
 			{newList.length > 0 && (
 				<LayoutWithRight>
 					<CategoryMain categoryName={categoryName} data={newList} />
-				</LayoutWithRight>	
+				</LayoutWithRight>
 			)}
 			{/*<LayoutWithRight*/}
 			{/*	right={*/}
