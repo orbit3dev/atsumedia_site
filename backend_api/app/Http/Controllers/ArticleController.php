@@ -130,6 +130,11 @@ class ArticleController extends Controller
         $weekNumber = date('W');
         $year = date('Y');
         $genreTypeYearWeek = $year . $weekNumber;
+        $limit = 6;
+        $config = DB::table('at_config')->select('limit_list')->first();
+        if ($config && !empty($config->limit_list)) {
+            $limit = $config->limit_list;
+        } 
 
         $combinations = [
             $genreType . '-' . $genreTypeYearWeek . '-series',
@@ -150,6 +155,7 @@ class ArticleController extends Controller
                 'at_article.thumbnail_url AS path_thumbnail',
             )
             ->orderBy('click_count', 'desc')
+            ->limit($limit)
             ->get();
         $shapedData = $stats->map(function ($article, $genreType) {
             // Decode thumbnail JSON if exists
