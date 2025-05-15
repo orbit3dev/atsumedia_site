@@ -20,6 +20,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 		return {};
 	}
 	const { data } = await getResultData(params);
+	const headersList = headers();
+	const host = headersList.get('host') || 'localhost';
+	const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1');
+	const protocol = isLocal ? 'http' : 'https';
+	const baseUrl = `${protocol}://${host}`;
+	const imagePath = '/public/anime/dummy_thumbnail.png';
 
 	return {
 		title: data?.titleMeta,
@@ -28,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 			title: data?.titleMeta,
 			type: 'website',
 			description: data?.descriptionMeta,
-			images: '/public/anime/dummy_thumbnail.png',
+			images: [`${baseUrl}${imagePath}`],
 			locale: 'ja_JP',
 		},
 	};
@@ -66,7 +72,7 @@ const Page = async ({ params }: PageProps) => {
 			const pathTrimmer = data.pathName + '/';
 			if (firstChildPath.startsWith(pathTrimmer)) {
 				firstChildPath = firstChildPath.slice(pathTrimmer.length)
-			  }
+			}
 			if (firstChildPath) {
 				return permanentRedirect(firstChildPath);
 			}

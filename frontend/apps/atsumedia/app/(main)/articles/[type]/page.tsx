@@ -5,8 +5,7 @@ import { CategoryType, getCategoryByType } from '@atsumedia/data';
 import MainPath from '../../_components/MainPath';
 import LayoutWithRight from '../../_components/LayoutWithRight';
 import ArticlesMain from '../_components/ArticlesMain';
-import CategoryRight from '../../_components/CategoryRight';
-import AdTop from '../../_components/AdTop';
+import { headers } from 'next/headers';
 // import { S3Domain } from '@atsumedia/amplify-client';
 
 type PageProps = {
@@ -17,6 +16,12 @@ export const revalidate = 300;
 
 export function generateMetadata({ params }: PageProps): Metadata {
 	const value = getCategoryByType(params.type);
+	const headersList = headers();
+	const host = headersList.get('host') || 'localhost';
+	const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1');
+	const protocol = isLocal ? 'http' : 'https';
+	const baseUrl = `${protocol}://${host}`;
+	const imagePath = '/public/anime/dummy_thumbnail.png';
 	return {
 		title: value?.title,
 		description: value?.description,
@@ -24,7 +29,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
 			title: value?.title,
 			type: 'website',
 			description: value?.description,
-			images: '/public/anime/dummy_thumbnail.png',
+			images: [`${baseUrl}${imagePath}`],
 			locale: 'ja_JP',
 		},
 	};
