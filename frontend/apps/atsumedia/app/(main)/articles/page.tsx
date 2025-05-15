@@ -16,7 +16,7 @@ export function generateMetadata(): Metadata {
 	const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1');
 	const protocol = isLocal ? 'http' : 'https';
 	const baseUrl = `${protocol}://${host}`;
-	const imagePath = '/media/anime/dummy_thumbnail.png';
+	const imagePath = '/public/anime/dummy_thumbnail.png';
 
 	return {
 		title: 'ニュース',
