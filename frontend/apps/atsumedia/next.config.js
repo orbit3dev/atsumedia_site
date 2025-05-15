@@ -9,7 +9,7 @@ const {
 const nextConfig = {
   reactStrictMode: false,
   basePath: '/media',
-  trailingSlash: true,
+  trailingSlash: false,
   // basePath: '/media',
   experimental: {
     optimizePackageImports: [
