@@ -5,11 +5,19 @@ import React from 'react';
 import { Article, TagType } from '@atsumedia/data';
 import { getArticleListOrderByClickCount, getBannerList, getIsTopNewsList, getPersonList, getTopicData } from '../lib';
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 // import { S3Domain } from '@atsumedia/amplify-client';
 
 export const revalidate = 300;
 
 export function generateMetadata(): Metadata {
+	const headersList = headers();
+	const host = headersList.get('host') || 'localhost';
+	const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1');
+	const protocol = isLocal ? 'http' : 'https';
+	const baseUrl = `${protocol}://${host}`;
+	const imagePath = '/media/anime/dummy_thumbnail.png';
+
 	return {
 		title: 'あつめでぃあ | アニメ配信情報/番組情報/メディア情報サイト',
 		description:
@@ -20,7 +28,7 @@ export function generateMetadata(): Metadata {
 			description:
 				'『あつめでぃあ』は動画配信情報や放送日、キャスト/声優/原作者/制作会社などの番組情報を掲載している@S[アットエス]が運営する総合メディア情報サイトです。',
 			locale: 'ja_JP',
-			images: '/public/anime/dummy_thumbnail.png',
+			images: [`${baseUrl}${imagePath}`],
 		},
 	};
 }
@@ -31,7 +39,7 @@ export default async function Index() {
 		getBannerList('public'),
 		getTopicData('public'),
 		getArticleListOrderByClickCount(TagType.series),
-		getIsTopNewsList('public',10),
+		getIsTopNewsList('public', 10),
 	]);
 
 	type FanGroupArticle = {
@@ -60,9 +68,9 @@ export default async function Index() {
 	type ArticleWithMeta = Article & {
 		yearWeek: number;
 		clickCount: number;
-	  };
+	};
 
-	  type NewsItem = {
+	type NewsItem = {
 		id: number;
 		title: string;
 		type: string;
@@ -72,21 +80,21 @@ export default async function Index() {
 		image: string;
 		pathName: string;
 		author: string;
-	  };
-	  
+	};
+
 	const fanGroupList = (fanGroupListDbResult as FanGroupItem[]).map((item) => {
 		return {
-		  ...item.article,
-		  yearWeek: item.yearWeek,
-		  clickCount: item.clickCount,
+			...item.article,
+			yearWeek: item.yearWeek,
+			clickCount: item.clickCount,
 		};
-	  }) as ArticleWithMeta[];
+	}) as ArticleWithMeta[];
 
-	  let todayTopicList: ArticleWithMeta[] = [];
-	  if (fanGroupList && fanGroupList.length > 0) {
+	let todayTopicList: ArticleWithMeta[] = [];
+	if (fanGroupList && fanGroupList.length > 0) {
 		todayTopicList = fanGroupList.slice(0, 4);
-	  }
-	  return (
+	}
+	return (
 		<>
 			{bannerList.length > 0 && <HomeBanner data={bannerList} />}
 			{fanGroupList.length > 0 && (

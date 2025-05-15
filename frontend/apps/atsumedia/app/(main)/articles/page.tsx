@@ -4,11 +4,20 @@ import MainPath from '../_components/MainPath';
 import LayoutWithRight from '../_components/LayoutWithRight';
 import ArticlesMain from './_components/ArticlesMain';
 import CategoryRight from '../_components/CategoryRight';
-import AdTop from '../_components/AdTop';
+// import AdTop from '../_components/AdTop';
+import { headers } from 'next/headers';
+
 
 export const revalidate = 300;
 
 export function generateMetadata(): Metadata {
+	const headersList = headers();
+	const host = headersList.get('host') || 'localhost';
+	const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1');
+	const protocol = isLocal ? 'http' : 'https';
+	const baseUrl = `${protocol}://${host}`;
+	const imagePath = '/media/anime/dummy_thumbnail.png';
+
 	return {
 		title: 'ニュース',
 		description: 'ニュース',
@@ -16,7 +25,7 @@ export function generateMetadata(): Metadata {
 			title: 'ニュース',
 			type: 'website',
 			description: 'ニュース',
-			images: '/public/anime/dummy_thumbnail.png',
+			images: [`${baseUrl}${imagePath}`],
 			locale: 'ja_JP',
 		},
 	};
