@@ -31,7 +31,8 @@ const BASE_URL = process.env.NEXT_PUBLIC_ASSET_BASE_URL;
 const timestamp = new Date().getTime();
 
 const src = useMemo(() => {
-  const rawUrl = `${BASE_URL}/${path}?v=${timestamp}`;
+  // const rawUrl = `${BASE_URL}/${path}?v=${timestamp}`;
+  const rawUrl = `${BASE_URL}/${path}`;
   // Replace all double slashes, except after http(s):
   return rawUrl.replace(/([^:]\/)\/+/g, '$1');
 }, [path, timestamp]);
