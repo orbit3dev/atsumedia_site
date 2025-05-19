@@ -17,11 +17,14 @@ class NewsController extends Controller
 {
     public function newsListByGenre(Request $request)
     {
-        $genreType = !empty($request->genre_type) ? $request->genre_type : 'anime';
+        $genreType = !empty($request->genre_type) ? $request->genre_type : '';
         $is_top = !empty($request->is_top) ? $request->is_top : 0;
-        $limit = 10;
-        $page = 1;
+        $limit = !empty($request->limit) ? $request->limit : 10;
+        $perPage = $request->per_page ?? 18;
+        $limit = empty($request->per_page) ? $limit : 18;
+        $page = $request->page ?? 1;    
         $offset = ($page - 1) * $limit;
+        $is_top = !empty($request->isCategory) ? true :false;
 
         $query = News::where('datetime', '<', Carbon::now())
             ->where('is_public', 1)
@@ -38,8 +41,7 @@ class NewsController extends Controller
                 'author'
             )
             ->orderBy('created_at', 'desc');
-
-        if ($request->category != 'public') {
+        if (!empty($genreType)) {
             $query->where('genre_type', $genreType);
         }
         if ($is_top == 1) {
@@ -47,7 +49,7 @@ class NewsController extends Controller
         }
 
         $totalRecords = $query->count();
-
+        $totalPages = ceil($totalRecords / $perPage);
         $newsList = $query->offset($offset)
             ->limit($limit)
             ->get();
@@ -73,6 +75,7 @@ class NewsController extends Controller
         return response()->json([
             'newsList' => $newsList,
             'nextToken' => $nextPage,
+            'totalPages' => $totalPages,
         ]);
     }
 
@@ -400,7 +403,7 @@ class NewsController extends Controller
         ini_set('memory_limit', '2048M');
         mb_internal_encoding('UTF-8');
         ini_set('max_execution_time', '7200');
-        $config = DB::table('at_config')->select('path_env','data_csv_upload')->first();
+        $config = DB::table('at_config')->select('path_env', 'data_csv_upload')->first();
         $pathCsv = '';
         if ($config) {
             $pathEnv = $config->path_env;
@@ -436,10 +439,10 @@ class NewsController extends Controller
                 }
 
                 $rowData = array_combine($headers, $row);
-                $dateString = $rowData['createdAt']; 
+                $dateString = $rowData['createdAt'];
                 $cleanedDateString = trim($dateString, '"');
                 $createdAt = (string)Carbon::parse($cleanedDateString);
-                $dateTimeString = $rowData['updatedAt']; 
+                $dateTimeString = $rowData['updatedAt'];
                 $cleanedDateString = trim($dateTimeString, '"');
                 $updatedAt = (string)Carbon::parse($cleanedDateString);
                 $article_id = $rowData['article_id'];

@@ -138,7 +138,7 @@ export const getArticleListByParentIdOrderByClickCount = async (
 				YearWeek: `${parentId}-${now.getFullYear()}${weekNumber}`,
 				limit: limit,
 				sortDirection: 'DESC',
-				tagType:tag_type
+				tagType: tag_type
 			}),
 			headers: {
 				"Content-Type": "application/json",
@@ -151,9 +151,6 @@ export const getArticleListByParentIdOrderByClickCount = async (
 	let list = (dataResult2 ?? []) as ArticleStatistic[];
 	return list;
 };
-
-
-
 
 export const getNewsListByGenreType = async (
 	genreType: string,
@@ -178,6 +175,36 @@ export const getNewsListByGenreType = async (
 	return dataResult;
 };
 
+export const getNewsListByGenreTypeCategory = async (
+  isCategory:boolean,
+  genreType: string,
+  page?: number,
+  perPage?: number,
+): Promise<{
+  newsList: News[];
+  totalPages: number;
+}> => {
+	console.log('genreType',genreType)
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_API_URL + "/news-list-by-genre",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        genre_type: genreType,
+        per_page: perPage?? 1,
+        page: page?? 1,
+        is_category: isCategory,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    }
+  );
+
+  const dataResult = await response.json();
+  return dataResult;
+};
 
 
 
@@ -192,6 +219,7 @@ export const getIsTopNewsList = async (category: string, data: number) => {
 				tag_type_id: 2,
 				is_top: 1,
 				category: category,
+				limit: data
 			}),
 			headers: {
 				"Content-Type": "application/json",
