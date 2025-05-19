@@ -8,6 +8,22 @@
 # Allow the wordpress and backend_api directories
 !/wordpress/
 !/backend_api/
+# Ignore everything inside frontend
+# Ignore everything inside frontend
+/frontend/**
+
+# Un-ignore folders leading to those files so Git can check inside them
+!frontend/
+!frontend/apps/
+!frontend/apps/atsumedia/
+!frontend/apps/atsumedia/app/
+!frontend/apps/atsumedia/app/(main)/
+!frontend/apps/atsumedia/app/(main)/articles/
+!frontend/apps/atsumedia/app/(main)/articles/_components/
+
+# Un-ignore the two files
+!frontend/apps/atsumedia/app/(main)/articles/_components/ArticlesListPaginationNew.tsx
+!frontend/apps/atsumedia/app/(main)/articles/_components/QueryProvider.tsx
 
 # Ignore WordPress core
 /wordpress/wp-admin/
