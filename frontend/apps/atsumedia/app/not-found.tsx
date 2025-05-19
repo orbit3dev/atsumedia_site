@@ -15,13 +15,16 @@ const text_caption = (MAINTENANCE_MODE  == true)
 const title_caption = (MAINTENANCE_MODE == true)
 	? 'メンテナンス中のため、現在サービスをご利用いただけません。'
 	: 'お探しのページは見つかりませんでした。'
+	const class_name = (MAINTENANCE_MODE == true)
+	? 'mb-10 mt-10 w-2/4 md:mb-[0px] md:w-1/3'
+	: 'mb-10 mt-10 w-2/4 md:mb-[72px] md:w-auto'
 export default async function ErrorPage() {
 	return (
 		<main className="flex h-[100vh] flex-col">
 			<MainHeader />
 			<div className="flex flex-1 flex-col scroll-auto">
 				<div className="flex flex-1 flex-col items-center justify-center">
-					<picture className="mb-10 mt-10 w-2/4 md:mb-[0px] md:w-1/3">
+					<picture className={class_name}>
 						<img src={getBasePath(`/image/common/${img_location}.png`)} alt={`img_location`} />
 					</picture>
 					<p className="px-4 text-sm font-bold md:text-[17px]">{title_caption}</p>
