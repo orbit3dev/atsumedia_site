@@ -6,6 +6,8 @@ import { getIsTopNewsList, getNewsListByGenreType, getNewsListByGenreTypeCategor
 import { CategoryType, News } from '@atsumedia/data';
 import Link from 'next/link';
 import React from 'react';
+import MyImage from '../../../(main)/_components/MyImage';
+
 
 interface ArticlesListPaginationNewProps {
   defaultData: News[];
@@ -70,6 +72,7 @@ export default function ArticlesListPaginationNew({
     params.set('page', newPage.toString());
     router.push(`?${params.toString()}`, { scroll: false });
   };
+  console.log(data)
 
 
   return (
@@ -81,11 +84,12 @@ export default function ArticlesListPaginationNew({
               <div className="relative w-full overflow-hidden rounded-lg pt-[56.5%] text-[0px] leading-none">
                 <div className="absolute bottom-0 left-0 right-0 top-0">
                   <picture>
-                    <img
-                      alt={item.titleMeta}
-                      src={item.image}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
+                    <MyImage
+                              className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105`}
+                              visibleByDefault={true}
+                              alt={item.titleMeta}
+                              path={item.image}
+                            />
                   </picture>
                 </div>
               </div>
