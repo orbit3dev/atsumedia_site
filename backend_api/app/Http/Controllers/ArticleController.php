@@ -127,7 +127,7 @@ class ArticleController extends Controller
         // ]);
         $genreTypeYearWeek = $request->genre_type_year_week;
         $genreType = isset($request->genre_type) ?  $request->genre_type : 'anime';
-        $weekNumber = date('W');
+        $weekNumber = date('W')-1;
         $year = date('Y');
         $genreTypeYearWeek = $year . $weekNumber;
         $limit = 6;
