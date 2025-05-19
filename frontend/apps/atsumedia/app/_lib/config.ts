@@ -2,7 +2,7 @@ export const rootHostname = 'https://www.at-s.com';
 export const rootMainHostname = 'https://main.d3lpyf0nhbpqh3.amplifyapp.com';
 export const rootDevHostname = 'https://dev.d3lpyf0nhbpqh3.amplifyapp.com';
 export const rootTestHostname = 'https://test.d3lpyf0nhbpqh3.amplifyapp.com';
-export const basePath = 'media';
+export const basePath = '/media';
 export const articlePath = 'articles';
 
 export const rootHost = () => {
@@ -18,9 +18,10 @@ export const rootHost = () => {
 
 export const getBasePath = (url: string) => {
 	if (basePath.length) {
-		const cleanBase = basePath.replace(/\/$/, '');
+		// const cleanBase = basePath.replace(/\/$/, '');
 		const cleanUrl = url.replace(/^\//, '');
-		return basePath.length ? `/${cleanBase}/${cleanUrl}` : url;
+		return `${basePath}/${cleanUrl}`;
+		// return basePath.length ? `/${cleanBase}/${cleanUrl}` : url;
 	}
 	return url;
 };
