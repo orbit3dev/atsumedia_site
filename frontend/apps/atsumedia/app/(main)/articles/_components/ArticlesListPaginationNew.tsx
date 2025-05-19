@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getIsTopNewsList, getNewsListByGenreType, getNewsListByGenreTypeCategory } from '../../lib';
-import { CategoryType, News } from '@atsumedia/data';
+import { CategoryType, getCategoryByType, News } from '@atsumedia/data';
 import Link from 'next/link';
 import React from 'react';
 import MyImage from '../../../(main)/_components/MyImage';
@@ -72,6 +72,7 @@ export default function ArticlesListPaginationNew({
     params.set('page', newPage.toString());
     router.push(`?${params.toString()}`, { scroll: false });
   };
+  console.log(data)
 
 
   return (
@@ -97,7 +98,7 @@ export default function ArticlesListPaginationNew({
                 style={{ backgroundColor: '#00b2bd' }}
               >
                 <span className="inline-block scale-50 text-[20px]">
-                  {item.genreType}
+                  {getCategoryByType(item.genreType).name}
                 </span>
               </p>
             </div>
