@@ -72,7 +72,6 @@ export default function ArticlesListPaginationNew({
     params.set('page', newPage.toString());
     router.push(`?${params.toString()}`, { scroll: false });
   };
-  console.log(data)
 
 
   return (
