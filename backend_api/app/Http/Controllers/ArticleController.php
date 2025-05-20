@@ -666,9 +666,10 @@ class ArticleController extends Controller
                 ];
                 unset($article->content_genre);
                 unset($article->content_subgenre);
+                $cleanUrl = trim($article->video_url, "\"'");
                 $article->video = [
                     'text' => $article->video_text,
-                    'url' => $article->video_url,
+                     'url' => $cleanUrl,
                 ];
 
                 $cleanedArticle = trim($article->summary, '"');

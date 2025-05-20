@@ -62,7 +62,6 @@ const DetailMain: React.FC<MovieDetailMainProps> = ({ data, tagType, photography
 	const [vodsShowFlag, setVodsShowFlag] = useState(false);
 
 	const [truncateTextFlag, setTruncateTextFlag] = useState(true);
-	console.log(data)
 	return (
 		<>
 			<MainInfo data={data} />
