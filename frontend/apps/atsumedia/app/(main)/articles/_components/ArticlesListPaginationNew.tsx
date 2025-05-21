@@ -72,6 +72,7 @@ export default function ArticlesListPaginationNew({
     params.set('page', newPage.toString());
     router.push(`?${params.toString()}`, { scroll: false });
   };
+
   return (
     <div className="mx-auto max-w-[1240px] px-4 pb-10">
       <div className="grid grid-cols-3 gap-x-4 gap-y-8 md:gap-x-6">
