@@ -72,12 +72,11 @@ export default function ArticlesListPaginationNew({
     params.set('page', newPage.toString());
     router.push(`?${params.toString()}`, { scroll: false });
   };
-
   return (
     <div className="mx-auto max-w-[1240px] px-4 pb-10">
       <div className="grid grid-cols-3 gap-x-4 gap-y-8 md:gap-x-6">
         {data.newsList.map((item: News) => (
-          <Link key={item.id} href={`${item.genreType}/${item.pathName}/`}>
+          <Link key={item.id} href={`articles/${item.genreType}/${item.pathName}/`}>
             <div className="relative w-full">
               <div className="relative w-full overflow-hidden rounded-lg pt-[56.5%] text-[0px] leading-none">
                 <div className="absolute bottom-0 left-0 right-0 top-0">

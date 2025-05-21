@@ -184,7 +184,6 @@ export const getNewsListByGenreTypeCategory = async (
   newsList: News[];
   totalPages: number;
 }> => {
-	console.log('genreType',genreType)
   const response = await fetch(
     process.env.NEXT_PUBLIC_API_URL + "/news-list-by-genre",
     {
