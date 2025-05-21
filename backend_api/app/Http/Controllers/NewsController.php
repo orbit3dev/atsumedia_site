@@ -40,7 +40,8 @@ class NewsController extends Controller
                 'path_name as pathName',
                 'author'
             )
-            ->orderBy('datetime', 'desc');
+            ->orderBy('datetime', 'desc')
+            ->orderBy('title', 'desc');
         if (!empty($genreType)) {
             $query->where('genre_type', $genreType);
         }
