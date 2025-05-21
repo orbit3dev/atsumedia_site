@@ -41,7 +41,7 @@ class NewsController extends Controller
                 'author'
             )
             ->orderBy('datetime', 'desc')
-            ->orderBy('title', 'desc');
+            ->orderBy('title', 'asc');
         if (!empty($genreType)) {
             $query->where('genre_type', $genreType);
         }
