@@ -72,6 +72,15 @@ export const getCategoryByType = (type: CategoryType): Category => {
 	throw new Error('Category not found');
 };
 
+export const getCategoryColorByType = (type: CategoryType): string => {
+	for (const value of categories) {
+		if (value.type === type) {
+			return value.color;
+		}
+	}
+	throw new Error('Category color not found');
+};
+
 export type KeyValue = {
 	key: string;
 	value: string;
