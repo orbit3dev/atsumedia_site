@@ -22,7 +22,6 @@ const MainInfo: React.FC<MovieMainInfoProps> = ({ data }) => {
 	// 	}
 	// }, [data.category]);
 	const vod = data.vods.length > 0 ? data.vods[0].vod : undefined;
-	console.log( data.productionCountry)
 	return (
 		<div className="px-1 pb-1">
 			<div className="px-2">
