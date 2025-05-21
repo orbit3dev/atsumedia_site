@@ -69,12 +69,15 @@ const Page = async ({ params }: PageProps) => {
 	if (data.genreType === 'movie' && data.tagType === 'root') {
 		if (data.childs && data.childs.length === 1) {
 			let firstChildPath = data.childs[0]?.pathName;
-			const pathTrimmer = data.pathName + '/';
-			if (firstChildPath.startsWith(pathTrimmer)) {
-				firstChildPath = firstChildPath.slice(pathTrimmer.length)
-			}
-			if (firstChildPath) {
-				return permanentRedirect(firstChildPath);
+			const currentPath = data.pathName;
+			const pathTrimmer = currentPath + '/';
+
+			if (firstChildPath && firstChildPath.startsWith(pathTrimmer)) {
+				const relativeChildPath = firstChildPath.slice(pathTrimmer.length);
+
+				if (relativeChildPath && currentPath !== firstChildPath) {
+					return permanentRedirect(firstChildPath);
+				}
 			}
 		}
 	}

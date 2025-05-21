@@ -75,7 +75,7 @@ export default function ArticlesListPaginationNew({
 
   return (
     <div className="mx-auto max-w-[1240px] px-4 pb-10">
-      <div className="grid grid-cols-3 gap-x-4 gap-y-8 md:gap-x-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8">
         {data.newsList.map((item: News) => (
           <Link key={item.id} href={`articles/${item.genreType}/${item.pathName}/`}>
             <div className="relative w-full">
