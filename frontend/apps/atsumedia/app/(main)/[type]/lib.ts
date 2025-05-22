@@ -1,13 +1,13 @@
-import {
-	ArticleSelectionSet,
-	BannerSelectionSet,
-	PersonSelectionSet,
-	TopicArticleSelectionSet,
-	TopicSelectionSet,
-} from '../type';
-import { Article, PageSetting, Person, TagType, CategoryType } from '@atsumedia/data';
-// import { reqResBasedClient, runWithAmplifyServerContext } from '@atsumedia/amplify-client';
-import { unstable_cache } from 'next/cache';
+// import {
+// 	ArticleSelectionSet,
+// 	BannerSelectionSet,
+// 	PersonSelectionSet,
+// 	TopicArticleSelectionSet,
+// 	TopicSelectionSet,
+// } from '../type';
+// import { Article, PageSetting, Person, TagType, CategoryType } from '@atsumedia/data';
+// // import { reqResBasedClient, runWithAmplifyServerContext } from '@atsumedia/amplify-client';
+// import { unstable_cache } from 'next/cache';
 
 
 // export const getCategoryRootList = unstable_cache(

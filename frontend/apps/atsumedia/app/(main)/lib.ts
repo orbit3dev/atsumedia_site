@@ -1,6 +1,5 @@
 
 import { Article, ArticleStatistic, CategoryType, News, PageSetting, Person, TagType } from '@atsumedia/data';
-import { unstable_cache } from 'next/cache';
 
 
 export const getPersonList = async () => {
