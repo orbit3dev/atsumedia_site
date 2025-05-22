@@ -12,7 +12,7 @@ interface ArticlesMainProps {
 	searchParams?: {
     page?: string;
   };
-	type: CategoryType;
+	type?: CategoryType;
 }
 
 async function getNewsData(isCategory: boolean, genreType: string, limit: number) {
@@ -40,7 +40,7 @@ const ArticlesList: React.FC<ArticlesMainProps> = async ({
   searchParams,
   type 
 }) => {
-	const effectiveGenreType = type || genreType;
+	const effectiveGenreType = type || genreType || '';
   const page = parseInt(searchParams?.page || '1', 10);
   const { newsList, totalPages } = await getNewsData(
     isCategory, 
