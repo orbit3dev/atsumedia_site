@@ -74,4 +74,4 @@ export type articleListType = {
 // 	return <NotFound />;
 // };
 
-export default Page;
+// export default Page;

@@ -26,7 +26,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 	const protocol = isLocal ? 'http' : 'https';
 	const baseUrl = `${protocol}://${host}`;
 	const imagePath = '/public/anime/dummy_thumbnail.png';
-	console.log('baseUrl',baseUrl)
 
 	return {
 		title: data?.titleMeta,

@@ -384,7 +384,6 @@ export default class LinkTool {
 		this.showProgress();
 		this.data = { link: url };
 
-		console.log(url);
 		try {
 			const response = await fetch(this.config.endpoint + '?url=' + url, {
 				headers: this.config.headers,

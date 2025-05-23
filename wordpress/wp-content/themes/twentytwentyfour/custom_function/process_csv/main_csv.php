@@ -370,7 +370,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
 
     //Delete double data
     $wpdb->query(
-            "DELETE FROM at_article_cast WHERE id IN (SELECT id FROM (
+        "DELETE FROM at_article_cast WHERE id IN (SELECT id FROM (
                 SELECT id, ROW_NUMBER() OVER (
                 PARTITION BY article_id, person_id 
                 ORDER BY id
@@ -380,7 +380,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
         WHERE rn > 1);"
     );
     $wpdb->query(
-            "DELETE FROM at_article_author WHERE id IN (SELECT id FROM (
+        "DELETE FROM at_article_author WHERE id IN (SELECT id FROM (
                 SELECT id, ROW_NUMBER() OVER (
                 PARTITION BY article_id, person_id 
                 ORDER BY id
@@ -390,7 +390,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
         WHERE rn > 1);"
     );
     $wpdb->query(
-            "DELETE FROM at_article_director WHERE id IN (SELECT id FROM (
+        "DELETE FROM at_article_director WHERE id IN (SELECT id FROM (
                 SELECT id, ROW_NUMBER() OVER (
                 PARTITION BY article_id, person_id 
                 ORDER BY id
@@ -400,7 +400,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
         WHERE rn > 1);"
     );
     $wpdb->query(
-            "DELETE FROM at_article_producer WHERE id IN (SELECT id FROM (
+        "DELETE FROM at_article_producer WHERE id IN (SELECT id FROM (
                 SELECT id, ROW_NUMBER() OVER (
                 PARTITION BY article_id, person_id 
                 ORDER BY id
@@ -410,7 +410,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
         WHERE rn > 1);"
     );
     $wpdb->query(
-            "DELETE FROM at_article_screenwriter WHERE id IN (SELECT id FROM (
+        "DELETE FROM at_article_screenwriter WHERE id IN (SELECT id FROM (
                 SELECT id, ROW_NUMBER() OVER (
                 PARTITION BY article_id, person_id 
                 ORDER BY id
@@ -420,7 +420,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
         WHERE rn > 1);"
     );
     $wpdb->query(
-            "DELETE FROM at_article_production WHERE id IN (SELECT id FROM (
+        "DELETE FROM at_article_production WHERE id IN (SELECT id FROM (
                 SELECT id, ROW_NUMBER() OVER (
                 PARTITION BY article_id, production_id 
                 ORDER BY id
@@ -430,7 +430,7 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
         WHERE rn > 1);"
     );
     $wpdb->query(
-            "DELETE FROM at_article_vod WHERE id IN (SELECT id FROM (
+        "DELETE FROM at_article_vod WHERE id IN (SELECT id FROM (
                 SELECT id, ROW_NUMBER() OVER (
                 PARTITION BY article_id, vod_id 
                 ORDER BY id
@@ -438,6 +438,17 @@ function process_article_csv($target_input, $type_upload,  $limitRows = 17317, $
             FROM at_article_vod
         ) AS ranked
         WHERE rn > 1);"
+    );
+
+    $wpdb->query(
+        "UPDATE at_article b
+        JOIN at_article a 
+        ON a.title = b.title 
+        AND a.tag_type_id = 1 
+        AND a.genre_type_id = b.genre_type_id
+        SET b.parent_id = a.id
+        WHERE b.tag_type_id = 2
+        AND (b.parent_id IS NULL OR b.parent_id != a.id);"
     );
     file_put_contents($progress_file, json_encode([
         "status" => "done",
