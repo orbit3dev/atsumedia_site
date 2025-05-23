@@ -19,11 +19,17 @@ function fetch_content_data()
     $totalRecords = $wpdb->get_var("SELECT COUNT(*) FROM at_news where id=" . $current_user->ID);
     // Query example (adjust based on your DB structure)
     $current_user = wp_get_current_user();
+    $is_admin = in_array('administrator', $current_user->roles);
+    $where_clause = "is_deleted = 0";
+    if (!$is_admin) {
+        $where_clause .= " AND id_author_create = " . intval($current_user->ID);
+    }
     $results = $wpdb->get_results(
         "SELECT at_news.*, 
         path_name AS slug, 
         description_meta AS synopsis
-        FROM at_news where id_author_create = " .  $current_user->ID . "
+        FROM at_news 
+        WHERE $where_clause
         and is_deleted = 0
         ORDER BY created_at DESC         
         LIMIT $start, $length",
@@ -149,7 +155,8 @@ function change_status_activation()
     exit;
 }
 
-function delete_news_by_id() {
+function delete_news_by_id()
+{
     global $wpdb;
 
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
