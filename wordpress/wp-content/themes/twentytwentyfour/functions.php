@@ -212,6 +212,14 @@ add_action('init', 'twentytwentyfour_pattern_categories');
 
 // Starts Here
 
+function allow_contributor_uploads() {
+    $role = get_role('contributor');
+    if ($role && !$role->has_cap('upload_files')) {
+        $role->add_cap('upload_files');
+    }
+}
+add_action('admin_init', 'allow_contributor_uploads');
+
 function remove_admin_menus()
 {
 	remove_menu_page('edit.php'); // Posts
