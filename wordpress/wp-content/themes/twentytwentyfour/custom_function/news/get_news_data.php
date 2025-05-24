@@ -16,7 +16,7 @@ function fetch_content_data()
     $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
 
     // Get total records (before filtering)
-    $totalRecords = $wpdb->get_var("SELECT COUNT(*) FROM at_news where id=" . $current_user->ID);
+    
     // Query example (adjust based on your DB structure)
     $current_user = wp_get_current_user();
     $is_admin = in_array('administrator', $current_user->roles);
@@ -24,6 +24,7 @@ function fetch_content_data()
     if (!$is_admin) {
         $where_clause .= " AND id_author_create = " . intval($current_user->ID);
     }
+    $totalRecords = $wpdb->get_var("SELECT COUNT(*) FROM at_news where id=" . $where_clause);
     $results = $wpdb->get_results(
         "SELECT at_news.*, 
         path_name AS slug, 

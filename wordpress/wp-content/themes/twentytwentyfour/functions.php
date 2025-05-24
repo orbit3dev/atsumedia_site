@@ -1,5 +1,4 @@
 <?php
-echo $undefined_variable;
 
 /**
  * Twenty Twenty-Four functions and definitions
